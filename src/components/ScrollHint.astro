@@ -1,0 +1,65 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {}
+
+const { class: className, ...attrs } = Astro.props;
+---
+
+<!-- Trigger: 3s CSS animation on page load, no mouse interaction -->
+<div class:list={['scroll-hint', className]} {...attrs}>
+  <span><slot>Scroll</slot></span>
+</div>
+
+<style>
+  .scroll-hint {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 32px;
+    border-radius: 30px;
+    border: 1.5px solid var(--color-white);
+    background: transparent;
+    position: relative;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .scroll-hint::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: var(--color-white);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: fill 1s ease-out forwards;
+  }
+
+  span {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+    color: var(--color-white);
+    animation: invert 1s ease-out forwards;
+  }
+
+  @keyframes fill {
+    to {
+      width: 300%;
+      height: 600%;
+    }
+  }
+
+  @keyframes invert {
+    to {
+      color: var(--color-black);
+    }
+  }
+</style>
