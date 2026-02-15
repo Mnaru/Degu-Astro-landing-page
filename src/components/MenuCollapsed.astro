@@ -1,0 +1,135 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { spring } from 'motion';
+
+interface Props extends HTMLAttributes<'div'> {}
+
+const { class: className, ...attrs } = Astro.props;
+const springSmooth = spring(0.25, 0.15);
+const springSnappy = spring(0.15, 0);
+const springFast = spring(0.08, 0);
+---
+
+<!-- Test trigger: click to cycle states. Will be replaced by scroll-based logic. -->
+<div class:list={['menu-collapsed', 'state-home', 'sub-0', className]} {...attrs}>
+  <div class="text-wrapper">
+    <div class="text-inner">
+      <span>Contact</span>
+      <span>Work</span>
+      <span>Home</span>
+    </div>
+  </div>
+  <div class="subsection-wrapper">
+    <div class="subsection-inner">
+      <span>Key Visuals & OOH</span>
+      <span>Product photography</span>
+      <span>Social media assets</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const el = document.querySelector('.menu-collapsed') as HTMLElement;
+  const all = ['state-home', 'state-work', 'state-contact', 'sub-0', 'sub-1', 'sub-2'];
+  const steps: string[][] = [
+    ['state-home', 'sub-0'],
+    ['state-work', 'sub-0'],
+    ['state-work', 'sub-1'],
+    ['state-work', 'sub-2'],
+    ['state-contact', 'sub-0'],
+  ];
+  let i = 0;
+  el?.addEventListener('click', () => {
+    i = (i + 1) % steps.length;
+    el.classList.remove(...all);
+    el.classList.add(...steps[i]);
+  });
+</script>
+
+<style define:vars={{ springSmooth, springSnappy, springFast }}>
+  .menu-collapsed {
+    display: inline-flex;
+    align-items: center;
+    background: var(--color-white);
+    border-radius: 100px;
+    padding: 32px 42px;
+    cursor: pointer;
+    width: 148px;
+    transition: width var(--springSmooth);
+  }
+
+  .state-work.menu-collapsed {
+    width: 540px;
+    transition: width var(--springSmooth);
+  }
+
+  @media (max-width: 596px) {
+    .state-work.menu-collapsed {
+      width: calc(100vw - 56px);
+    }
+  }
+
+  .text-wrapper,
+  .subsection-wrapper {
+    overflow: hidden;
+    height: 20px;
+  }
+
+  /* Contraction: text out fast so it clears before width finishes */
+  .text-inner {
+    transition: transform var(--springSnappy);
+  }
+
+  .subsection-inner {
+    visibility: hidden;
+    opacity: 0;
+    transition: none;
+  }
+
+  /* Expansion: text in at a relaxed pace */
+  .state-work .text-inner {
+    transition: transform var(--springSnappy);
+  }
+
+  .state-work .subsection-inner {
+    visibility: visible;
+    opacity: 1;
+    transition: transform var(--springSnappy), opacity var(--springSmooth);
+  }
+
+  .text-inner span,
+  .subsection-inner span {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+    color: var(--color-black);
+    white-space: nowrap;
+  }
+
+  /* Text slide: reversed stack so new enters from top, old exits bottom */
+  .state-home .text-inner { transform: translateY(-40px); }
+  .state-work .text-inner { transform: translateY(-20px); }
+  .state-contact .text-inner { transform: translateY(0); }
+
+  /* Subsection: hidden by default, expands in work state */
+  .subsection-wrapper {
+    max-width: 0;
+    transition: max-width var(--springSmooth);
+  }
+
+  .state-work .subsection-wrapper {
+    max-width: 280px;
+    margin-left: auto;
+    transition: max-width var(--springSmooth);
+  }
+
+  .subsection-inner {
+    padding-left: 16px;
+  }
+
+  .sub-0 .subsection-inner { transform: translateY(-40px); }
+  .sub-1 .subsection-inner { transform: translateY(-20px); }
+  .sub-2 .subsection-inner { transform: translateY(0); }
+</style>
