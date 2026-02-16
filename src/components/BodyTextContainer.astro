@@ -15,14 +15,14 @@ const { text, class: className, ...attrs } = Astro.props;
 
 <style>
   .body-text-container {
-    max-width: min(11em, 30vw);
+    max-width: min(11em, 34vw);
   }
 
   p {
     font-family: var(--font-body);
-    font-size: 16px;
+    font-size: clamp(12px, 4.2vw, 16px);
     font-weight: 400;
-    line-height: 20px;
+    line-height: 120%;
     color: var(--color-text);
   }
 </style>

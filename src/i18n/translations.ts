@@ -48,12 +48,12 @@ export const translations = {
     // TODO: Replace with actual Lithuanian translations
     meta: {
       title: 'Degu Studio',
-      description: 'Šviežia vizualika jūsų reklamai ir socialiniams tinklams',
+      description: 'Vizualika reklamai ir socialiniams tinklams',
     },
     intro: {
       header1: 'DEGU',
       header2: 'STUDIO',
-      body: 'Šviežia vizualika jūsų reklamai ir socialiniams tinklams.',
+      body: 'Vizualika reklamai ir socialiniams tinklams.',
       scrollHint: 'Slinkite',
     },
     work: {

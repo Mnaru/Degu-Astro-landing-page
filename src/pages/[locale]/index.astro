@@ -60,7 +60,7 @@ const i18n = t(locale);
   .studio-row {
     display: flex;
     align-items: center;
-    gap: min(26px, 3vw);
+    gap: min(26px, 2vw);
   }
 
   .intro-body {
@@ -81,4 +81,9 @@ const i18n = t(locale);
     pointer-events: none;
   }
 
+  @media (max-width: 768px) {
+    .hero {
+      padding: 32.8vh 1rem 2rem;
+    }
+  }
 </style>
