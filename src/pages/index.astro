@@ -1,3 +1,75 @@
 ---
-return Astro.redirect('/en/');
+import BaseLayout from '@layouts/BaseLayout.astro';
+import BodyTextContainer from '@components/BodyTextContainer.astro';
+import DeguLogo from '@components/DeguLogo.astro';
+import HeaderContainer from '@components/HeaderContainer.astro';
+import LanguageSwitcher from '@components/LanguageSwitcher.astro';
+import MenuCollapsed from '@components/MenuCollapsed.astro';
+import ScrollHint from '@components/ScrollHint.astro';
+
+import { t } from '@i18n/utils';
+
+const locale = 'lt';
+const i18n = t(locale);
 ---
+
+<BaseLayout title={i18n.meta.title} description={i18n.meta.description} locale={locale}>
+  <DeguLogo />
+  <LanguageSwitcher currentLocale={locale} />
+
+  <main class="hero">
+    <div class="intro-block">
+      <HeaderContainer text={i18n.intro.header1} />
+      <div class="studio-row">
+        <HeaderContainer text={i18n.intro.header2} />
+        <BodyTextContainer text={i18n.intro.body} class="intro-body" />
+      </div>
+    </div>
+    <ScrollHint class="scroll-hint-pos" />
+    <div class="menu-wrapper">
+      <MenuCollapsed />
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100dvh;
+    padding: 32.8vh 2rem 2rem;
+  }
+
+  .intro-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .studio-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .intro-body {
+    text-align: left;
+  }
+
+  .scroll-hint-pos {
+    margin-top: 20px;
+  }
+
+  .menu-wrapper {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>

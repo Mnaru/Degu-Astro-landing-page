@@ -1,12 +1,12 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://degu.studio',
+  site: 'https://degu.lt',
   i18n: {
-    defaultLocale: 'en',
+    defaultLocale: 'lt',
     locales: ['en', 'lt'],
     routing: {
-      prefixDefaultLocale: true,
+      prefixDefaultLocale: false,
     },
   },
 });
