@@ -1,0 +1,64 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import { getLocalizedPath } from '@i18n/utils';
+
+interface Props extends HTMLAttributes<'nav'> {
+  currentLocale: string;
+  class?: string;
+}
+
+const { currentLocale, class: className, ...attrs } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<nav class:list={['lang-switcher', className]} aria-label="Language" {...attrs}>
+  <a
+    href={getLocalizedPath(currentPath, 'en')}
+    class:list={[{ active: currentLocale === 'en' }]}
+    aria-current={currentLocale === 'en' ? 'page' : undefined}
+  >EN</a>
+  <span class="separator">|</span>
+  <a
+    href={getLocalizedPath(currentPath, 'lt')}
+    class:list={[{ active: currentLocale === 'lt' }]}
+    aria-current={currentLocale === 'lt' ? 'page' : undefined}
+  >LT</a>
+</nav>
+
+<style>
+  .lang-switcher {
+    position: fixed;
+    top: 2rem;
+    right: 5rem;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  a {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text);
+    text-decoration: none;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+
+  a:hover {
+    opacity: 0.8;
+  }
+
+  a.active {
+    opacity: 1;
+  }
+
+  .separator {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-text);
+    opacity: 0.3;
+  }
+</style>

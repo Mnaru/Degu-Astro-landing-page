@@ -1,0 +1,28 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  text: string;
+  class?: string;
+}
+
+const { text, class: className, ...attrs } = Astro.props;
+---
+
+<div class:list={['body-text-container', className]} {...attrs}>
+  <p set:html={text} />
+</div>
+
+<style>
+  .body-text-container {
+    max-width: 28ch;
+  }
+
+  p {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20px;
+    color: var(--color-text);
+  }
+</style>

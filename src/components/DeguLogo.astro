@@ -1,0 +1,28 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  class?: string;
+}
+
+const { class: className, ...attrs } = Astro.props;
+---
+
+<div class:list={['degu-logo', className]} {...attrs}>
+  <img src="/favicon.svg" alt="Degu Studio" width="36" height="36" />
+</div>
+
+<style>
+  .degu-logo {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 100;
+  }
+
+  img {
+    display: block;
+    width: 36px;
+    height: 36px;
+  }
+</style>

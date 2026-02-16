@@ -1,8 +1,12 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  prefetch: {
-    prefetchAll: false,
-    defaultStrategy: 'hover',
+  site: 'https://degu.studio',
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'lt'],
+    routing: {
+      prefixDefaultLocale: true,
+    },
   },
 });

@@ -1,0 +1,33 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  text: string;
+  class?: string;
+}
+
+const { text, class: className, ...attrs } = Astro.props;
+---
+
+<div class:list={['header-container', className]} {...attrs}>
+  <span class="header-text">{text}</span>
+</div>
+
+<style>
+  .header-container {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+  }
+
+  .header-text {
+    font-family: var(--font-display);
+    font-size: 12.1vh;
+    font-weight: 400;
+    line-height: 0.93;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+</style>
