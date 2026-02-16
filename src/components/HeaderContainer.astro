@@ -22,7 +22,7 @@ const { text, class: className, ...attrs } = Astro.props;
 
   .header-text {
     font-family: var(--font-display);
-    font-size: 12.1vh;
+    font-size: min(12.1vh, 18vw);
     font-weight: 400;
     line-height: 0.93;
     text-transform: uppercase;

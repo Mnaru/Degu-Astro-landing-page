@@ -10,12 +10,12 @@ const { text, class: className, ...attrs } = Astro.props;
 ---
 
 <div class:list={['body-text-container', className]} {...attrs}>
-  <p set:html={text} />
+  <p>{text}</p>
 </div>
 
 <style>
   .body-text-container {
-    max-width: 28ch;
+    max-width: min(11em, 30vw);
   }
 
   p {

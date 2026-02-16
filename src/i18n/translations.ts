@@ -7,7 +7,7 @@ export const translations = {
     intro: {
       header1: 'DEGU',
       header2: 'STUDIO',
-      body: 'Fresh visuals to feed<br>your ads & socials.',
+      body: 'Fresh visuals to feed your ads & socials.',
       scrollHint: 'Scroll',
     },
     work: {
@@ -53,7 +53,7 @@ export const translations = {
     intro: {
       header1: 'DEGU',
       header2: 'STUDIO',
-      body: 'Šviežia vizualika jūsų reklamai<br>ir socialiniams tinklams.',
+      body: 'Šviežia vizualika jūsų reklamai ir socialiniams tinklams.',
       scrollHint: 'Slinkite',
     },
     work: {
