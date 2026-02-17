@@ -36,6 +36,9 @@ const { class: className, ...attrs } = Astro.props;
     background: var(--color-white);
     border-radius: 50%;
     transform: translate(-50%, -50%);
+  }
+
+  .scroll-hint.animate::before {
     animation: fill 1s ease-out forwards;
   }
 
@@ -47,6 +50,9 @@ const { class: className, ...attrs } = Astro.props;
     font-weight: 500;
     line-height: 18px;
     color: var(--color-white);
+  }
+
+  .scroll-hint.animate span {
     animation: invert 1s ease-out forwards;
   }
 

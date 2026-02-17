@@ -26,19 +26,24 @@ const i18n = t(locale);
   <LanguageSwitcher currentLocale={locale} />
 
   <main class="hero">
-    <div class="intro-block">
-      <HeaderContainer text={i18n.intro.header1} />
+    <div class="intro-block" data-intro="intro-block">
+      <HeaderContainer text={i18n.intro.header1} data-intro="header-degu" />
       <div class="studio-row">
-        <HeaderContainer text={i18n.intro.header2} />
-        <BodyTextContainer text={i18n.intro.body} class="intro-body" />
+        <HeaderContainer text={i18n.intro.header2} data-intro="header-studio" />
+        <BodyTextContainer text={i18n.intro.body} class="intro-body" data-intro="body-text" />
       </div>
     </div>
-    <ScrollHint class="scroll-hint-pos" />
+    <ScrollHint class="scroll-hint-pos" data-intro="scroll-hint" />
     <div class="menu-wrapper">
       <MenuCollapsed />
     </div>
   </main>
 </BaseLayout>
+
+<script>
+  import { initIntroAnimation } from '@lib/animations/intro';
+  initIntroAnimation();
+</script>
 
 <style>
   .hero {
@@ -79,6 +84,11 @@ const i18n = t(locale);
     z-index: 100;
     opacity: 0;
     pointer-events: none;
+  }
+
+  [data-intro="intro-block"],
+  [data-intro="scroll-hint"] {
+    visibility: hidden;
   }
 
   @media (max-width: 768px) {
