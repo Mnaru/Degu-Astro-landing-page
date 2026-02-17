@@ -1,0 +1,32 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'section'> {
+  class?: string;
+}
+
+const { class: className, ...attrs } = Astro.props;
+---
+
+<section class:list={['page-scroll-desktop', className]} {...attrs}>
+  <div class="page-scroll-track">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .page-scroll-desktop {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-scroll-track {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+  }
+
+  .page-scroll-track > :global(*) {
+    flex-shrink: 0;
+  }
+</style>

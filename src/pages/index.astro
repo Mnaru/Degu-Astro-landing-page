@@ -5,9 +5,15 @@ import DeguLogo from '@components/DeguLogo.astro';
 import HeaderContainer from '@components/HeaderContainer.astro';
 import LanguageSwitcher from '@components/LanguageSwitcher.astro';
 import MenuCollapsed from '@components/MenuCollapsed.astro';
+import PageDesktop from '@components/PageDesktop.astro';
+import PageScrollDesktop from '@components/PageScrollDesktop.astro';
 import ScrollHint from '@components/ScrollHint.astro';
 
 import { t } from '@i18n/utils';
+
+import socialMediaHero from '@assets/images/pages/social-media-hero.png';
+import productPhotographyHero from '@assets/images/pages/product-photography-hero.png';
+import keyVisualsHero from '@assets/images/pages/key-visuals-hero.png';
 
 const locale = 'lt';
 const i18n = t(locale);
@@ -26,10 +32,28 @@ const i18n = t(locale);
       </div>
     </div>
     <ScrollHint class="scroll-hint-pos" data-intro="scroll-hint" />
-    <div class="gallery-placeholder" data-intro="gallery-placeholder"></div>
     <div class="menu-wrapper">
       <MenuCollapsed />
     </div>
+    <PageScrollDesktop data-scroll="page-scroll">
+      <PageDesktop
+        imageSrc={socialMediaHero}
+        imageAlt={i18n.work.pages.socialMedia.imageAlt}
+        galleryId="social-media"
+        loading="eager"
+        data-intro="gallery-placeholder"
+      />
+      <PageDesktop
+        imageSrc={productPhotographyHero}
+        imageAlt={i18n.work.pages.productPhotography.imageAlt}
+        galleryId="product-photography"
+      />
+      <PageDesktop
+        imageSrc={keyVisualsHero}
+        imageAlt={i18n.work.pages.keyVisuals.imageAlt}
+        galleryId="key-visuals"
+      />
+    </PageScrollDesktop>
   </main>
 </BaseLayout>
 
@@ -74,14 +98,6 @@ const i18n = t(locale);
     margin-top: 20px;
   }
 
-  .gallery-placeholder {
-    position: absolute;
-    inset: 0;
-    background: #333;
-    z-index: 1;
-    transform-origin: center center;
-  }
-
   .menu-wrapper {
     position: fixed;
     bottom: 2rem;
@@ -90,6 +106,13 @@ const i18n = t(locale);
     z-index: 100;
     opacity: 0;
     pointer-events: none;
+  }
+
+  .hero :global(.page-scroll-desktop) {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    visibility: hidden;
   }
 
   [data-intro="intro-block"],

@@ -18,18 +18,22 @@ import {
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Intro animation — two phases.
+ * Intro animation — two phases, one ScrollTrigger.
  *
  * Phase A (time-based, on page load):
- *   DEGU + STUDIO centred → STUDIO slides left → body text fades in → scroll hint.
- *   End state matches static CSS layout; inline styles are cleared.
+ *   DEGU + STUDIO centred -> STUDIO slides left -> body text fades in -> scroll hint.
  *
  * Phase B (scroll-driven, after Phase A):
- *   Headers scale up → body text exits right → DEGU exits left, STUDIO exits right →
- *   gallery placeholder revealed at ~60 % and scales to fill the viewport.
+ *   Part 1 — Intro-to-gallery transition:
+ *     Headers scale up, gallery fades in at 60% and scales to 100%,
+ *     headers exit left/right.
+ *   Part 2 — Horizontal page scroll (desktop only):
+ *     Track translates left, scrolling through gallery pages.
+ *
+ * Single ScrollTrigger pins .hero for the entire sequence, eliminating
+ * the gap that two separate ScrollTriggers would create.
  */
 export function initIntroAnimation(): void {
-  // Respect prefers-reduced-motion
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     gsap.set('[data-intro="intro-block"]', { visibility: 'visible' });
     gsap.set('[data-intro="scroll-hint"]', { visibility: 'visible' });
@@ -53,11 +57,12 @@ export function initIntroAnimation(): void {
     return;
   }
 
-  // The .studio-row is the flex parent that holds STUDIO + BodyTextContainer.
   const studioRow = headerStudio.parentElement as HTMLElement;
-
-  // Capture the CSS-defined gap before we override it
   const finalGap = getComputedStyle(studioRow).getPropertyValue('gap') || '0px';
+
+  // Page scroll track (inside hero via CSS position: absolute)
+  const track = hero.querySelector<HTMLElement>('.page-scroll-track');
+  const isDesktop = window.innerWidth > 768;
 
   // ---- Set initial state ----
   gsap.set(bodyText, {
@@ -69,7 +74,18 @@ export function initIntroAnimation(): void {
   });
   gsap.set(studioRow, { gap: 0 });
   gsap.set(scrollHint, { opacity: 0, y: -INTRO_SCROLL_HINT_OFFSET });
-  gsap.set(galleryPlaceholder, { scale: 0.6, opacity: 0 });
+  gsap.set(galleryPlaceholder, {
+    scale: 0.6,
+    opacity: 0,
+    visibility: 'visible',
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    zIndex: 1,
+    transformOrigin: 'center center',
+  });
 
   // Reveal elements now that initial positions are set (prevents FOUC)
   gsap.set(introBlock, { visibility: 'visible' });
@@ -82,13 +98,6 @@ export function initIntroAnimation(): void {
     delay: INTRO_INITIAL_PAUSE,
     defaults: { ease: INTRO_SLIDE_EASE },
     onComplete() {
-      // Clear animated inline styles so CSS takes over.
-      // Keep visibility: visible on introBlock and scrollHint.
-      gsap.set(bodyText, { clearProps: 'opacity,transform,width,height,overflow' });
-      gsap.set(studioRow, { clearProps: 'gap' });
-      gsap.set(scrollHint, { clearProps: 'opacity,transform' });
-
-      // Initialise Phase B now that Phase A is done
       initPhaseB();
     },
   });
@@ -102,9 +111,8 @@ export function initIntroAnimation(): void {
   phaseA.to(studioRow, {
     gap: finalGap,
     duration: INTRO_SLIDE_DURATION,
-  }, '<'); // same time
+  }, '<');
 
-  // Snap height to auto now that width is at its final value.
   phaseA.set(bodyText, { height: 'auto' });
 
   // 2. BodyTextContainer fades in and slides from the right
@@ -130,6 +138,7 @@ export function initIntroAnimation(): void {
   // ==================================================================
   function initPhaseB(): void {
     hero!.style.overflow = 'hidden';
+    hero!.style.zIndex = '2';
 
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -152,7 +161,6 @@ export function initIntroAnimation(): void {
     const scaleRatio = targetHeight / deguRect.height;
     const targetFontSize = currentFontSize * scaleRatio;
 
-    // Target top positions
     const studioTargetTop = padding + targetHeight + gapBetween;
 
     // Exit offsets: clear viewport at the grown size
@@ -162,8 +170,6 @@ export function initIntroAnimation(): void {
     const bodyExitX = vw * 1.5;
 
     // Fix ALL animated elements in place before taking headers out of flow.
-    // This prevents BodyText and ScrollHint from shifting when headers
-    // switch to position: fixed.
     gsap.set(headerDegu, {
       position: 'fixed',
       left: deguRect.left,
@@ -190,33 +196,110 @@ export function initIntroAnimation(): void {
       margin: 0,
     });
 
-    // Hint browser about upcoming font-size changes
     gsap.set([deguText, studioText], { willChange: 'font-size' });
+
+    // ---- Scroll distances ----
+    // The intro tweens occupy timeline time 0–0.85.
+    // Horizontal scroll (desktop only) is appended after.
+    const INTRO_TIMELINE_END = 0.85;
+    const introScrollDist = INTRO_SCROLL_DISTANCE * vh;
+    const pageCount = track?.children.length ?? 0;
+    const hScrollDist = isDesktop && track && pageCount > 1
+      ? (pageCount - 1) * vw
+      : 0;
+    const totalScrollDist = introScrollDist + hScrollDist;
+
+    // Horizontal scroll timeline duration, scaled so the ratio of
+    // timeline-time to scroll-pixels stays consistent with the intro.
+    const hScrollDuration = hScrollDist > 0
+      ? INTRO_TIMELINE_END * (hScrollDist / introScrollDist)
+      : 0;
+
+    // Progress boundary between intro and horizontal scroll
+    const introEnd = introScrollDist / totalScrollDist;
+
+    // Track gallery-placeholder state for forward/reverse transitions
+    let galleryInFlow = false;
 
     const phaseB = gsap.timeline({
       scrollTrigger: {
         trigger: hero,
         start: 'top top',
-        end: () => `+=${INTRO_SCROLL_DISTANCE * window.innerHeight}`,
+        end: () => `+=${totalScrollDist}`,
         pin: true,
         scrub: true,
         snap: {
-          snapTo: (progress: number) => (progress > 0.5 ? 1 : progress),
+          snapTo: (progress: number) => {
+            // Snap past intro if user scrolls > 50% of intro portion
+            if (hScrollDist > 0) {
+              if (progress > introEnd * 0.5 && progress <= introEnd) {
+                return introEnd;
+              }
+              return progress;
+            }
+            // No horizontal scroll: original snap behavior
+            return progress > 0.5 ? 1 : progress;
+          },
           duration: INTRO_SNAP_DURATION,
         },
-        onLeave: () => gsap.set([deguText, studioText], { willChange: 'auto' }),
-        onEnterBack: () => gsap.set([deguText, studioText], { willChange: 'font-size' }),
+        onUpdate: (self) => {
+          // Switch gallery-placeholder between position:fixed (intro)
+          // and normal track flow (horizontal scroll).
+          if (!track || !isDesktop || hScrollDist === 0) return;
+
+          const shouldBeInFlow = self.progress >= introEnd;
+
+          if (shouldBeInFlow && !galleryInFlow) {
+            // Gallery enters track flow for horizontal scrolling.
+            // Only clear position-related props; scale/opacity are
+            // managed by the Phase B timeline tweens.
+            gsap.set(galleryPlaceholder, {
+              clearProps: 'position,top,left,width,height,zIndex,transformOrigin,visibility',
+            });
+            // Show section so all pages are visible during horizontal scroll
+            const sec = hero!.querySelector<HTMLElement>('[data-scroll="page-scroll"]');
+            if (sec) gsap.set(sec, { visibility: 'visible' });
+            galleryInFlow = true;
+          } else if (!shouldBeInFlow && galleryInFlow) {
+            // Re-fix gallery for intro reverse scroll.
+            // Scale/opacity are managed by timeline — don't override.
+            gsap.set(galleryPlaceholder, {
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              zIndex: 1,
+              transformOrigin: 'center center',
+              visibility: 'visible',
+            });
+            // Hide section again so pages 2, 3 aren't visible behind intro
+            const sec = hero!.querySelector<HTMLElement>('[data-scroll="page-scroll"]');
+            if (sec) gsap.set(sec, { visibility: 'hidden' });
+            galleryInFlow = false;
+          }
+        },
+        onLeave: () => {
+          gsap.set(hero, { visibility: 'hidden' });
+          gsap.set([deguText, studioText], { willChange: 'auto' });
+        },
+        onEnterBack: () => {
+          gsap.set(hero, { visibility: 'visible' });
+          gsap.set([deguText, studioText], { willChange: 'font-size' });
+        },
       },
     });
 
-    // --- 0.00–0.10: ScrollHint fades out ---
+    // ---- Part 1: Intro animations (time 0 – 0.85) ----
+
+    // ScrollHint fades out
     phaseB.to(scrollHint, {
       opacity: 0,
       y: 20,
       duration: 0.1,
     }, 0);
 
-    // --- 0.00–0.40: Headers grow (fontSize) + reposition to top-left ---
+    // Headers grow (fontSize) + reposition to top-left
     phaseB.to(deguText, {
       fontSize: targetFontSize,
       duration: 0.4,
@@ -237,7 +320,7 @@ export function initIntroAnimation(): void {
       duration: 0.4,
     }, 0);
 
-    // --- 0.00–0.30: BodyText exits right ---
+    // BodyText exits right
     phaseB.to(bodyText, {
       x: bodyExitX,
       opacity: 0,
@@ -245,28 +328,37 @@ export function initIntroAnimation(): void {
       duration: 0.3,
     }, 0);
 
-    // --- 0.40–0.65: DEGU exits left ---
+    // DEGU exits left
     phaseB.to(headerDegu, {
       x: deguExitX,
       duration: 0.25,
     }, 0.4);
 
-    // --- 0.40–0.65: STUDIO exits right ---
+    // STUDIO exits right
     phaseB.to(headerStudio, {
       x: studioExitX,
       duration: 0.25,
     }, 0.4);
 
-    // --- 0.35–0.45: Gallery placeholder fades in at 60 % scale ---
+    // Gallery placeholder fades in at 60% scale
     phaseB.to(galleryPlaceholder, {
       opacity: 1,
       duration: 0.1,
     }, 0.35);
 
-    // --- 0.45–0.85: Gallery scales from 60 % to 100 % ---
+    // Gallery scales from 60% to 100%
     phaseB.to(galleryPlaceholder, {
       scale: 1,
       duration: 0.4,
     }, 0.45);
+
+    // ---- Part 2: Horizontal page scroll (time 0.85 onward) ----
+    if (isDesktop && track && hScrollDist > 0) {
+      phaseB.to(track, {
+        x: -hScrollDist,
+        ease: 'none',
+        duration: hScrollDuration,
+      }, INTRO_TIMELINE_END);
+    }
   }
 }
