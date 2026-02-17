@@ -26,6 +26,7 @@ const i18n = t(locale);
       </div>
     </div>
     <ScrollHint class="scroll-hint-pos" data-intro="scroll-hint" />
+    <div class="gallery-placeholder" data-intro="gallery-placeholder"></div>
     <div class="menu-wrapper">
       <MenuCollapsed />
     </div>
@@ -39,6 +40,7 @@ const i18n = t(locale);
 
 <style>
   .hero {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -48,6 +50,8 @@ const i18n = t(locale);
   }
 
   .intro-block {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -57,7 +61,7 @@ const i18n = t(locale);
   .studio-row {
     display: flex;
     align-items: center;
-    gap: clamp(4px, 1.5vw, 24px);
+    gap: clamp(4px, 2vw, 24px);
   }
 
   .intro-body {
@@ -65,7 +69,17 @@ const i18n = t(locale);
   }
 
   .scroll-hint-pos {
+    position: relative;
+    z-index: 2;
     margin-top: 20px;
+  }
+
+  .gallery-placeholder {
+    position: absolute;
+    inset: 0;
+    background: #333;
+    z-index: 1;
+    transform-origin: center center;
   }
 
   .menu-wrapper {

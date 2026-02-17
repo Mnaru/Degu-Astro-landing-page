@@ -7,8 +7,11 @@
 /** Duration of Phase A time-based intro animation (seconds) */
 export const INTRO_TIMED_DURATION = 2;
 
-/** Scroll distance (px) for Phase B header scaling */
-export const INTRO_SCALE_SCROLL_DISTANCE = 1500;
+/** Scroll distance for Phase B as viewport-height multiplier (2 = 200vh) */
+export const INTRO_SCROLL_DISTANCE = 2;
+
+/** Peak scale factor for headers before they exit viewport */
+export const INTRO_SCALE_FACTOR = 3.5;
 
 /** Snap duration when user scrolls during gallery scale-up (seconds) */
 export const INTRO_SNAP_DURATION = 0.3;
