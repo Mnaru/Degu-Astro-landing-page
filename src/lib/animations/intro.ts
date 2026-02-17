@@ -135,29 +135,63 @@ export function initIntroAnimation(): void {
     const vh = window.innerHeight;
     const padding = vw * 0.025;
 
-    // Measure current header positions (Phase A CSS end state)
+    // Measure ALL positions before taking anything out of flow
     const deguRect = headerDegu!.getBoundingClientRect();
     const studioRect = headerStudio!.getBoundingClientRect();
+    const bodyRect = bodyText!.getBoundingClientRect();
+    const scrollHintRect = scrollHint!.getBoundingClientRect();
+
+    // Text spans — animate fontSize on these for crisp rendering
+    const deguText = headerDegu!.querySelector<HTMLElement>('.header-text')!;
+    const studioText = headerStudio!.querySelector<HTMLElement>('.header-text')!;
+    const currentFontSize = parseFloat(getComputedStyle(deguText).fontSize);
 
     // Fill viewport: padding + DEGU + gap + STUDIO + padding = vh
     const gapBetween = vh * 0.005;
     const targetHeight = (vh - 2 * padding - gapBetween) / 2;
-    const deguScale = targetHeight / deguRect.height;
-    const studioScale = targetHeight / studioRect.height;
+    const scaleRatio = targetHeight / deguRect.height;
+    const targetFontSize = currentFontSize * scaleRatio;
 
-    // Translation from current centred position to top-left alignment
-    const deguDx = padding - deguRect.left;
-    const deguDy = padding - deguRect.top;
-    const studioDx = padding - studioRect.left;
-    const studioDy = (padding + targetHeight + gapBetween) - studioRect.top;
+    // Target top positions
+    const studioTargetTop = padding + targetHeight + gapBetween;
 
-    // Exit offsets: just enough to clear the viewport at scaled size
-    const deguExitX = -(deguRect.left + deguScale * deguRect.width + 100);
-    const studioExitX = vw - studioRect.left + 100;
+    // Exit offsets: clear viewport at the grown size
+    const grownDeguWidth = scaleRatio * deguRect.width;
+    const deguExitX = -(padding + grownDeguWidth + 100);
+    const studioExitX = vw - padding + 100;
     const bodyExitX = vw * 1.5;
 
-    // Scale from top-left corner (no visual change at scale 1)
-    gsap.set([headerDegu, headerStudio], { transformOrigin: '0% 0%' });
+    // Fix ALL animated elements in place before taking headers out of flow.
+    // This prevents BodyText and ScrollHint from shifting when headers
+    // switch to position: fixed.
+    gsap.set(headerDegu, {
+      position: 'fixed',
+      left: deguRect.left,
+      top: deguRect.top,
+      margin: 0,
+    });
+    gsap.set(headerStudio, {
+      position: 'fixed',
+      left: studioRect.left,
+      top: studioRect.top,
+      margin: 0,
+    });
+    gsap.set(bodyText, {
+      position: 'fixed',
+      left: bodyRect.left,
+      top: bodyRect.top,
+      width: bodyRect.width,
+      margin: 0,
+    });
+    gsap.set(scrollHint, {
+      position: 'fixed',
+      left: scrollHintRect.left,
+      top: scrollHintRect.top,
+      margin: 0,
+    });
+
+    // Hint browser about upcoming font-size changes
+    gsap.set([deguText, studioText], { willChange: 'font-size' });
 
     const phaseB = gsap.timeline({
       scrollTrigger: {
@@ -170,6 +204,8 @@ export function initIntroAnimation(): void {
           snapTo: (progress: number) => (progress > 0.5 ? 1 : progress),
           duration: INTRO_SNAP_DURATION,
         },
+        onLeave: () => gsap.set([deguText, studioText], { willChange: 'auto' }),
+        onEnterBack: () => gsap.set([deguText, studioText], { willChange: 'font-size' }),
       },
     });
 
@@ -180,18 +216,24 @@ export function initIntroAnimation(): void {
       duration: 0.1,
     }, 0);
 
-    // --- 0.00–0.40: Headers scale up + reposition to top-left ---
+    // --- 0.00–0.40: Headers grow (fontSize) + reposition to top-left ---
+    phaseB.to(deguText, {
+      fontSize: targetFontSize,
+      duration: 0.4,
+    }, 0);
     phaseB.to(headerDegu, {
-      scale: deguScale,
-      x: deguDx,
-      y: deguDy,
+      left: padding,
+      top: padding,
       duration: 0.4,
     }, 0);
 
+    phaseB.to(studioText, {
+      fontSize: targetFontSize,
+      duration: 0.4,
+    }, 0);
     phaseB.to(headerStudio, {
-      scale: studioScale,
-      x: studioDx,
-      y: studioDy,
+      left: padding,
+      top: studioTargetTop,
       duration: 0.4,
     }, 0);
 
