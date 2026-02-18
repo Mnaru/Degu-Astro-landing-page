@@ -57,6 +57,32 @@ export const GALLERY_FADE_DURATION = 0.3;
 /** Delay between each gallery image appearing (seconds) */
 export const GALLERY_IMAGE_STAGGER = 0.1;
 
+// --- Menu Expanded ---
+
+/** Stagger delay between each menu item appearing from the bottom (seconds) */
+export const MENU_ITEM_STAGGER = 0.06;
+
+/** Duration for each menu item entrance animation (seconds) */
+export const MENU_ITEM_DURATION = 0.4;
+
+/** Vertical offset (px) menu items travel from during entrance */
+export const MENU_ITEM_OFFSET = 40;
+
+/** Easing for menu item entrance */
+export const MENU_ITEM_EASE = 'power3.out';
+
+/** Duration for the menu overlay fade-in (seconds) */
+export const MENU_FADE_IN_DURATION = 0.3;
+
+/** Duration for the menu overlay fade-out (seconds) */
+export const MENU_FADE_OUT_DURATION = 0.25;
+
+/** Duration for GSAP scrollTo when navigating via menu (seconds) */
+export const MENU_SCROLL_DURATION = 1;
+
+/** Easing for GSAP scrollTo navigation */
+export const MENU_SCROLL_EASE = 'power2.inOut';
+
 // --- Outro ---
 
 /** Delay between each outro element appearing (seconds) */

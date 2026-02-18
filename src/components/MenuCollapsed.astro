@@ -73,6 +73,21 @@ const i18n = t(locale);
       page?: number;
     }
 
+    // Open expanded menu on click
+    el.addEventListener('click', () => {
+      // Map current state to the activeSection id MenuExpanded expects
+      let activeSection = 'home';
+      if (currentType === 'work') {
+        const pageMap = ['work-social-media', 'work-product-photography', 'work-key-visuals'];
+        activeSection = pageMap[currentPage] ?? 'work-social-media';
+      } else if (currentType === 'contact') {
+        activeSection = 'contact';
+      }
+      window.dispatchEvent(
+        new CustomEvent('menu:expand', { detail: { activeSection } }),
+      );
+    });
+
     window.addEventListener('menu:state', ((e: CustomEvent<MenuStateDetail>) => {
       const { type, page } = e.detail;
 

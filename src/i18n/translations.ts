@@ -39,6 +39,7 @@ export const translations = {
       home: 'Home',
       work: 'Work',
       contact: 'Contact',
+      close: 'Close menu',
     },
     gallery: {
       close: 'Close gallery',
@@ -85,6 +86,7 @@ export const translations = {
       home: 'Pradžia',
       work: 'Darbai',
       contact: 'Kontaktai',
+      close: 'Uždaryti meniu',
     },
     gallery: {
       close: 'Uždaryti galeriją',
