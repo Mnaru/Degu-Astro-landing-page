@@ -6,7 +6,9 @@ import HeaderContainer from '@components/HeaderContainer.astro';
 import LanguageSwitcher from '@components/LanguageSwitcher.astro';
 import MenuCollapsed from '@components/MenuCollapsed.astro';
 import PageDesktop from '@components/PageDesktop.astro';
+import PageMobile from '@components/PageMobile.astro';
 import PageScrollDesktop from '@components/PageScrollDesktop.astro';
+import PageScrollMobile from '@components/PageScrollMobile.astro';
 import ScrollHint from '@components/ScrollHint.astro';
 
 import { t } from '@i18n/utils';
@@ -54,6 +56,25 @@ const i18n = t(locale);
         galleryId="key-visuals"
       />
     </PageScrollDesktop>
+    <PageScrollMobile data-scroll="page-scroll-mobile">
+      <PageMobile
+        imageSrc={socialMediaHero}
+        imageAlt={i18n.work.pages.socialMedia.imageAlt}
+        galleryId="social-media"
+        loading="eager"
+        data-intro="gallery-placeholder"
+      />
+      <PageMobile
+        imageSrc={productPhotographyHero}
+        imageAlt={i18n.work.pages.productPhotography.imageAlt}
+        galleryId="product-photography"
+      />
+      <PageMobile
+        imageSrc={keyVisualsHero}
+        imageAlt={i18n.work.pages.keyVisuals.imageAlt}
+        galleryId="key-visuals"
+      />
+    </PageScrollMobile>
   </main>
 </BaseLayout>
 
@@ -69,7 +90,7 @@ const i18n = t(locale);
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    height: 100dvh;
+    height: 100vh;
     overflow: hidden;
     padding: 32.8vh 2rem 2rem;
   }
@@ -109,11 +130,25 @@ const i18n = t(locale);
     pointer-events: none;
   }
 
-  .hero :global(.page-scroll-desktop) {
+  .hero :global(.page-scroll-desktop),
+  .hero :global(.page-scroll-mobile) {
     position: absolute;
     inset: 0;
     z-index: 1;
+    overflow: hidden;
     visibility: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .hero :global(.page-scroll-desktop) {
+      display: none;
+    }
+  }
+
+  @media (min-width: 769px) {
+    .hero :global(.page-scroll-mobile) {
+      display: none;
+    }
   }
 
   [data-intro="intro-block"],

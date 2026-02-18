@@ -17,6 +17,10 @@ import {
 } from '@lib/animations/config';
 
 gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.config({ ignoreMobileResize: true });
+if (ScrollTrigger.isTouch) {
+  ScrollTrigger.normalizeScroll(true);
+}
 
 /**
  * Intro animation — two phases, one ScrollTrigger.
@@ -28,8 +32,9 @@ gsap.registerPlugin(ScrollTrigger);
  *   Part 1 — Intro-to-gallery transition:
  *     Headers scale up, gallery fades in at 60% and scales to 100%,
  *     headers exit left/right.
- *   Part 2 — Horizontal page scroll (desktop only):
- *     Track translates left, scrolling through gallery pages.
+ *   Part 2 — Page scroll:
+ *     Desktop: track translates left (horizontal scroll through pages).
+ *     Mobile:  track translates up (vertical scroll through pages).
  *
  * Single ScrollTrigger pins .hero for the entire sequence, eliminating
  * the gap that two separate ScrollTriggers would create.
@@ -49,21 +54,28 @@ export function initIntroAnimation(): void {
   const headerStudio = document.querySelector<HTMLElement>('[data-intro="header-studio"]');
   const bodyText = document.querySelector<HTMLElement>('[data-intro="body-text"]');
   const scrollHint = document.querySelector<HTMLElement>('[data-intro="scroll-hint"]');
-  const galleryPlaceholder = document.querySelector<HTMLElement>('[data-intro="gallery-placeholder"]');
 
   if (
     !hero || !introBlock || !headerDegu || !headerStudio ||
-    !bodyText || !scrollHint || !galleryPlaceholder
+    !bodyText || !scrollHint
   ) {
     return;
   }
 
+  // Page scroll: desktop targets horizontal section, mobile targets vertical.
+  const isDesktop = window.innerWidth > 768;
+  const scrollSection = hero.querySelector<HTMLElement>(
+    isDesktop ? '[data-scroll="page-scroll"]' : '[data-scroll="page-scroll-mobile"]',
+  );
+  const track = scrollSection?.querySelector<HTMLElement>('.page-scroll-track') ?? null;
+  const galleryPlaceholder = scrollSection?.querySelector<HTMLElement>(
+    '[data-intro="gallery-placeholder"]',
+  ) ?? null;
+
+  if (!scrollSection || !galleryPlaceholder) return;
+
   const studioRow = headerStudio.parentElement as HTMLElement;
   const finalGap = getComputedStyle(studioRow).getPropertyValue('gap') || '0px';
-
-  // Page scroll track (inside hero via CSS position: absolute)
-  const track = hero.querySelector<HTMLElement>('.page-scroll-track');
-  const isDesktop = window.innerWidth > 768;
 
   // ---- Set initial state ----
   gsap.set(bodyText, {
@@ -201,22 +213,24 @@ export function initIntroAnimation(): void {
 
     // ---- Scroll distances ----
     // The intro tweens occupy timeline time 0–0.85.
-    // Horizontal scroll (desktop only) is appended after.
+    // Page scroll (desktop: horizontal, mobile: vertical) is appended after.
     const INTRO_TIMELINE_END = 0.85;
     const introScrollDist = INTRO_SCROLL_DISTANCE * vh;
     const pageCount = track?.children.length ?? 0;
-    const hScrollDist = isDesktop && track && pageCount > 1
-      ? (pageCount - 1) * vw
-      : 0;
-    const totalScrollDist = introScrollDist + hScrollDist;
 
-    // Horizontal scroll timeline duration, scaled so the ratio of
+    // Desktop scrolls horizontally (x), mobile scrolls vertically (y).
+    const pageScrollDist = track && pageCount > 1
+      ? (pageCount - 1) * (isDesktop ? vw : vh)
+      : 0;
+    const totalScrollDist = introScrollDist + pageScrollDist;
+
+    // Page scroll timeline duration, scaled so the ratio of
     // timeline-time to scroll-pixels stays consistent with the intro.
-    const hScrollDuration = hScrollDist > 0
-      ? INTRO_TIMELINE_END * (hScrollDist / introScrollDist)
+    const pageScrollDuration = pageScrollDist > 0
+      ? INTRO_TIMELINE_END * (pageScrollDist / introScrollDist)
       : 0;
 
-    // Progress boundary between intro and horizontal scroll
+    // Progress boundary between intro and page scroll
     const introEnd = introScrollDist / totalScrollDist;
 
     // Track gallery-placeholder state for forward/reverse transitions
@@ -232,34 +246,33 @@ export function initIntroAnimation(): void {
         snap: {
           snapTo: (progress: number) => {
             // Snap to gallery completion when past threshold
-            if (hScrollDist > 0) {
+            if (pageScrollDist > 0) {
               if (progress > introEnd * INTRO_SNAP_THRESHOLD && progress <= introEnd) {
                 return introEnd;
               }
               return progress;
             }
-            // No horizontal scroll: snap to end (= gallery completion)
+            // No page scroll: snap to end (= gallery completion)
             return progress > INTRO_SNAP_THRESHOLD ? 1 : progress;
           },
           duration: INTRO_SNAP_DURATION,
         },
         onUpdate: (self) => {
           // Switch gallery-placeholder between position:fixed (intro)
-          // and normal track flow (horizontal scroll).
-          if (!track || !isDesktop || hScrollDist === 0) return;
+          // and normal track flow (page scroll).
+          if (!track || pageScrollDist === 0) return;
 
           const shouldBeInFlow = self.progress >= introEnd;
 
           if (shouldBeInFlow && !galleryInFlow) {
-            // Gallery enters track flow for horizontal scrolling.
+            // Gallery enters track flow for page scrolling.
             // Only clear position-related props; scale/opacity are
             // managed by the Phase B timeline tweens.
             gsap.set(galleryPlaceholder, {
               clearProps: 'position,top,left,width,height,zIndex,transformOrigin,visibility',
             });
-            // Show section so all pages are visible during horizontal scroll
-            const sec = hero!.querySelector<HTMLElement>('[data-scroll="page-scroll"]');
-            if (sec) gsap.set(sec, { visibility: 'visible' });
+            // Show section so all pages are visible during page scroll
+            gsap.set(scrollSection, { visibility: 'visible' });
             galleryInFlow = true;
           } else if (!shouldBeInFlow && galleryInFlow) {
             // Re-fix gallery for intro reverse scroll.
@@ -275,8 +288,7 @@ export function initIntroAnimation(): void {
               visibility: 'visible',
             });
             // Hide section again so pages 2, 3 aren't visible behind intro
-            const sec = hero!.querySelector<HTMLElement>('[data-scroll="page-scroll"]');
-            if (sec) gsap.set(sec, { visibility: 'hidden' });
+            gsap.set(scrollSection, { visibility: 'hidden' });
             galleryInFlow = false;
           }
         },
@@ -353,12 +365,14 @@ export function initIntroAnimation(): void {
       duration: 0.4,
     }, 0.45);
 
-    // ---- Part 2: Horizontal page scroll (time 0.85 onward) ----
-    if (isDesktop && track && hScrollDist > 0) {
+    // ---- Part 2: Page scroll (time 0.85 onward) ----
+    // Desktop: translate track on x (horizontal).
+    // Mobile: translate track on y (vertical).
+    if (track && pageScrollDist > 0) {
       phaseB.to(track, {
-        x: -hScrollDist,
+        ...(isDesktop ? { x: -pageScrollDist } : { y: -pageScrollDist }),
         ease: 'none',
-        duration: hScrollDuration,
+        duration: pageScrollDuration,
       }, INTRO_TIMELINE_END);
     }
   }
