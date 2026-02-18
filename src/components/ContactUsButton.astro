@@ -1,0 +1,123 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'button'> {
+  email?: string;
+  label?: string;
+  feedbackText?: string;
+  class?: string;
+}
+
+const {
+  email = 'monika@nuar.app',
+  label = 'Email us',
+  feedbackText = 'Email copied',
+  class: className,
+  ...attrs
+} = Astro.props;
+---
+
+<button
+  class:list={['contact-button', className]}
+  aria-label={`${label} — ${email}`}
+  data-email={email}
+  data-label={label}
+  data-feedback={feedbackText}
+  {...attrs}
+>
+  <svg class="contact-icon" viewBox="0 0 31 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M2 22L15.5 2L29 22" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </svg>
+  <span class="contact-label">{label}</span>
+</button>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.contact-button').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const email = btn.dataset.email ?? '';
+      const label = btn.dataset.label ?? '';
+      const feedback = btn.dataset.feedback ?? '';
+      const labelEl = btn.querySelector('.contact-label');
+      if (!labelEl) return;
+
+      try {
+        await navigator.clipboard.writeText(email);
+        labelEl.textContent = feedback;
+        btn.classList.add('copied');
+        setTimeout(() => {
+          labelEl.textContent = label;
+          btn.classList.remove('copied');
+        }, 2000);
+      } catch {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = email;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        labelEl.textContent = feedback;
+        btn.classList.add('copied');
+        setTimeout(() => {
+          labelEl.textContent = label;
+          btn.classList.remove('copied');
+        }, 2000);
+      }
+    });
+  });
+</script>
+
+<style>
+  .contact-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px 40px 16px 32px;
+    border-radius: 30px;
+    border: 1.5px solid var(--color-white);
+    background: transparent;
+    color: var(--color-white);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .contact-button:hover {
+    background: var(--color-white);
+    color: var(--color-black);
+  }
+
+  .contact-button:focus-visible {
+    outline: 2px solid var(--color-white);
+    outline-offset: 2px;
+  }
+
+  .contact-icon {
+    width: 31px;
+    height: 24px;
+    flex-shrink: 0;
+    transform: rotate(-90deg);
+  }
+
+  .contact-label {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .contact-button {
+      gap: 8px;
+      padding: 16px 24px 16px 20px;
+    }
+
+    .contact-icon {
+      width: 18px;
+      height: 14px;
+    }
+  }
+</style>

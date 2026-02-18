@@ -338,8 +338,7 @@ export function initIntroAnimation(): void {
         onLeave: () => {
           gsap.set(hero, { visibility: 'hidden' });
           gsap.set([deguText, studioText], { willChange: 'auto' });
-          // Keep showing last work page until outro section is built
-          dispatchMenuState('work', pageCount - 1);
+          dispatchMenuState('contact');
         },
         onEnterBack: () => {
           gsap.set(hero, { visibility: 'visible' });

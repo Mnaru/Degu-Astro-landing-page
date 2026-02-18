@@ -1,0 +1,41 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  imageSrc: ImageMetadata;
+  imageAlt: string;
+  class?: string;
+}
+
+const { imageSrc, imageAlt, class: className, ...attrs } = Astro.props;
+---
+
+<div class:list={['team-image-container', className]} {...attrs}>
+  <Image
+    src={imageSrc}
+    alt={imageAlt}
+    format="webp"
+    width={370}
+    height={406}
+    loading="lazy"
+    class="team-image"
+  />
+</div>
+
+<style>
+  .team-image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .team-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>
