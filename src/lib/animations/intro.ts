@@ -13,6 +13,7 @@ import {
   INTRO_FADE_EASE,
   INTRO_SCROLL_DISTANCE,
   INTRO_SNAP_DURATION,
+  INTRO_SNAP_THRESHOLD,
 } from '@lib/animations/config';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -230,15 +231,15 @@ export function initIntroAnimation(): void {
         scrub: true,
         snap: {
           snapTo: (progress: number) => {
-            // Snap past intro if user scrolls > 50% of intro portion
+            // Snap to gallery completion when past threshold
             if (hScrollDist > 0) {
-              if (progress > introEnd * 0.5 && progress <= introEnd) {
+              if (progress > introEnd * INTRO_SNAP_THRESHOLD && progress <= introEnd) {
                 return introEnd;
               }
               return progress;
             }
-            // No horizontal scroll: original snap behavior
-            return progress > 0.5 ? 1 : progress;
+            // No horizontal scroll: snap to end (= gallery completion)
+            return progress > INTRO_SNAP_THRESHOLD ? 1 : progress;
           },
           duration: INTRO_SNAP_DURATION,
         },

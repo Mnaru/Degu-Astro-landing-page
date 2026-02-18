@@ -16,6 +16,9 @@ export const INTRO_SCALE_FACTOR = 3.5;
 /** Snap duration when user scrolls during gallery scale-up (seconds) */
 export const INTRO_SNAP_DURATION = 0.3;
 
+/** Snap threshold within gallery scale-up (0–1): snap to completion when past this fraction */
+export const INTRO_SNAP_THRESHOLD = 0.5;
+
 /** Easing function for all intro movements */
 export const INTRO_EASING = 'power2.out';
 
