@@ -15,7 +15,7 @@ interface Props extends HTMLAttributes<'div'> {
 const { imageSrc, imageAlt, galleryId, mobileImageSrc, loading = 'lazy', class: className, ...attrs } = Astro.props;
 ---
 
-<div class:list={['page-mobile', className]} data-gallery-id={galleryId} {...attrs}>
+<div class:list={['page-mobile', className]} data-gallery-id={galleryId} role="button" tabindex="0" aria-label={`Open ${imageAlt} gallery`} {...attrs}>
   <Image
     src={imageSrc}
     alt={imageAlt}
@@ -38,12 +38,50 @@ const { imageSrc, imageAlt, galleryId, mobileImageSrc, loading = 'lazy', class: 
   )}
 </div>
 
+<script>
+  document.querySelectorAll<HTMLElement>('.page-mobile[data-gallery-id]').forEach((page) => {
+    const galleryId = page.dataset.galleryId;
+    if (!galleryId) return;
+
+    function isPageVisible(): boolean {
+      const style = getComputedStyle(page);
+      if (style.display === 'none' || style.visibility === 'hidden') return false;
+      const section = page.closest('.page-scroll-mobile');
+      if (section) {
+        const sectionStyle = getComputedStyle(section);
+        if (sectionStyle.display === 'none' || sectionStyle.visibility === 'hidden') return false;
+      }
+      return true;
+    }
+
+    page.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!isPageVisible()) return;
+      window.dispatchEvent(
+        new CustomEvent('gallery:open', { detail: { galleryId } }),
+      );
+    });
+
+    page.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!isPageVisible()) return;
+        window.dispatchEvent(
+          new CustomEvent('gallery:open', { detail: { galleryId } }),
+        );
+      }
+    });
+  });
+</script>
+
 <style>
   .page-mobile {
     position: relative;
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    cursor: pointer;
   }
 
   .page-mobile::after {

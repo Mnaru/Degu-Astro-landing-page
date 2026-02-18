@@ -1,0 +1,220 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  galleryId: string;
+  images: { src: ImageMetadata; alt: string }[];
+  layout?: ('full' | 'pair')[];
+  closeLabel?: string;
+  class?: string;
+}
+
+const { galleryId, images, layout, closeLabel = 'Close gallery', class: className } = Astro.props;
+
+// Build rows from layout prop, or fall back to alternating full/pair pattern
+type GalleryItem = { src: ImageMetadata; alt: string; index: number };
+type GalleryRow = { type: 'full'; item: GalleryItem } | { type: 'pair'; items: GalleryItem[] };
+
+const rows: GalleryRow[] = [];
+let i = 0;
+
+if (layout) {
+  for (const rowType of layout) {
+    if (i >= images.length) break;
+    if (rowType === 'full') {
+      rows.push({ type: 'full', item: { ...images[i], index: i } });
+      i++;
+    } else {
+      const pairItems: GalleryItem[] = [{ ...images[i], index: i }];
+      i++;
+      if (i < images.length) {
+        pairItems.push({ ...images[i], index: i });
+        i++;
+      }
+      rows.push({ type: 'pair', items: pairItems });
+    }
+  }
+} else {
+  // Default: alternating full, pair, full, pair, ...
+  while (i < images.length) {
+    rows.push({ type: 'full', item: { ...images[i], index: i } });
+    i++;
+    if (i < images.length) {
+      const pairItems: GalleryItem[] = [{ ...images[i], index: i }];
+      i++;
+      if (i < images.length) {
+        pairItems.push({ ...images[i], index: i });
+        i++;
+      }
+      rows.push({ type: 'pair', items: pairItems });
+    }
+  }
+}
+---
+
+<div
+  class:list={['image-gallery', className]}
+  data-gallery={galleryId}
+  role="dialog"
+  aria-modal="true"
+  aria-label={`${galleryId} gallery`}
+>
+  <div class="gallery-overlay"></div>
+  <button class="gallery-close" aria-label={closeLabel} data-gallery-close>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M5 5L19 19M19 5L5 19" stroke="#1D1B20" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  </button>
+  <div class="gallery-content">
+    <div class="gallery-images">
+      {rows.map((row) =>
+        row.type === 'full' ? (
+          <div class="gallery-row-full" data-gallery-image>
+            <Image
+              src={row.item.src}
+              alt={row.item.alt}
+              width={row.item.src.width}
+              height={row.item.src.height}
+              format="webp"
+              loading="lazy"
+            />
+          </div>
+        ) : (
+          <div class="gallery-row-pair">
+            {row.items.map((item) => (
+              <div class="gallery-pair-item" data-gallery-image>
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  width={item.src.width}
+                  height={item.src.height}
+                  format="webp"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
+        ),
+      )}
+    </div>
+  </div>
+</div>
+
+<style>
+  .image-gallery {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    opacity: 0;
+  }
+
+  .image-gallery.is-open {
+    display: block;
+  }
+
+  .gallery-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  /* Close button — pill shape, white fill, backdrop blur
+     Matches Figma: 108×88, cornerRadius 100, white bg, 30px blur
+     Desktop: 80px from top, 80px from right
+     Mobile: 38px from top, 35px from right */
+  .gallery-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 108px;
+    height: 88px;
+    padding: 32px 42px;
+    border: none;
+    border-radius: 100px;
+    background: var(--color-white, #ffffff);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .gallery-close:hover,
+  .gallery-close:focus-visible {
+    background: rgba(255, 255, 255, 0.85);
+  }
+
+  .gallery-close:focus-visible {
+    outline: 2px solid var(--color-white, #ffffff);
+    outline-offset: 2px;
+  }
+
+  .gallery-content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px;
+  }
+
+  .gallery-images {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .gallery-row-full {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .gallery-row-full.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .gallery-row-full :global(img) {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .gallery-row-pair {
+    display: flex;
+    gap: 8px;
+  }
+
+  .gallery-pair-item {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .gallery-pair-item.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .gallery-pair-item :global(img) {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .gallery-row-pair {
+      flex-direction: column;
+    }
+  }
+</style>

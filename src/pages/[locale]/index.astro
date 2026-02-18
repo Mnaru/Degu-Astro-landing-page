@@ -5,6 +5,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import BodyTextContainer from '@components/BodyTextContainer.astro';
 import DeguLogo from '@components/DeguLogo.astro';
 import HeaderContainer from '@components/HeaderContainer.astro';
+import ImageGallery from '@components/ImageGallery.astro';
 import LanguageSwitcher from '@components/LanguageSwitcher.astro';
 import MenuCollapsed from '@components/MenuCollapsed.astro';
 import MenuExpanded from '@components/MenuExpanded.astro';
@@ -23,6 +24,25 @@ import socialMediaMobile from '@assets/images/pages/Social media assets - Mobile
 import productPhotographyMobile from '@assets/images/pages/Product photography- Mobile.png';
 import keyVisualsMobile from '@assets/images/pages/Key Visuals & OOH - Mobile.png';
 
+// Gallery images — social media
+import sm01 from '@assets/images/gallery/social-media/social-media-1.png';
+import sm02 from '@assets/images/gallery/social-media/social-media-2.png';
+import sm03 from '@assets/images/gallery/social-media/social-media-3.png';
+import sm04 from '@assets/images/gallery/social-media/social-media-4.png';
+import sm05 from '@assets/images/gallery/social-media/social-media-5.png';
+import sm06 from '@assets/images/gallery/social-media/social-media-6.png';
+
+// Gallery images — product photography
+import pp01 from '@assets/images/gallery/product-photography/product-photography-1.png';
+import pp02 from '@assets/images/gallery/product-photography/product-photography-2.png';
+import pp03 from '@assets/images/gallery/product-photography/product-photography-3.png';
+import pp04 from '@assets/images/gallery/product-photography/product-photography-4.png';
+import pp05 from '@assets/images/gallery/product-photography/product-photography-5.png';
+
+// Gallery images — key visuals
+import kv01 from '@assets/images/gallery/key-visuals/key-visuals-1.png';
+import kv02 from '@assets/images/gallery/key-visuals/key-visuals-2.png';
+
 export const getStaticPaths = (() => {
   return [
     { params: { locale: 'en' } },
@@ -31,6 +51,21 @@ export const getStaticPaths = (() => {
 
 const { locale } = Astro.params;
 const i18n = t(locale);
+
+const socialMediaGalleryImages = [sm01, sm02, sm03, sm04, sm05, sm06].map((src, i) => ({
+  src,
+  alt: i18n.work.pages.socialMedia.gallery[i],
+}));
+
+const productPhotographyGalleryImages = [pp01, pp02, pp03, pp04, pp05].map((src, i) => ({
+  src,
+  alt: i18n.work.pages.productPhotography.gallery[i],
+}));
+
+const keyVisualsGalleryImages = [kv01, kv02].map((src, i) => ({
+  src,
+  alt: i18n.work.pages.keyVisuals.gallery[i],
+}));
 ---
 
 <BaseLayout title={i18n.meta.title} description={i18n.meta.description} locale={locale}>
@@ -92,11 +127,32 @@ const i18n = t(locale);
     <MenuCollapsed locale={locale} />
   </div>
   <MenuExpanded activeSection="home" locale={locale} />
+
+  <ImageGallery
+    galleryId="social-media"
+    images={socialMediaGalleryImages}
+    layout={['full', 'pair', 'full', 'pair']}
+    closeLabel={i18n.gallery.close}
+  />
+  <ImageGallery
+    galleryId="product-photography"
+    images={productPhotographyGalleryImages}
+    layout={['full', 'pair', 'pair']}
+    closeLabel={i18n.gallery.close}
+  />
+  <ImageGallery
+    galleryId="key-visuals"
+    images={keyVisualsGalleryImages}
+    layout={['full', 'full']}
+    closeLabel={i18n.gallery.close}
+  />
 </BaseLayout>
 
 <script>
   import { initIntroAnimation } from '@lib/animations/intro';
+  import { initGallery } from '@lib/animations/gallery';
   initIntroAnimation();
+  initGallery();
 </script>
 
 <style>

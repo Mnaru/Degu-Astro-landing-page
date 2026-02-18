@@ -14,6 +14,9 @@ npm-debug.log*
 .env
 .env.production
 
+# MCP config (contains API tokens)
+.mcp.json
+
 # macOS
 .DS_Store
 .vercel
