@@ -74,6 +74,14 @@ export function initIntroAnimation(): void {
 
   if (!scrollSection || !galleryPlaceholder) return;
 
+  // Measure what CSS 100vh resolves to in pixels. On mobile, this can be
+  // taller than window.innerHeight when the address bar is visible.
+  const measureDiv = document.createElement('div');
+  measureDiv.style.cssText = 'position:fixed;top:0;height:100vh;pointer-events:none;visibility:hidden;';
+  document.body.appendChild(measureDiv);
+  const cssVh = measureDiv.offsetHeight;
+  document.body.removeChild(measureDiv);
+
   const studioRow = headerStudio.parentElement as HTMLElement;
   const finalGap = getComputedStyle(studioRow).getPropertyValue('gap') || '0px';
 
@@ -95,7 +103,7 @@ export function initIntroAnimation(): void {
     top: 0,
     left: 0,
     width: '100vw',
-    height: '100vh',
+    height: cssVh,
     zIndex: 1,
     transformOrigin: 'center center',
   });
@@ -215,12 +223,15 @@ export function initIntroAnimation(): void {
     // The intro tweens occupy timeline time 0–0.85.
     // Page scroll (desktop: horizontal, mobile: vertical) is appended after.
     const INTRO_TIMELINE_END = 0.85;
-    const introScrollDist = INTRO_SCROLL_DISTANCE * vh;
+    // On mobile, use cssVh (actual CSS 100vh) so scroll distances match
+    // the CSS-sized page elements, avoiding address-bar mismatch.
+    const scrollVh = isDesktop ? vh : cssVh;
+    const introScrollDist = INTRO_SCROLL_DISTANCE * scrollVh;
     const pageCount = track?.children.length ?? 0;
 
     // Desktop scrolls horizontally (x), mobile scrolls vertically (y).
     const pageScrollDist = track && pageCount > 1
-      ? (pageCount - 1) * (isDesktop ? vw : vh)
+      ? (pageCount - 1) * (isDesktop ? vw : cssVh)
       : 0;
     const totalScrollDist = introScrollDist + pageScrollDist;
 
@@ -282,7 +293,7 @@ export function initIntroAnimation(): void {
               top: 0,
               left: 0,
               width: '100vw',
-              height: '100vh',
+              height: cssVh,
               zIndex: 1,
               transformOrigin: 'center center',
               visibility: 'visible',
