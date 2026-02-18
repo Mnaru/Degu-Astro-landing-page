@@ -87,19 +87,13 @@ The intro layout uses viewport-relative units for consistent scaling:
 - [ ] Step 11: OutroAnimation
 - [ ] Step 12: Polish + edge cases
 
-## Known Limitations
+## Resize Adaptivity
 
-### Animations do not adapt on browser resize
+Animations adapt to viewport resizes using GSAP's built-in tools:
 
-All GSAP animations (Phase A intro and Phase B scroll) measure element positions and sizes once at page load using `getBoundingClientRect()` and calculate animation targets as fixed pixel values. If the browser window is resized after the page loads, the animations will not recalculate — elements may appear mispositioned or overflow the viewport.
-
-**Why this happens:** Phase B switches elements to `position: fixed` with hardcoded `left`/`top`/`width` values measured at load time. These override the responsive CSS layout. Phase A also uses pixel-based initial positions but clears them on completion, so it's only an issue if the user resizes during the 2.5s intro animation.
-
-**Impact in production:** Minimal. Mobile viewports are fixed-size and desktop users rarely resize during a scroll experience. This primarily affects developer testing when resizing the browser to check responsive breakpoints.
-
-**Workaround for testing:** Refresh the page after resizing to get correct measurements.
-
-**Potential future fix:** Kill and re-initialize Phase B on resize (debounced), clearing all GSAP inline styles so elements return to CSS flow, then re-measuring from the new viewport size. An attempt was made but introduced visual artifacts during the re-initialization. Deferred to a future polish pass.
+- **Cross-breakpoint (768px):** `ScrollTrigger.matchMedia()` kills and rebuilds all Phase B animations when crossing the mobile/desktop boundary. Elements revert to CSS flow, re-measure, and re-initialize for the new layout.
+- **Within-breakpoint:** `invalidateOnRefresh: true` re-evaluates functional tween values (positions, font sizes, exit offsets, scroll distances) on resize. A `refreshInit` listener clears and re-measures `position: fixed` elements in CSS flow before each refresh.
+- **Touch devices:** `ScrollTrigger.config({ ignoreMobileResize: true })` prevents address bar show/hide from triggering a refresh (active on touch devices only).
 
 ## Development
 

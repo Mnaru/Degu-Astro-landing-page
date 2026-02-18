@@ -96,10 +96,9 @@ These are structural improvements. Save for a dedicated refactor session.
 ## Priority 4: Nice to Have (Future)
 Low priority improvements. Address if time permits.
 
-### 4.1 Animations don't adapt on browser resize
-- **Status:** Known limitation, documented in README
-- **Fix:** Kill + re-init Phase B on resize (debounced)
-- **Why:** Only affects developer testing. Mobile viewports are fixed.
+### 4.1 ~~Animations don't adapt on browser resize~~ ✅ RESOLVED
+- **Status:** Fixed via adaptivity refactor (Steps 1–5)
+- **How:** `ScrollTrigger.matchMedia()` for cross-breakpoint rebuild, `invalidateOnRefresh` + functional tween values for within-breakpoint resize, `refreshInit` listener for re-measuring fixed positions
 
 ### 4.2 Hash URL navigation (#contact)
 - **Fix:** Add hashchange listener that maps to scroll positions
