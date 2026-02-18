@@ -15,6 +15,7 @@ import {
   INTRO_SNAP_DURATION,
   INTRO_SNAP_THRESHOLD,
 } from '@lib/animations/config';
+import { playOutro, reverseOutro } from '@lib/animations/outro';
 
 gsap.registerPlugin(ScrollTrigger);
 ScrollTrigger.config({ ignoreMobileResize: true });
@@ -61,6 +62,10 @@ export function initIntroAnimation(): void {
   ) {
     return;
   }
+
+  // Lock scroll during Phase A so user can't scroll past intro to the outro.
+  // Phase B's ScrollTrigger will take over scroll control when it's created.
+  document.documentElement.style.overflow = 'hidden';
 
   // Page scroll: desktop targets horizontal section, mobile targets vertical.
   const isDesktop = window.innerWidth > 768;
@@ -120,6 +125,8 @@ export function initIntroAnimation(): void {
     defaults: { ease: INTRO_SLIDE_EASE },
     onComplete() {
       initPhaseB();
+      // Unlock scroll now that Phase B's ScrollTrigger controls it.
+      document.documentElement.style.overflow = '';
     },
   });
 
@@ -338,9 +345,11 @@ export function initIntroAnimation(): void {
         onLeave: () => {
           gsap.set(hero, { visibility: 'hidden' });
           gsap.set([deguText, studioText], { willChange: 'auto' });
+          playOutro();
           dispatchMenuState('contact');
         },
         onEnterBack: () => {
+          reverseOutro();
           gsap.set(hero, { visibility: 'visible' });
           gsap.set([deguText, studioText], { willChange: 'font-size' });
           dispatchMenuState('work', pageCount - 1);

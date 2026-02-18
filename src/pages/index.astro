@@ -24,7 +24,7 @@ import socialMediaMobile from '@assets/images/pages/Social media assets - Mobile
 import productPhotographyMobile from '@assets/images/pages/Product photography- Mobile.png';
 import keyVisualsMobile from '@assets/images/pages/Key Visuals & OOH - Mobile.png';
 
-import teamPhoto from '@assets/images/team/team-photo.jpg';
+import teamPhoto from '@assets/images/team/Team image.png';
 
 // Gallery images — social media
 import sm01 from '@assets/images/gallery/social-media/social-media-1.png';
@@ -121,19 +121,21 @@ const keyVisualsGalleryImages = [kv01, kv02].map((src, i) => ({
   </main>
 
   <section class="outro" data-section="outro">
-    <HeaderContainer text={i18n.outro.header1} class="outro-header outro-drop-us" />
+    <HeaderContainer text={i18n.outro.header1} class="outro-header outro-drop-us" data-outro="header1" />
     <TeamImageContainer
       imageSrc={teamPhoto}
       imageAlt={i18n.outro.teamImageAlt}
       class="outro-team-image"
+      data-outro="team-image"
     />
     <div class="outro-right">
-      <HeaderContainer text={i18n.outro.header2} class="outro-header outro-a-line" />
+      <HeaderContainer text={i18n.outro.header2} class="outro-header outro-a-line" data-outro="header2" />
       <div class="outro-content">
-        <BodyTextContainer text={i18n.outro.body} class="outro-body" />
+        <BodyTextContainer text={i18n.outro.body} class="outro-body" data-outro="body" />
         <ContactUsButton
           label={i18n.outro.emailButton}
           feedbackText={i18n.outro.emailCopied}
+          data-outro="contact-button"
         />
       </div>
     </div>
@@ -167,7 +169,9 @@ const keyVisualsGalleryImages = [kv01, kv02].map((src, i) => ({
 <script>
   import { initIntroAnimation } from '@lib/animations/intro';
   import { initGallery } from '@lib/animations/gallery';
+  import { initOutroAnimation } from '@lib/animations/outro';
   initIntroAnimation();
+  initOutroAnimation();
   initGallery();
 </script>
 
@@ -251,13 +255,14 @@ const keyVisualsGalleryImages = [kv01, kv02].map((src, i) => ({
   }
 
   /* ===== Outro Section ===== */
-  /* Starts collapsed and hidden so it doesn't affect ScrollTrigger
-     calculations during intro/gallery phases. Step 11's OutroAnimation
-     will set height: 100vh and visibility: visible when triggered. */
+  /* Full height from the start so ScrollTrigger measures the document
+     correctly. Kept invisible until initOutroAnimation() sets visibility
+     and animates children in. overflow:hidden clips elements that start
+     off-screen during their slide-in entrance. */
   .outro {
     position: relative;
     width: 100%;
-    height: 0;
+    height: 100vh;
     background: var(--color-bg);
     overflow: hidden;
     visibility: hidden;
@@ -269,47 +274,49 @@ const keyVisualsGalleryImages = [kv01, kv02].map((src, i) => ({
     line-height: 1;
   }
 
-  /* "DROP US" — Figma: x:173 y:147 on 1440x1024 */
+  /* "DROP US" */
   .outro-drop-us {
     position: absolute;
     left: 12.014%;
-    top: 14.355%;
+    top: 3%;
   }
 
-  /* Team photo — Figma: x:419 y:359, 370x406 on 1440x1024 */
+  /* Team photo — 12px below DROP US bottom.
+     DROP US top (3%) + header height (13.889vw at line-height:1) + 12px gap */
   .outro-team-image {
     position: absolute;
     left: 29.097%;
-    top: 35.059%;
+    top: calc(3% + 13.889vw + 12px);
     width: 25.694%;
-    height: 39.648%;
+    aspect-ratio: 370 / 406;
   }
 
-  /* Right block: "A LINE" + body + button — Figma: x:817 y:347, 451w on 1440x1024 */
+  /* Right block: "A LINE" + body + button — aligned with team image */
   .outro-right {
     position: absolute;
     left: 56.736%;
-    top: 33.887%;
+    top: calc(3% + 13.889vw + 12px);
     width: 31.319%;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 0;
   }
 
   .outro-content {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 16px;
   }
 
   /* Override BodyTextContainer scoped styles for outro */
   .outro :global(.body-text-container) {
-    max-width: 280px;
+    max-width: min(280px, 90%);
   }
 
   .outro :global(.body-text-container p) {
-    font-size: 20px;
-    line-height: 24px;
+    margin: 0;
+    font-size: 16px;
+    line-height: 120%;
   }
 
   @media (max-width: 768px) {
@@ -335,7 +342,7 @@ const keyVisualsGalleryImages = [kv01, kv02].map((src, i) => ({
       left: 45.128%;
       top: 19.313%;
       width: 48.205%;
-      height: 24.408%;
+      aspect-ratio: 188 / 206;
     }
 
     /* Right block — Figma: x:26 y:378, 339w on 390x844 */

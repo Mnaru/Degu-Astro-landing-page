@@ -55,6 +55,9 @@ const canonicalUrl = locale === 'lt' ? `${siteUrl}/` : `${siteUrl}/${locale}/`;
       </>
     )}
 
+    <!-- Prevent browser from restoring scroll position on language switch -->
+    <script is:inline>history.scrollRestoration = 'manual';</script>
+
     <slot name="head" />
   </head>
   <body>

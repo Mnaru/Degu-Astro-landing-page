@@ -38,19 +38,27 @@ const i18n = t(locale);
     const subInner = el.querySelector('.subsection-inner') as HTMLElement;
 
     // Measure actual span height for transform calculations
-    const spanHeight = (textInner.querySelector('span') as HTMLElement).offsetHeight;
+    let spanHeight = (textInner.querySelector('span') as HTMLElement).offsetHeight;
     const spanCount = textInner.querySelectorAll('span').length;
+
+    // Re-measure after fonts load in case line-height changed
+    document.fonts.ready.then(() => {
+      spanHeight = (textInner.querySelector('span') as HTMLElement).offsetHeight;
+    });
 
     // Text y offsets: stack is reversed (contact, work, home top-to-bottom)
     // home = -(spanCount-1)*spanHeight, work = -spanHeight, contact = 0
-    const TEXT_Y_HOME = -(spanCount - 1) * spanHeight;
-    const TEXT_Y_WORK = -spanHeight;
-    const TEXT_Y_CONTACT = 0;
+    function getTextY(index: number): number {
+      return -index * spanHeight;
+    }
+    const TEXT_INDEX_HOME = spanCount - 1;
+    const TEXT_INDEX_WORK = 1;
+    const TEXT_INDEX_CONTACT = 0;
 
-    // Work width: responsive
-    const workWidth = window.innerWidth <= 596
-      ? window.innerWidth - 56
-      : 540;
+    // Work width: recalculated on each state change so it adapts to resize
+    function getWorkWidth(): number {
+      return window.innerWidth <= 768 ? window.innerWidth - 56 : 540;
+    }
     const defaultWidth = 148;
 
     // GSAP easing (spring-like approximations)
@@ -61,7 +69,7 @@ const i18n = t(locale);
     const DUR_FADE = 0.3;
 
     // Set initial state: home (hidden via wrapper opacity)
-    gsap.set(textInner, { y: TEXT_Y_HOME });
+    gsap.set(textInner, { y: getTextY(TEXT_INDEX_HOME) });
     gsap.set(subInner, { opacity: 0, visibility: 'hidden' });
     gsap.set(subWrapper, { maxWidth: 0 });
 
@@ -120,8 +128,8 @@ const i18n = t(locale);
         const subSpanCount = subInner.querySelectorAll('span').length;
         const subY = -(subSpanCount - 1 - page) * spanHeight;
 
-        gsap.to(el, { width: workWidth, duration: DUR_SMOOTH, ease: EASE_SMOOTH });
-        gsap.to(textInner, { y: TEXT_Y_WORK, duration: DUR_SNAPPY, ease: EASE_SNAPPY });
+        gsap.to(el, { width: getWorkWidth(), duration: DUR_SMOOTH, ease: EASE_SMOOTH });
+        gsap.to(textInner, { y: getTextY(TEXT_INDEX_WORK), duration: DUR_SNAPPY, ease: EASE_SNAPPY });
         gsap.to(subWrapper, { maxWidth: 280, duration: DUR_SMOOTH, ease: EASE_SMOOTH });
         gsap.to(subInner, {
           y: subY,
@@ -136,7 +144,7 @@ const i18n = t(locale);
       // --- Contact state (future: outro) ---
       if (type === 'contact') {
         gsap.to(el, { width: defaultWidth, duration: DUR_SMOOTH, ease: EASE_SMOOTH });
-        gsap.to(textInner, { y: TEXT_Y_CONTACT, duration: DUR_SNAPPY, ease: EASE_SNAPPY });
+        gsap.to(textInner, { y: getTextY(TEXT_INDEX_CONTACT), duration: DUR_SNAPPY, ease: EASE_SNAPPY });
         gsap.to(subWrapper, { maxWidth: 0, duration: DUR_SMOOTH, ease: EASE_SMOOTH });
         gsap.to(subInner, { opacity: 0, duration: DUR_FADE, ease: EASE_SMOOTH });
       }
