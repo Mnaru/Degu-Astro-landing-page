@@ -103,7 +103,7 @@ export function initIntroAnimation(): void {
     top: 0,
     left: 0,
     width: '100vw',
-    height: cssVh,
+    height: window.innerHeight,
     zIndex: 1,
     transformOrigin: 'center center',
   });
@@ -229,6 +229,13 @@ export function initIntroAnimation(): void {
     const introScrollDist = INTRO_SCROLL_DISTANCE * scrollVh;
     const pageCount = track?.children.length ?? 0;
 
+    // On mobile, pages are CSS height:100vh which is taller than the visible
+    // viewport. Override to window.innerHeight so they fit what the user sees.
+    if (!isDesktop && track) {
+      const pages = track.querySelectorAll('.page-mobile, .page-desktop');
+      gsap.set(pages, { height: vh });
+    }
+
     // Desktop scrolls horizontally (x), mobile scrolls vertically (y).
     const pageScrollDist = track && pageCount > 1
       ? (pageCount - 1) * (isDesktop ? vw : cssVh)
@@ -293,7 +300,7 @@ export function initIntroAnimation(): void {
               top: 0,
               left: 0,
               width: '100vw',
-              height: cssVh,
+              height: vh,
               zIndex: 1,
               transformOrigin: 'center center',
               visibility: 'visible',
