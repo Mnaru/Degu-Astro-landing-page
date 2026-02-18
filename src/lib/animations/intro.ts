@@ -254,6 +254,17 @@ export function initIntroAnimation(): void {
     // Track gallery-placeholder state for forward/reverse transitions
     let galleryInFlow = false;
 
+    // Menu state dispatching — only fires when state changes
+    let lastMenuState = '';
+    function dispatchMenuState(type: string, page?: number): void {
+      const key = page != null ? `${type}:${page}` : type;
+      if (key === lastMenuState) return;
+      lastMenuState = key;
+      window.dispatchEvent(
+        new CustomEvent('menu:state', { detail: { type, page } }),
+      );
+    }
+
     const phaseB = gsap.timeline({
       scrollTrigger: {
         trigger: hero,
@@ -276,8 +287,22 @@ export function initIntroAnimation(): void {
           duration: INTRO_SNAP_DURATION,
         },
         onUpdate: (self) => {
-          // Switch gallery-placeholder between position:fixed (intro)
-          // and normal track flow (page scroll).
+          // ---- Menu state ----
+          if (self.progress < introEnd) {
+            dispatchMenuState('intro');
+          } else if (pageScrollDist > 0) {
+            const pageProgress = (self.progress - introEnd) / (1 - introEnd);
+            const page = Math.min(
+              Math.floor(pageProgress * pageCount),
+              pageCount - 1,
+            );
+            dispatchMenuState('work', page);
+          } else {
+            // No page scroll — single gallery page
+            dispatchMenuState('work', 0);
+          }
+
+          // ---- Gallery flow toggle ----
           if (!track || pageScrollDist === 0) return;
 
           const shouldBeInFlow = self.progress >= introEnd;
@@ -313,10 +338,13 @@ export function initIntroAnimation(): void {
         onLeave: () => {
           gsap.set(hero, { visibility: 'hidden' });
           gsap.set([deguText, studioText], { willChange: 'auto' });
+          // Keep showing last work page until outro section is built
+          dispatchMenuState('work', pageCount - 1);
         },
         onEnterBack: () => {
           gsap.set(hero, { visibility: 'visible' });
           gsap.set([deguText, studioText], { willChange: 'font-size' });
+          dispatchMenuState('work', pageCount - 1);
         },
       },
     });

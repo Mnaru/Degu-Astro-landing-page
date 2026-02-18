@@ -16,6 +16,9 @@ import { t } from '@i18n/utils';
 import socialMediaHero from '@assets/images/pages/social-media-hero.png';
 import productPhotographyHero from '@assets/images/pages/product-photography-hero.png';
 import keyVisualsHero from '@assets/images/pages/key-visuals-hero.png';
+import socialMediaMobile from '@assets/images/pages/Social media assets - Mobile.png';
+import productPhotographyMobile from '@assets/images/pages/Product photography- Mobile.png';
+import keyVisualsMobile from '@assets/images/pages/Key Visuals & OOH - Mobile.png';
 
 const locale = 'lt';
 const i18n = t(locale);
@@ -34,9 +37,6 @@ const i18n = t(locale);
       </div>
     </div>
     <ScrollHint class="scroll-hint-pos" data-intro="scroll-hint" />
-    <div class="menu-wrapper">
-      <MenuCollapsed />
-    </div>
     <PageScrollDesktop data-scroll="page-scroll">
       <PageDesktop
         imageSrc={socialMediaHero}
@@ -59,6 +59,7 @@ const i18n = t(locale);
     <PageScrollMobile data-scroll="page-scroll-mobile">
       <PageMobile
         imageSrc={socialMediaHero}
+        mobileImageSrc={socialMediaMobile}
         imageAlt={i18n.work.pages.socialMedia.imageAlt}
         galleryId="social-media"
         loading="eager"
@@ -66,16 +67,21 @@ const i18n = t(locale);
       />
       <PageMobile
         imageSrc={productPhotographyHero}
+        mobileImageSrc={productPhotographyMobile}
         imageAlt={i18n.work.pages.productPhotography.imageAlt}
         galleryId="product-photography"
       />
       <PageMobile
         imageSrc={keyVisualsHero}
+        mobileImageSrc={keyVisualsMobile}
         imageAlt={i18n.work.pages.keyVisuals.imageAlt}
         galleryId="key-visuals"
       />
     </PageScrollMobile>
   </main>
+  <div class="menu-wrapper">
+    <MenuCollapsed locale={locale} />
+  </div>
 </BaseLayout>
 
 <script>

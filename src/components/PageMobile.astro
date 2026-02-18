@@ -7,11 +7,12 @@ interface Props extends HTMLAttributes<'div'> {
   imageSrc: ImageMetadata;
   imageAlt: string;
   galleryId: string;
+  mobileImageSrc?: ImageMetadata;
   loading?: 'eager' | 'lazy';
   class?: string;
 }
 
-const { imageSrc, imageAlt, galleryId, loading = 'lazy', class: className, ...attrs } = Astro.props;
+const { imageSrc, imageAlt, galleryId, mobileImageSrc, loading = 'lazy', class: className, ...attrs } = Astro.props;
 ---
 
 <div class:list={['page-mobile', className]} data-gallery-id={galleryId} {...attrs}>
@@ -22,7 +23,19 @@ const { imageSrc, imageAlt, galleryId, loading = 'lazy', class: className, ...at
     height={1080}
     format="webp"
     loading={loading}
+    class="img-default"
   />
+  {mobileImageSrc && (
+    <Image
+      src={mobileImageSrc}
+      alt={imageAlt}
+      width={mobileImageSrc.width}
+      height={mobileImageSrc.height}
+      format="webp"
+      loading={loading}
+      class="img-small"
+    />
+  )}
 </div>
 
 <style>
@@ -47,5 +60,18 @@ const { imageSrc, imageAlt, galleryId, loading = 'lazy', class: className, ...at
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+
+  .page-mobile :global(.img-small) {
+    display: none;
+  }
+
+  @media (max-width: 389px) {
+    .page-mobile :global(.img-default) {
+      display: none;
+    }
+    .page-mobile :global(.img-small) {
+      display: block;
+    }
   }
 </style>

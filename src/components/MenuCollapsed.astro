@@ -1,52 +1,135 @@
 ---
-import type { HTMLAttributes } from 'astro/types';
-import { spring } from 'motion';
+import { t } from '@i18n/utils';
 
-interface Props extends HTMLAttributes<'div'> {}
+interface Props {
+  locale: string;
+  class?: string;
+}
 
-const { class: className, ...attrs } = Astro.props;
-const springSmooth = spring(0.25, 0.15);
-const springSnappy = spring(0.15, 0);
-const springFast = spring(0.08, 0);
+const { locale, class: className } = Astro.props;
+const i18n = t(locale);
 ---
 
-<!-- Test trigger: click to cycle states. Will be replaced by scroll-based logic. -->
-<div class:list={['menu-collapsed', 'state-home', 'sub-0', className]} {...attrs}>
+<div class:list={['menu-collapsed', className]}>
   <div class="text-wrapper">
     <div class="text-inner">
-      <span>Contact</span>
-      <span>Work</span>
-      <span>Home</span>
+      <span>{i18n.menu.contact}</span>
+      <span>{i18n.menu.work}</span>
+      <span>{i18n.menu.home}</span>
     </div>
   </div>
   <div class="subsection-wrapper">
     <div class="subsection-inner">
-      <span>Key Visuals & OOH</span>
-      <span>Product photography</span>
-      <span>Social media assets</span>
+      <span>{i18n.work.pages.keyVisuals.title}</span>
+      <span>{i18n.work.pages.productPhotography.title}</span>
+      <span>{i18n.work.pages.socialMedia.title}</span>
     </div>
   </div>
 </div>
 
 <script>
+  import { gsap } from 'gsap';
+
   const el = document.querySelector('.menu-collapsed') as HTMLElement;
-  const all = ['state-home', 'state-work', 'state-contact', 'sub-0', 'sub-1', 'sub-2'];
-  const steps: string[][] = [
-    ['state-home', 'sub-0'],
-    ['state-work', 'sub-0'],
-    ['state-work', 'sub-1'],
-    ['state-work', 'sub-2'],
-    ['state-contact', 'sub-0'],
-  ];
-  let i = 0;
-  el?.addEventListener('click', () => {
-    i = (i + 1) % steps.length;
-    el.classList.remove(...all);
-    el.classList.add(...steps[i]);
-  });
+  const wrapper = document.querySelector('.menu-wrapper') as HTMLElement;
+  if (el && wrapper) {
+    const textInner = el.querySelector('.text-inner') as HTMLElement;
+    const subWrapper = el.querySelector('.subsection-wrapper') as HTMLElement;
+    const subInner = el.querySelector('.subsection-inner') as HTMLElement;
+
+    // Measure actual span height for transform calculations
+    const spanHeight = (textInner.querySelector('span') as HTMLElement).offsetHeight;
+    const spanCount = textInner.querySelectorAll('span').length;
+
+    // Text y offsets: stack is reversed (contact, work, home top-to-bottom)
+    // home = -(spanCount-1)*spanHeight, work = -spanHeight, contact = 0
+    const TEXT_Y_HOME = -(spanCount - 1) * spanHeight;
+    const TEXT_Y_WORK = -spanHeight;
+    const TEXT_Y_CONTACT = 0;
+
+    // Work width: responsive
+    const workWidth = window.innerWidth <= 596
+      ? window.innerWidth - 56
+      : 540;
+    const defaultWidth = 148;
+
+    // GSAP easing (spring-like approximations)
+    const EASE_SMOOTH = 'power3.out';
+    const EASE_SNAPPY = 'back.out(1.7)';
+    const DUR_SMOOTH = 0.5;
+    const DUR_SNAPPY = 0.35;
+    const DUR_FADE = 0.3;
+
+    // Set initial state: home (hidden via wrapper opacity)
+    gsap.set(textInner, { y: TEXT_Y_HOME });
+    gsap.set(subInner, { opacity: 0, visibility: 'hidden' });
+    gsap.set(subWrapper, { maxWidth: 0 });
+
+    let currentType = 'intro';
+    let currentPage = -1;
+
+    interface MenuStateDetail {
+      type: 'intro' | 'work' | 'contact';
+      page?: number;
+    }
+
+    window.addEventListener('menu:state', ((e: CustomEvent<MenuStateDetail>) => {
+      const { type, page } = e.detail;
+
+      // Skip if nothing changed
+      if (type === currentType && (type !== 'work' || page === currentPage)) return;
+
+      const prevType = currentType;
+      currentType = type;
+      currentPage = page ?? -1;
+
+      // --- Show / hide wrapper ---
+      if (type === 'intro') {
+        gsap.to(wrapper, {
+          opacity: 0,
+          duration: DUR_FADE,
+          ease: EASE_SMOOTH,
+          onComplete: () => { wrapper.style.pointerEvents = 'none'; },
+        });
+        return;
+      }
+
+      if (prevType === 'intro') {
+        wrapper.style.pointerEvents = 'auto';
+        gsap.to(wrapper, { opacity: 1, duration: DUR_FADE, ease: EASE_SMOOTH });
+      }
+
+      // --- Work state ---
+      if (type === 'work' && page != null) {
+        // Subsection y: page 0 → bottom span, page N → top span
+        const subSpanCount = subInner.querySelectorAll('span').length;
+        const subY = -(subSpanCount - 1 - page) * spanHeight;
+
+        gsap.to(el, { width: workWidth, duration: DUR_SMOOTH, ease: EASE_SMOOTH });
+        gsap.to(textInner, { y: TEXT_Y_WORK, duration: DUR_SNAPPY, ease: EASE_SNAPPY });
+        gsap.to(subWrapper, { maxWidth: 280, duration: DUR_SMOOTH, ease: EASE_SMOOTH });
+        gsap.to(subInner, {
+          y: subY,
+          opacity: 1,
+          visibility: 'visible',
+          duration: DUR_SNAPPY,
+          ease: EASE_SNAPPY,
+        });
+        return;
+      }
+
+      // --- Contact state (future: outro) ---
+      if (type === 'contact') {
+        gsap.to(el, { width: defaultWidth, duration: DUR_SMOOTH, ease: EASE_SMOOTH });
+        gsap.to(textInner, { y: TEXT_Y_CONTACT, duration: DUR_SNAPPY, ease: EASE_SNAPPY });
+        gsap.to(subWrapper, { maxWidth: 0, duration: DUR_SMOOTH, ease: EASE_SMOOTH });
+        gsap.to(subInner, { opacity: 0, duration: DUR_FADE, ease: EASE_SMOOTH });
+      }
+    }) as EventListener);
+  }
 </script>
 
-<style define:vars={{ springSmooth, springSnappy, springFast }}>
+<style>
   .menu-collapsed {
     display: inline-flex;
     align-items: center;
@@ -55,46 +138,21 @@ const springFast = spring(0.08, 0);
     padding: 32px 42px;
     cursor: pointer;
     width: 148px;
-    transition: width var(--springSmooth);
-  }
-
-  .state-work.menu-collapsed {
-    width: 540px;
-    transition: width var(--springSmooth);
-  }
-
-  @media (max-width: 596px) {
-    .state-work.menu-collapsed {
-      width: calc(100vw - 56px);
-    }
   }
 
   .text-wrapper,
   .subsection-wrapper {
     overflow: hidden;
+  }
+
+  .text-wrapper {
     height: 20px;
   }
 
-  /* Contraction: text out fast so it clears before width finishes */
-  .text-inner {
-    transition: transform var(--springSnappy);
-  }
-
-  .subsection-inner {
-    visibility: hidden;
-    opacity: 0;
-    transition: none;
-  }
-
-  /* Expansion: text in at a relaxed pace */
-  .state-work .text-inner {
-    transition: transform var(--springSnappy);
-  }
-
-  .state-work .subsection-inner {
-    visibility: visible;
-    opacity: 1;
-    transition: transform var(--springSnappy), opacity var(--springSmooth);
+  .subsection-wrapper {
+    height: 20px;
+    max-width: 0;
+    margin-left: auto;
   }
 
   .text-inner span,
@@ -108,28 +166,7 @@ const springFast = spring(0.08, 0);
     white-space: nowrap;
   }
 
-  /* Text slide: reversed stack so new enters from top, old exits bottom */
-  .state-home .text-inner { transform: translateY(-40px); }
-  .state-work .text-inner { transform: translateY(-20px); }
-  .state-contact .text-inner { transform: translateY(0); }
-
-  /* Subsection: hidden by default, expands in work state */
-  .subsection-wrapper {
-    max-width: 0;
-    transition: max-width var(--springSmooth);
-  }
-
-  .state-work .subsection-wrapper {
-    max-width: 280px;
-    margin-left: auto;
-    transition: max-width var(--springSmooth);
-  }
-
   .subsection-inner {
     padding-left: 16px;
   }
-
-  .sub-0 .subsection-inner { transform: translateY(-40px); }
-  .sub-1 .subsection-inner { transform: translateY(-20px); }
-  .sub-2 .subsection-inner { transform: translateY(0); }
 </style>
