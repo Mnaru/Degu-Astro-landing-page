@@ -2,13 +2,16 @@
 :root {
   /* Colors */
   --color-white: #FFFFFF;
-  --color-black: #1A1A1A;
+  --color-black: #000000;
+  --color-offwhite: #E4E4E4;
   --color-bg: var(--color-black);
   --color-text: var(--color-white);
 
   /* Typography */
   --font-display: 'Anton SC', sans-serif;
   --font-body: 'Public Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+
 }
 
 /* ===== Reset ===== */
@@ -42,6 +45,19 @@ svg {
   display: block;
   max-width: 100%;
   height: auto;
+}
+
+/* ===== Hero Layout ===== */
+.hero-row {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  gap: max(16px, calc(12.33px + 1.019vw));
+  margin-top: min(-8px, calc(-2.8px - 1.444vw));
+}
+
+.hero-row > .body-text-container {
+  margin-top: max(16px, calc(12.33px + 1.019vw));
 }
 
 /* ===== GSAP ===== */

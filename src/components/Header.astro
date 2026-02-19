@@ -1,0 +1,28 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import DeguLogo from './DeguLogo.astro';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+
+interface Props extends HTMLAttributes<'header'> {
+  locale: string;
+  class?: string;
+}
+
+const { locale, class: className, ...attrs } = Astro.props;
+---
+
+<header class:list={['site-header', className]} {...attrs}>
+  <LanguageSwitcher currentLocale={locale} />
+  <DeguLogo />
+</header>
+
+<style>
+  .site-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+    padding: max(15px, calc(10px + 1.389vw));
+    padding-bottom: 0;
+  }
+</style>

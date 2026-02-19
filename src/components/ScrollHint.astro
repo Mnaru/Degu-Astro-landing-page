@@ -6,9 +6,8 @@ interface Props extends HTMLAttributes<'div'> {}
 const { class: className, ...attrs } = Astro.props;
 ---
 
-<!-- Trigger: 3s CSS animation on page load, no mouse interaction -->
 <div class:list={['scroll-hint', className]} {...attrs}>
-  <span><slot>Scroll</slot></span>
+  <span class="roll-text"><slot>Scroll</slot></span>
 </div>
 
 <style>
@@ -16,56 +15,82 @@ const { class: className, ...attrs } = Astro.props;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
-    padding: 10px 24px;
-    border-radius: 30px;
-    border: 1px solid var(--color-white);
-    background: transparent;
-    position: relative;
-    overflow: hidden;
     pointer-events: none;
-  }
-
-  .scroll-hint::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: var(--color-white);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  .scroll-hint.animate::before {
-    animation: fill 1s ease-out forwards;
-  }
-
-  span {
-    position: relative;
-    z-index: 1;
     font-family: var(--font-body);
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 18px;
-    color: var(--color-white);
-  }
-
-  .scroll-hint.animate span {
-    animation: invert 1s ease-out forwards;
-  }
-
-  @keyframes fill {
-    to {
-      width: 300%;
-      height: 600%;
-    }
-  }
-
-  @keyframes invert {
-    to {
-      color: var(--color-black);
-    }
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 1.32px;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--color-offwhite);
   }
 </style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  document.querySelectorAll('.scroll-hint').forEach((hint) => {
+    const textEl = hint.querySelector('.roll-text');
+    if (!textEl) return;
+
+    const content = textEl.textContent || '';
+    hint.removeChild(textEl);
+
+    // Tube container (holds 3 stacked lines)
+    const tube = document.createElement('div');
+    tube.style.position = 'relative';
+    hint.appendChild(tube);
+
+    const lineCount = 4;
+    const allLines: HTMLElement[] = [];
+    const charSets: HTMLElement[][] = [];
+
+    for (let i = 0; i < lineCount; i++) {
+      const line = document.createElement('span');
+      line.style.display = 'block';
+      line.style.whiteSpace = 'nowrap';
+
+      if (i > 0) {
+        line.style.position = 'absolute';
+        line.style.top = '0';
+        line.style.left = '0';
+      }
+
+      const chars: HTMLElement[] = [];
+      content.split('').forEach((c) => {
+        const span = document.createElement('span');
+        span.textContent = c;
+        span.style.display = 'inline-block';
+        span.style.backfaceVisibility = 'hidden';
+        line.appendChild(span);
+        chars.push(span);
+      });
+
+      tube.appendChild(line);
+      allLines.push(line);
+      charSets.push(chars);
+    }
+
+    // 3D setup — depth creates cylinder radius, scaled for 11px font
+    const depth = -7;
+    const transformOrigin = `50% 50% ${depth}px`;
+
+    gsap.set(allLines, { perspective: 200, transformStyle: 'preserve-3d' });
+
+    // TODO: add trigger (ScrollTrigger or custom event) — plays immediately for now
+    // Top-to-bottom: each line rotates from top(90) through front(0) to bottom(-90)
+    // Lines are staggered so one is always visible at the front
+    const animTime = 0.9;
+    const tl = gsap.timeline({ repeat: -1 });
+
+    charSets.forEach((chars, index) => {
+      tl.fromTo(chars,
+        { rotationX: 90 },
+        { rotationX: -90, stagger: 0.1, duration: animTime, ease: 'none', transformOrigin },
+        index * (animTime * 0.5)
+      );
+    });
+  });
+</script>

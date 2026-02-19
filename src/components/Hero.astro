@@ -1,0 +1,41 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'section'> {
+  class?: string;
+}
+
+const { class: className, ...attrs } = Astro.props;
+---
+
+<section class:list={['hero', className]} {...attrs}>
+  <div class="hero-inner">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .hero {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    padding-top: max(15px, calc(10px + 1.389vw));
+    padding-right: max(15px, calc(10px + 1.389vw));
+    padding-bottom: max(calc(72.67px - 2.963vw), calc(10px + 1.389vw));
+    padding-left: max(15px, calc(10px + 1.389vw));
+    background: red;
+  }
+
+  .hero-inner {
+    flex: 1;
+    position: relative;
+    background: grey;
+  }
+
+  .hero-inner :global(.scroll-hint) {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+</style>

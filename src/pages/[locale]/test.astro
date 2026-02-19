@@ -1,5 +1,7 @@
 ---
-import '../styles/global.css';
+import type { GetStaticPaths } from 'astro';
+
+import '../../styles/global.css';
 import { t } from '@i18n/utils';
 import Header from '@components/Header.astro';
 import BodyTextContainer from '@components/BodyTextContainer.astro';
@@ -8,7 +10,13 @@ import HeaderContainerStudio from '@components/HeaderContainerStudio.astro';
 import Hero from '@components/Hero.astro';
 import ScrollHint from '@components/ScrollHint.astro';
 
-const locale = 'lt';
+export const getStaticPaths = (() => {
+  return [
+    { params: { locale: 'en' } },
+  ];
+}) satisfies GetStaticPaths;
+
+const { locale } = Astro.params;
 const i18n = t(locale);
 ---
 
