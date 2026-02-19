@@ -66,16 +66,16 @@ const menuItems = [
   import { gsap } from 'gsap';
   import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
-  import {
-    MENU_ITEM_STAGGER,
-    MENU_ITEM_DURATION,
-    MENU_ITEM_OFFSET,
-    MENU_ITEM_EASE,
-    MENU_FADE_IN_DURATION,
-    MENU_FADE_OUT_DURATION,
-    MENU_SCROLL_DURATION,
-    MENU_SCROLL_EASE,
-  } from '@lib/animations/config';
+
+  // Animation constants (previously in @lib/animations/config)
+  const MENU_ITEM_STAGGER = 0.06;
+  const MENU_ITEM_DURATION = 0.4;
+  const MENU_ITEM_OFFSET = 40;
+  const MENU_ITEM_EASE = 'power2.out';
+  const MENU_FADE_IN_DURATION = 0.3;
+  const MENU_FADE_OUT_DURATION = 0.25;
+  const MENU_SCROLL_DURATION = 1;
+  const MENU_SCROLL_EASE = 'power3.inOut';
 
   gsap.registerPlugin(ScrollToPlugin, ScrollTrigger);
 

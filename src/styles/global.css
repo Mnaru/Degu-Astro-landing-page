@@ -33,3 +33,39 @@ body {
   font-family: var(--font-body);
   line-height: 1.6;
 }
+
+/* ===== Adaptive Foundations ===== */
+img,
+picture,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ===== GSAP ===== */
+/* Prevent flash of unstyled/unanimated content.
+   Elements that GSAP will animate start hidden and
+   are revealed by GSAP once the animation is ready. */
+[data-gsap] {
+  visibility: hidden;
+}
+
+/* Respect user motion preferences globally.
+   GSAP animations should also check this via
+   gsap.matchMedia() and skip/reduce animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-gsap] {
+    visibility: visible;
+  }
+}
