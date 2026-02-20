@@ -79,11 +79,11 @@ const { class: className, ...attrs } = Astro.props;
 
     gsap.set(allLines, { perspective: 200, transformStyle: 'preserve-3d' });
 
-    // TODO: add trigger (ScrollTrigger or custom event) — plays immediately for now
+    // Cylinder rotation — starts paused, triggered by parent animation (e.g. heroIntro)
     // Top-to-bottom: each line rotates from top(90) through front(0) to bottom(-90)
     // Lines are staggered so one is always visible at the front
     const animTime = 0.9;
-    const tl = gsap.timeline({ repeat: -1 });
+    const tl = gsap.timeline({ repeat: -1, paused: true });
 
     charSets.forEach((chars, index) => {
       tl.fromTo(chars,
@@ -92,5 +92,8 @@ const { class: className, ...attrs } = Astro.props;
         index * (animTime * 0.5)
       );
     });
+
+    // Expose timeline so parent animations can trigger it
+    (hint as any)._scrollHintTl = tl;
   });
 </script>

@@ -9,10 +9,20 @@ const { class: className, ...attrs } = Astro.props;
 ---
 
 <section class:list={['hero', className]} {...attrs}>
-  <div class="hero-inner">
+  <div class="hero-inner" data-gsap>
     <slot />
   </div>
 </section>
+
+<script>
+  import { heroIntro } from '@lib/animations/heroIntro';
+  import { heroOutro } from '@lib/animations/heroOutro';
+  history.scrollRestoration = 'manual';
+  await document.fonts.ready;
+  document.querySelectorAll('.hero').forEach((el) => {
+    heroIntro(el as HTMLElement, () => heroOutro(el as HTMLElement));
+  });
+</script>
 
 <style>
   .hero {
