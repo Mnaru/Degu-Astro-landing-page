@@ -1,0 +1,129 @@
+---
+import { t } from '@i18n/utils';
+
+interface Props {
+  locale: string;
+  class?: string;
+}
+
+const { locale, class: className } = Astro.props;
+const i18n = t(locale);
+---
+
+<div class:list={['menu', className]}>
+  <div class="text-wrapper">
+    <div class="text-inner">
+      <span>{i18n.menu.contact}</span>
+      <span>{i18n.menu.work}</span>
+      <span>{i18n.menu.home}</span>
+    </div>
+  </div>
+  <div class="subsection-wrapper">
+    <div class="subsection-inner">
+      <span>{i18n.work.pages.socialMedia.title}</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const el = document.querySelector('.menu') as HTMLElement;
+  if (el) {
+    const textInner = el.querySelector('.text-inner') as HTMLElement;
+
+    // Measure span height for transform calculations
+    let spanHeight = (textInner.querySelector('span') as HTMLElement).offsetHeight;
+    const spanCount = textInner.querySelectorAll('span').length;
+
+    document.fonts.ready.then(() => {
+      spanHeight = (textInner.querySelector('span') as HTMLElement).offsetHeight;
+      // Re-apply current position after font measurement
+      gsap.set(textInner, { y: -currentIndex * spanHeight });
+    });
+
+    // Text stack order: contact(0), work(1), home(2) — start at home
+    let currentIndex = spanCount - 1;
+    gsap.set(textInner, { y: -currentIndex * spanHeight });
+
+    // Click cycles through states: home → work → contact → home → ...
+    el.addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % spanCount;
+      gsap.to(textInner, {
+        y: -currentIndex * spanHeight,
+        duration: 0.35,
+        ease: 'back.out(1.7)',
+      });
+    });
+
+    // Also respond to menu:state events
+    const stateMap: Record<string, number> = {
+      home: spanCount - 1,
+      work: 1,
+      contact: 0,
+    };
+
+    window.addEventListener('menu:state', ((e: CustomEvent) => {
+      const index = stateMap[e.detail.type];
+      if (index === undefined || index === currentIndex) return;
+      currentIndex = index;
+      gsap.to(textInner, {
+        y: -currentIndex * spanHeight,
+        duration: 0.35,
+        ease: 'back.out(1.7)',
+      });
+    }) as EventListener);
+  }
+</script>
+
+<style>
+  .menu {
+    display: inline-flex;
+    align-items: center;
+    background: var(--color-white);
+    border-radius: 100px;
+    height: 78px;
+    padding: 0 42px;
+    cursor: pointer;
+    width: 540px;
+  }
+
+  .text-wrapper,
+  .subsection-wrapper {
+    overflow: hidden;
+  }
+
+  .text-wrapper {
+    height: 20px;
+  }
+
+  .subsection-wrapper {
+    height: 30px;
+    margin-left: auto;
+  }
+
+  .text-inner span {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+    color: var(--color-black);
+    white-space: nowrap;
+  }
+
+  .subsection-inner span {
+    display: block;
+    font-family: 'Instrument Serif', serif;
+    font-size: 30px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 30px;
+    color: #1A1A1A;
+    white-space: nowrap;
+  }
+
+  .subsection-inner {
+    padding-left: 16px;
+  }
+</style>

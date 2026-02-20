@@ -1,7 +1,6 @@
 ---
 import '../styles/global.css';
 import { t } from '@i18n/utils';
-import Header from '@components/Header.astro';
 import BodyTextContainer from '@components/BodyTextContainer.astro';
 import HeaderContainer from '@components/HeaderContainer.astro';
 import HeaderContainerStudio from '@components/HeaderContainerStudio.astro';
@@ -33,6 +32,5 @@ const i18n = t(locale);
       </div>
       <ScrollHint>{i18n.intro.scrollHint}</ScrollHint>
     </Hero>
-    <Header locale={locale} />
   </body>
 </html>

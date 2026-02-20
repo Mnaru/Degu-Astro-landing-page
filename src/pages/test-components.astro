@@ -1,0 +1,78 @@
+---
+import '../styles/global.css';
+import Header from '@components/Header.astro';
+import Menu from '@components/Menu.astro';
+
+const locale = 'lt';
+---
+
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Component Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton+SC&family=Instrument+Serif:ital@1&family=Public+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <Header locale={locale} />
+    <div class="menu-wrapper">
+      <Menu locale={locale} />
+    </div>
+
+    <div class="controls">
+      <button data-state="intro">intro</button>
+      <button data-state="work">work</button>
+      <button data-state="contact">contact</button>
+    </div>
+  </body>
+</html>
+
+<script>
+  document.querySelectorAll('.controls button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const type = (btn as HTMLElement).dataset.state;
+      window.dispatchEvent(new CustomEvent('menu:state', { detail: { type } }));
+    });
+  });
+</script>
+
+<style>
+  body {
+    background: var(--color-black);
+  }
+
+  .menu-wrapper {
+    display: inline-block;
+    padding: 40px;
+  }
+
+  .controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+  }
+
+  .controls button {
+    font-family: var(--font-body);
+    font-size: 13px;
+    padding: 8px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .controls button:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+</style>
