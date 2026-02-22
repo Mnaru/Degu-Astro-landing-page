@@ -1,5 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
+import { Image } from 'astro:assets';
+import teamPhoto from '../assets/images/team/TeamPhoto.png';
 
 interface Props extends HTMLAttributes<'section'> {
   class?: string;
@@ -11,6 +13,7 @@ const { class: className, ...attrs } = Astro.props;
 <section class:list={['outro', className]} {...attrs}>
   <div class="outro-inner">
     <slot />
+    <Image src={teamPhoto} alt="Degu Studio team" class="team-photo" />
   </div>
 </section>
 
@@ -33,5 +36,14 @@ const { class: className, ...attrs } = Astro.props;
     flex-direction: column;
     justify-content: center;
     background: grey;
+  }
+
+  .team-photo {
+    position: absolute;
+    right: calc(-160.87px + 36.685vw);
+    top: calc(388px + 10.19vw);
+    transform: translateY(-50%) rotate(10deg);
+    width: max(256px, calc(236.33px + 5.463vw));
+    height: auto;
   }
 </style>
