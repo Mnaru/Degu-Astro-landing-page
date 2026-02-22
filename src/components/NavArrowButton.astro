@@ -1,0 +1,52 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'button'> {
+  direction?: 'up' | 'down';
+  class?: string;
+}
+
+const { direction = 'down', class: className, ...attrs } = Astro.props;
+---
+
+<button
+  class:list={['nav-arrow-button', className]}
+  aria-label={`Scroll ${direction}`}
+  {...attrs}
+>
+  <svg
+    class:list={['nav-arrow-icon', { 'nav-arrow-icon--up': direction === 'up' }]}
+    width="20"
+    height="20"
+    viewBox="0 0 22 22"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <path d="M11 1L11 21M11 21L21 11M11 21L1 11" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+<style>
+  .nav-arrow-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: none;
+    background: var(--color-white);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .nav-arrow-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .nav-arrow-icon--up {
+    transform: rotate(180deg);
+  }
+</style>

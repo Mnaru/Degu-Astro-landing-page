@@ -1,0 +1,146 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import NavArrowButton from './NavArrowButton.astro';
+import NavTextButton from './NavTextButton.astro';
+
+interface Props extends HTMLAttributes<'nav'> {
+  homeLabel: string;
+  contactLabel: string;
+  class?: string;
+}
+
+const { homeLabel, contactLabel, class: className, ...attrs } = Astro.props;
+---
+
+<nav class:list={['new-menu', className]} {...attrs}>
+  <NavTextButton label={homeLabel}>
+    <svg slot="icon" width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M18.5359 8.46815L10.6192 0.468252C10.3223 0.168425 9.91975 0 9.5 0C9.08025 0 8.67768 0.168425 8.38078 0.468252L0.464124 8.46815C0.316384 8.61633 0.199271 8.79272 0.119595 8.98705C0.0399184 9.18139 -0.000730961 9.38979 9.94875e-06 9.60013V19.2C9.94875e-06 19.4122 0.0834175 19.6157 0.231884 19.7657C0.38035 19.9157 0.581713 20 0.791676 20H7.125C7.33497 20 7.53633 19.9157 7.68479 19.7657C7.83326 19.6157 7.91667 19.4122 7.91667 19.2V13.6001H11.0833V19.2C11.0833 19.4122 11.1667 19.6157 11.3152 19.7657C11.4637 19.9157 11.665 20 11.875 20H18.2083C18.4183 20 18.6197 19.9157 18.7681 19.7657C18.9166 19.6157 19 19.4122 19 19.2V9.60013C19.0007 9.38979 18.9601 9.18139 18.8804 8.98705C18.8007 8.79272 18.6836 8.61633 18.5359 8.46815ZM17.4167 18.4H12.6667V12.8001C12.6667 12.5879 12.5833 12.3844 12.4348 12.2344C12.2863 12.0844 12.085 12.0001 11.875 12.0001H7.125C6.91504 12.0001 6.71368 12.0844 6.56521 12.2344C6.41674 12.3844 6.33334 12.5879 6.33334 12.8001V18.4H1.58334V9.60013L9.5 1.60024L17.4167 9.60013V18.4Z" fill="black"/>
+    </svg>
+  </NavTextButton>
+  <div class="new-menu__arrows">
+    <NavArrowButton direction="up" />
+    <NavArrowButton direction="down" />
+  </div>
+  <NavTextButton label={contactLabel}>
+    <svg slot="icon" width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M8.25 12.5926C8.25 12.789 8.17098 12.9775 8.03033 13.1164C7.88968 13.2553 7.69891 13.3333 7.5 13.3333H3.75C3.55109 13.3333 3.36032 13.2553 3.21967 13.1164C3.07902 12.9775 3 12.789 3 12.5926C3 12.3961 3.07902 12.2077 3.21967 12.0688C3.36032 11.9299 3.55109 11.8519 3.75 11.8519H7.5C7.69891 11.8519 7.88968 11.9299 8.03033 12.0688C8.17098 12.2077 8.25 12.3961 8.25 12.5926ZM21 9.25926V14.8148C21 15.2077 20.842 15.5845 20.5607 15.8624C20.2794 16.1402 19.8978 16.2963 19.5 16.2963H11.25V19.2593C11.25 19.4557 11.171 19.6441 11.0303 19.783C10.8897 19.922 10.6989 20 10.5 20C10.3011 20 10.1103 19.922 9.96967 19.783C9.82902 19.6441 9.75 19.4557 9.75 19.2593V16.2963H1.5C1.10218 16.2963 0.720644 16.1402 0.43934 15.8624C0.158035 15.5845 0 15.2077 0 14.8148V9.25926C0.00173682 7.78636 0.594927 6.37428 1.64944 5.33278C2.70396 4.29129 4.13369 3.70542 5.625 3.7037H12.75V0.740741C12.75 0.544284 12.829 0.355874 12.9697 0.216958C13.1103 0.0780421 13.3011 0 13.5 0H16.5C16.6989 0 16.8897 0.0780421 17.0303 0.216958C17.171 0.355874 17.25 0.544284 17.25 0.740741C17.25 0.937197 17.171 1.12561 17.0303 1.26452C16.8897 1.40344 16.6989 1.48148 16.5 1.48148H14.25V3.7037H15.375C16.8663 3.70542 18.296 4.29129 19.3506 5.33278C20.4051 6.37428 20.9983 7.78636 21 9.25926ZM9.75 14.8148V9.25926C9.75 8.17875 9.3154 7.14249 8.54182 6.37845C7.76823 5.61442 6.71902 5.18518 5.625 5.18518C4.53098 5.18518 3.48177 5.61442 2.70818 6.37845C1.9346 7.14249 1.5 8.17875 1.5 9.25926V14.8148H9.75ZM19.5 9.25926C19.4988 8.17912 19.0638 7.14358 18.2904 6.37981C17.5171 5.61604 16.4686 5.18641 15.375 5.18518H14.25V11.8519C14.25 12.0483 14.171 12.2367 14.0303 12.3756C13.8897 12.5146 13.6989 12.5926 13.5 12.5926C13.3011 12.5926 13.1103 12.5146 12.9697 12.3756C12.829 12.2367 12.75 12.0483 12.75 11.8519V5.18518H9.44531C10.0146 5.70441 10.4689 6.33445 10.7795 7.03563C11.0901 7.7368 11.2503 8.49391 11.25 9.25926V14.8148H19.5V9.25926Z" fill="black"/>
+    </svg>
+  </NavTextButton>
+</nav>
+
+<style>
+  .new-menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    margin-inline: auto;
+  }
+
+  .new-menu > :global(*) {
+    flex-shrink: 0;
+  }
+
+  .new-menu__arrows {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  @media (max-width: 420px) {
+    .new-menu {
+      padding: 0 15px;
+      gap: 0;
+      justify-content: space-between;
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const mm = gsap.matchMedia();
+
+  mm.add(
+    {
+      pointer: '(hover: hover) and (prefers-reduced-motion: no-preference)',
+      touch: '(hover: none) and (prefers-reduced-motion: no-preference)',
+    },
+    (context) => {
+      const { pointer, touch } = context.conditions!;
+      const buttons = document.querySelectorAll<HTMLButtonElement>('.new-menu button');
+
+      buttons.forEach((btn) => {
+        if (pointer) {
+          gsap.set(btn, { transformPerspective: 400 });
+
+          const rotX = gsap.quickTo(btn, 'rotationX', { ease: 'power3', duration: 0.4 });
+          const rotY = gsap.quickTo(btn, 'rotationY', { ease: 'power3', duration: 0.4 });
+
+          const children = Array.from(btn.children);
+          const childQuickTos = children.map((child) => ({
+            x: gsap.quickTo(child, 'x', { ease: 'power3', duration: 0.4 }),
+            y: gsap.quickTo(child, 'y', { ease: 'power3', duration: 0.4 }),
+          }));
+
+          btn.addEventListener('pointermove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const relX = (e.clientX - rect.left) / rect.width;
+            const relY = (e.clientY - rect.top) / rect.height;
+
+            rotX(gsap.utils.interpolate(20, -20, relY));
+            rotY(gsap.utils.interpolate(-20, 20, relX));
+
+            childQuickTos.forEach((qt) => {
+              qt.x(gsap.utils.interpolate(-4, 4, relX));
+              qt.y(gsap.utils.interpolate(-4, 4, relY));
+            });
+          });
+
+          btn.addEventListener('pointerleave', () => {
+            rotX(0);
+            rotY(0);
+            childQuickTos.forEach((qt) => {
+              qt.x(0);
+              qt.y(0);
+            });
+          });
+        }
+
+        if (touch) {
+          btn.addEventListener('pointerdown', () => {
+            gsap.to(btn, {
+              scale: 0.92,
+              opacity: 0.85,
+              duration: 0.05,
+              ease: 'power2.in',
+              overwrite: true,
+            });
+          });
+
+          btn.addEventListener('pointerup', () => {
+            gsap.to(btn, {
+              scale: 1,
+              opacity: 1,
+              duration: 0.24,
+              ease: 'back.out(1.7)',
+              overwrite: true,
+            });
+          });
+
+          btn.addEventListener('pointerleave', () => {
+            gsap.to(btn, {
+              scale: 1,
+              opacity: 1,
+              duration: 0.24,
+              ease: 'back.out(1.7)',
+              overwrite: true,
+            });
+          });
+        }
+      });
+    }
+  );
+</script>

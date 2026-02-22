@@ -14,6 +14,40 @@
 - Width auto preserves aspect ratio
 - Removed fixed positioning (now lives inside Header)
 
+### NavArrowButton
+- White circular button: 64x64px, border-radius 50%
+- Centered arrow icon (20x20px) from NavArrowButtonIcon.svg
+- Two variants via `direction` prop: 'up' | 'down' (default 'down')
+- Up variant rotates icon 180deg
+- Fixed size on all viewports
+
+### NavTextButton
+- White pill-shaped button: 64px height, border-radius 100px
+- Text: #1A1A1A, Public Sans, 16px, 500 weight, 32px horizontal padding
+- Width adapts to text content
+- Named `icon` slot for responsive icon switching
+- Responsive: >=420px shows text, <=419px collapses to 64x64px icon button (text hidden, icon shown)
+
+### NewMenu
+- Composite nav component: Home button + arrow up + arrow down + Contact button
+- Default: flex row, 8px gap, align-items center
+- Responsive (<=420px): full width, 15px left/right padding, justify-content space-between
+  - Arrow buttons wrapped in `.new-menu__arrows` div preserving 8px gap
+  - Available space distributed equally between home/arrows and arrows/contact
+  - All children have flex-shrink: 0 to prevent button shrinking
+- Icons: inline SVGs from NavHomeButtonIcon.svg and NavContactButtonIcon.svg
+- Translations: en (Home / Contact), lt (Į pradžią / Parašyk mums)
+- **Pointer hover interaction** (`hover: hover`): GSAP 3D tilt + parallax
+  - `transformPerspective: 400` on each button
+  - `rotationX`/`rotationY` ±20deg via `gsap.quickTo` (power3, 0.4s) tracking cursor position relative to button bounds
+  - Inner content (icons, labels) shifts ±4px x/y for parallax depth
+  - Resets to neutral on `pointerleave`
+- **Touch interaction** (`hover: none`): compress & release
+  - `pointerdown`: scale 0.92, opacity 0.85 (0.05s, power2.in) — near-instant for fast taps
+  - `pointerup`/`pointerleave`: spring back to scale 1, opacity 1 (0.24s, back.out(1.7) overshoot)
+  - `overwrite: true` prevents tween conflicts on rapid taps
+- Both interactions wrapped in `gsap.matchMedia()`, disabled when `prefers-reduced-motion: reduce`
+
 ### LanguageSwitcher
 - Vertical layout: LT on top, EN below
 - 38px circles with -10deg rotation, 8px gap (fixed sizes)

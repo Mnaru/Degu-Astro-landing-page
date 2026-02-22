@@ -60,6 +60,10 @@ export const translations = {
       contact: 'Contact',
       close: 'Close menu',
     },
+    nav: {
+      home: 'Home',
+      contact: 'Contact',
+    },
     gallery: {
       close: 'Close gallery',
     },
@@ -125,6 +129,10 @@ export const translations = {
       work: 'Darbai',
       contact: 'Kontaktai',
       close: 'Uždaryti meniu',
+    },
+    nav: {
+      home: 'Į pradžią',
+      contact: 'Parašyk mums',
     },
     gallery: {
       close: 'Uždaryti galeriją',

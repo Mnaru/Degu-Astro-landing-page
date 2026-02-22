@@ -1,0 +1,66 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'button'> {
+  label: string;
+  class?: string;
+}
+
+const { label, class: className, ...attrs } = Astro.props;
+---
+
+<button
+  class:list={['nav-text-button', className]}
+  aria-label={label}
+  {...attrs}
+>
+  <span class="nav-text-button__label">{label}</span>
+  <span class="nav-text-button__icon">
+    <slot name="icon" />
+  </span>
+</button>
+
+<style>
+  .nav-text-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 64px;
+    padding: 0 32px;
+    border: none;
+    border-radius: 100px;
+    background: var(--color-white);
+    cursor: pointer;
+  }
+
+  .nav-text-button__label {
+    color: #1A1A1A;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    white-space: nowrap;
+  }
+
+  .nav-text-button__icon {
+    display: none;
+  }
+
+  @media (max-width: 419px) {
+    .nav-text-button {
+      width: 64px;
+      padding: 0;
+    }
+
+    .nav-text-button__label {
+      display: none;
+    }
+
+    .nav-text-button__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+</style>
