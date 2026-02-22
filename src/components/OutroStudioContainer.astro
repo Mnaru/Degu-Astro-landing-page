@@ -15,14 +15,12 @@ const { text, class: className, ...attrs } = Astro.props;
 
 <style>
   .outro-studio-container {
-    width: max(158px, calc(77px + 22.5vw));
+    width: fit-content;
     margin-top: calc(-3.6px - 1vw);
-    margin-left: max(0px, calc(-116.35px + 29.087vw));
   }
 
   .outro-studio-text {
     display: block;
-    margin-left: var(--optical-adjust-display);
     font-family: var(--font-display);
     font-size: max(70px, calc(34.33px + 9.907vw));
     font-style: normal;

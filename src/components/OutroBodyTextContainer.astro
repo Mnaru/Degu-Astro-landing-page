@@ -1,0 +1,32 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  text: string;
+  class?: string;
+}
+
+const { text, class: className, ...attrs } = Astro.props;
+---
+
+<div class:list={['outro-body-text-container', className]} {...attrs}>
+  <p set:html={text} />
+</div>
+
+<style>
+  .outro-body-text-container {
+    width: fit-content;
+  }
+
+  p {
+    margin: 0;
+    margin-left: var(--optical-adjust-serif);
+    font-family: var(--font-serif);
+    font-size: max(18px, calc(16px + 0.556vw));
+    font-style: italic;
+    font-weight: 400;
+    line-height: max(18px, calc(16px + 0.556vw));
+    color: var(--color-offwhite);
+    text-align: left;
+  }
+</style>

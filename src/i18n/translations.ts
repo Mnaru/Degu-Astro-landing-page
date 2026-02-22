@@ -49,7 +49,7 @@ export const translations = {
     outro: {
       header1: 'DROP US',
       header2: 'A LINE',
-      body: "Don't be shy - send us an email and we'll get back to you.",
+      body: "Don't be shy - send us an email<br>and we'll get back to you.",
       emailButton: 'Email us',
       emailCopied: '💚 Email copied',
       teamImageAlt: 'Degu Studio team',
@@ -120,7 +120,7 @@ export const translations = {
     outro: {
       header1: 'PARAŠYK',
       header2: 'MUMS',
-      body: 'Nebūk drovus – parašyk mums el. laišką ir mes susisieksime.',
+      body: 'Nebūk drovus – parašyk mums<br>el. laišką ir mes susisieksime.',
       emailButton: 'Rašyk mums',
       emailCopied: '💚 Emeilas nukopijuotas!',
       teamImageAlt: 'Degu Studio komanda',

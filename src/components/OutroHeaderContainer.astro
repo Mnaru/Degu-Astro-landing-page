@@ -15,13 +15,11 @@ const { text, class: className, ...attrs } = Astro.props;
 
 <style>
   .outro-header-container {
-    width: max(310px, calc(155px + 43.056vw));
-    margin-left: max(0px, calc(-116.35px + 29.087vw));
+    width: fit-content;
   }
 
   .outro-header-text {
     display: block;
-    margin-left: var(--optical-adjust-display);
     font-family: var(--font-display);
     font-size: max(100px, calc(50px + 13.889vw));
     font-style: normal;

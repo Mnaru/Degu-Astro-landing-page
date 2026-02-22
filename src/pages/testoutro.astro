@@ -3,7 +3,7 @@ import '../styles/global.css';
 import Outro from '@components/Outro.astro';
 import OutroHeaderContainer from '@components/OutroHeaderContainer.astro';
 import OutroStudioContainer from '@components/OutroStudioContainer.astro';
-import BodyTextContainer from '@components/BodyTextContainer.astro';
+import OutroBodyTextContainer from '@components/OutroBodyTextContainer.astro';
 import EmailUsButton from '@components/EmailUsButton.astro';
 import FollowUsButton from '@components/FollowUsButton.astro';
 import { translations } from '../i18n/translations';
@@ -26,12 +26,14 @@ const t = translations[locale];
   </head>
   <body>
     <Outro>
-      <OutroHeaderContainer text={t.outro.header1} />
-      <OutroStudioContainer text={t.outro.header2} />
-      <BodyTextContainer text={t.outro.body} class="outro-body" />
-      <div class="outro-buttons">
-        <EmailUsButton label={t.outro.emailButton} />
-        <FollowUsButton />
+      <div class="outro-content">
+        <OutroHeaderContainer text={t.outro.header1} />
+        <OutroStudioContainer text={t.outro.header2} />
+        <OutroBodyTextContainer text={t.outro.body} class="outro-body" />
+        <div class="outro-buttons">
+          <EmailUsButton label={t.outro.emailButton} />
+          <FollowUsButton />
+        </div>
       </div>
     </Outro>
   </body>
@@ -42,17 +44,26 @@ const t = translations[locale];
     background: var(--color-black);
   }
 
+  .outro-content {
+    width: fit-content;
+    margin-inline: auto;
+  }
+
+  @media (max-width: 400px) {
+    .outro-content {
+      margin-inline: 0;
+    }
+  }
+
   .outro-body {
-    margin-top: clamp(20px, calc(10px + 2vw), 40px);
-    margin-left: max(0px, calc(-116.35px + 29.087vw));
+    margin-top: clamp(24px, calc(432px - 28.333vw), 330px);
   }
 
   .outro-buttons {
     display: flex;
     flex-direction: row;
     gap: 12px;
-    margin-top: clamp(20px, calc(10px + 2vw), 40px);
-    margin-left: max(0px, calc(-116.35px + 29.087vw));
+    margin-top: 27px;
   }
 
 </style>
