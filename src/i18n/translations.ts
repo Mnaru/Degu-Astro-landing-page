@@ -51,7 +51,7 @@ export const translations = {
       header2: 'A LINE',
       body: "Don't be shy - send us an email and we'll get back to you.",
       emailButton: 'Email us',
-      emailCopied: 'Email copied',
+      emailCopied: '💚 Email copied',
       teamImageAlt: 'Degu Studio team',
     },
     menu: {
@@ -63,6 +63,7 @@ export const translations = {
     nav: {
       home: 'Home',
       contact: 'Contact',
+      cta: 'Email us',
     },
     gallery: {
       close: 'Close gallery',
@@ -121,7 +122,7 @@ export const translations = {
       header2: 'MUMS',
       body: 'Nebūk drovus – parašyk mums el. laišką ir mes susisieksime.',
       emailButton: 'Rašyk mums',
-      emailCopied: 'El. paštas nukopijuotas',
+      emailCopied: '💚 Emeilas nukopijuotas!',
       teamImageAlt: 'Degu Studio komanda',
     },
     menu: {
@@ -133,6 +134,7 @@ export const translations = {
     nav: {
       home: 'Į pradžią',
       contact: 'Parašyk mums',
+      cta: 'Parašyk mums',
     },
     gallery: {
       close: 'Uždaryti galeriją',

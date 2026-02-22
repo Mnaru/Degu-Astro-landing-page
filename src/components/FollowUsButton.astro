@@ -1,0 +1,74 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'button'> {
+  href?: string;
+  label?: string;
+  class?: string;
+}
+
+const {
+  href = 'https://www.instagram.com/degu.studio/',
+  label = 'Follow us',
+  class: className,
+  ...attrs
+} = Astro.props;
+---
+
+<button
+  class:list={['follow-us-button', className]}
+  aria-label={label}
+  data-href={href}
+  {...attrs}
+>
+  <span class="follow-us-button__label">{label}</span>
+</button>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.follow-us-button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const href = btn.dataset.href ?? '';
+      window.open(href, '_blank', 'noopener,noreferrer');
+    });
+  });
+</script>
+
+<style>
+  .follow-us-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    padding: 0 23px;
+    border: 1px solid var(--color-offwhite);
+    border-radius: 100px;
+    background: var(--color-black);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .follow-us-button:hover {
+    background: var(--color-offwhite);
+  }
+
+  .follow-us-button:hover .follow-us-button__label {
+    color: var(--color-black);
+  }
+
+  .follow-us-button:focus-visible {
+    outline: 2px solid var(--color-offwhite);
+    outline-offset: 2px;
+  }
+
+  .follow-us-button__label {
+    color: var(--color-offwhite);
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+</style>

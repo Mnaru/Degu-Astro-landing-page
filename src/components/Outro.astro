@@ -1,0 +1,37 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'section'> {
+  class?: string;
+}
+
+const { class: className, ...attrs } = Astro.props;
+---
+
+<section class:list={['outro', className]} {...attrs}>
+  <div class="outro-inner">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .outro {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    padding-top: max(15px, calc(10px + 1.389vw));
+    padding-right: max(15px, calc(10px + 1.389vw));
+    padding-bottom: max(calc(72.67px - 2.963vw), calc(10px + 1.389vw));
+    padding-left: max(15px, calc(10px + 1.389vw));
+    background: red;
+  }
+
+  .outro-inner {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: grey;
+  }
+</style>

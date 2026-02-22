@@ -5,6 +5,8 @@ import Header from '@components/Header.astro';
 import NavArrowButton from '@components/NavArrowButton.astro';
 import NavTextButton from '@components/NavTextButton.astro';
 import NewMenu from '@components/NewMenu.astro';
+import EmailUsButton from '@components/EmailUsButton.astro';
+import FollowUsButton from '@components/FollowUsButton.astro';
 import { translations, type Locale } from '../../i18n/translations';
 
 export const getStaticPaths = (() => {
@@ -49,6 +51,11 @@ const t = translations[locale as Locale];
 
     <NewMenu homeLabel={t.nav.home} contactLabel={t.nav.contact} />
 
+    <div class="cta-buttons">
+      <EmailUsButton label={t.nav.cta} feedbackText={t.outro.emailCopied} />
+      <FollowUsButton label="Follow us" />
+    </div>
+
   </body>
 </html>
 
@@ -64,6 +71,12 @@ const t = translations[locale as Locale];
   }
 
   .nav-text-buttons {
+    display: flex;
+    gap: 16px;
+    padding: 40px;
+  }
+
+  .cta-buttons {
     display: flex;
     gap: 16px;
     padding: 40px;

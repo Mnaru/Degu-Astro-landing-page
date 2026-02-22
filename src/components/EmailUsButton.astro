@@ -1,0 +1,120 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'button'> {
+  email?: string;
+  label?: string;
+  feedbackText?: string;
+  class?: string;
+}
+
+const {
+  email = 'monika@nuar.app',
+  label = 'Contact us',
+  feedbackText = '💚 Email copied!',
+  class: className,
+  ...attrs
+} = Astro.props;
+---
+
+<button
+  class:list={['email-us-button', className]}
+  aria-label={`${label} — ${email}`}
+  data-email={email}
+  data-label={label}
+  data-feedback={feedbackText}
+  {...attrs}
+>
+  <span class="email-us-button__label">{label}</span>
+</button>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.email-us-button').forEach((btn) => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    btn.addEventListener('click', async () => {
+      const email = btn.dataset.email ?? '';
+      const label = btn.dataset.label ?? '';
+      const feedback = btn.dataset.feedback ?? '';
+      const labelEl = btn.querySelector('.email-us-button__label');
+      if (!labelEl) return;
+
+      clearTimeout(timeoutId);
+
+      const showFeedback = () => {
+        const emojiMatch = feedback.match(/^(\p{Emoji_Presentation})\s*(.*)/u);
+        if (emojiMatch) {
+          labelEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px"><span style="font-size:1.2em;line-height:1">${emojiMatch[1]}</span>${emojiMatch[2]}</span>`;
+        } else {
+          labelEl.textContent = feedback;
+        }
+        btn.classList.add('copied');
+        timeoutId = setTimeout(() => {
+          labelEl.textContent = label;
+          btn.classList.remove('copied');
+        }, 3000);
+      };
+
+      try {
+        await navigator.clipboard.writeText(email);
+        showFeedback();
+      } catch {
+        const textarea = document.createElement('textarea');
+        textarea.value = email;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showFeedback();
+      }
+    });
+  });
+</script>
+
+<style>
+  .email-us-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    padding: 0 23px;
+    border: 1px solid var(--color-offwhite);
+    border-radius: 100px;
+    background: var(--color-black);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .email-us-button:hover,
+  .email-us-button.copied {
+    background: var(--color-offwhite);
+  }
+
+  .email-us-button.copied {
+    padding-left: 18px;
+  }
+
+  .email-us-button:hover .email-us-button__label,
+  .email-us-button.copied .email-us-button__label {
+    color: var(--color-black);
+  }
+
+  .email-us-button:focus-visible {
+    outline: 2px solid var(--color-offwhite);
+    outline-offset: 2px;
+  }
+
+  .email-us-button__label {
+    color: var(--color-offwhite);
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+</style>

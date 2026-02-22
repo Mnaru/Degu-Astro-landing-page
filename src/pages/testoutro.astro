@@ -1,0 +1,58 @@
+---
+import '../styles/global.css';
+import Outro from '@components/Outro.astro';
+import OutroHeaderContainer from '@components/OutroHeaderContainer.astro';
+import OutroStudioContainer from '@components/OutroStudioContainer.astro';
+import BodyTextContainer from '@components/BodyTextContainer.astro';
+import EmailUsButton from '@components/EmailUsButton.astro';
+import FollowUsButton from '@components/FollowUsButton.astro';
+import { translations } from '../i18n/translations';
+
+const locale = 'en';
+const t = translations[locale];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Outro Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton+SC&family=Instrument+Serif:ital@1&family=Public+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <Outro>
+      <OutroHeaderContainer text={t.outro.header1} />
+      <OutroStudioContainer text={t.outro.header2} />
+      <BodyTextContainer text={t.outro.body} class="outro-body" />
+      <div class="outro-buttons">
+        <EmailUsButton label={t.outro.emailButton} />
+        <FollowUsButton />
+      </div>
+    </Outro>
+  </body>
+</html>
+
+<style>
+  body {
+    background: var(--color-black);
+  }
+
+  .outro-body {
+    margin-top: clamp(20px, calc(10px + 2vw), 40px);
+    margin-left: max(0px, calc(-116.35px + 29.087vw));
+  }
+
+  .outro-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    margin-top: clamp(20px, calc(10px + 2vw), 40px);
+    margin-left: max(0px, calc(-116.35px + 29.087vw));
+  }
+
+</style>

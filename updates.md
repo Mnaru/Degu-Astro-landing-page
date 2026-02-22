@@ -48,6 +48,27 @@
   - `overwrite: true` prevents tween conflicts on rapid taps
 - Both interactions wrapped in `gsap.matchMedia()`, disabled when `prefers-reduced-motion: reduce`
 
+### EmailUsButton
+- Pill-shaped CTA button: 42px height, border-radius 100px
+- Text: Public Sans, 14px, 500 weight, 2px letter-spacing, uppercase, offwhite
+- Border: 1px solid offwhite, background black
+- Hover: offwhite fill, black text (0.2s transition)
+- Focus-visible: 2px offwhite outline, 2px offset
+- Click: copies email to clipboard (Clipboard API with `execCommand` fallback)
+- Feedback: shows "💚 Email copied!" for 3s, then reverts to label
+  - Emoji detected via `\p{Emoji_Presentation}` regex, rendered at 1.2em with inline-flex wrapper and 8px gap
+  - `.copied` class keeps offwhite fill active during feedback
+  - `.copied` state reduces left padding to 18px
+  - `clearTimeout` pattern prevents stale timeouts on rapid clicks
+- Props: `email` (default: monika@nuar.app), `label`, `feedbackText`, `class`
+- Translations: en "Email us" / "💚 Email copied", lt "Parašyk mums" / "💚 Emeilas nukopijuotas!"
+
+### FollowUsButton
+- Pill-shaped CTA button: identical styling to EmailUsButton
+- Click: opens Instagram link in new window (`window.open` with `noopener,noreferrer`)
+- Props: `href` (default: https://www.instagram.com/degu.studio/), `label` (default: "Follow us"), `class`
+- No feedback state (simple link action)
+
 ### LanguageSwitcher
 - Vertical layout: LT on top, EN below
 - 38px circles with -10deg rotation, 8px gap (fixed sizes)

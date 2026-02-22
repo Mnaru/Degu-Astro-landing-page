@@ -4,6 +4,8 @@ import Header from '@components/Header.astro';
 import NavArrowButton from '@components/NavArrowButton.astro';
 import NavTextButton from '@components/NavTextButton.astro';
 import NewMenu from '@components/NewMenu.astro';
+import EmailUsButton from '@components/EmailUsButton.astro';
+import FollowUsButton from '@components/FollowUsButton.astro';
 import { translations } from '../i18n/translations';
 
 const locale = 'lt';
@@ -44,6 +46,11 @@ const t = translations[locale];
 
     <NewMenu homeLabel={t.nav.home} contactLabel={t.nav.contact} />
 
+    <div class="email-us-buttons">
+      <EmailUsButton label={t.nav.cta} feedbackText={t.outro.emailCopied} />
+      <FollowUsButton label="Follow us" />
+    </div>
+
   </body>
 </html>
 
@@ -59,6 +66,12 @@ const t = translations[locale];
   }
 
   .nav-text-buttons {
+    display: flex;
+    gap: 16px;
+    padding: 40px;
+  }
+
+  .email-us-buttons {
     display: flex;
     gap: 16px;
     padding: 40px;

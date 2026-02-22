@@ -1,0 +1,38 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  text: string;
+  class?: string;
+}
+
+const { text, class: className, ...attrs } = Astro.props;
+---
+
+<div class:list={['outro-studio-container', className]} {...attrs}>
+  <span class="outro-studio-text">{text}</span>
+</div>
+
+<style>
+  .outro-studio-container {
+    width: max(158px, calc(77px + 22.5vw));
+    margin-top: calc(-3.6px - 1vw);
+    margin-left: max(0px, calc(-116.35px + 29.087vw));
+  }
+
+  .outro-studio-text {
+    display: block;
+    margin-left: var(--optical-adjust-display);
+    font-family: var(--font-display);
+    font-size: max(70px, calc(34.33px + 9.907vw));
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    text-align: left;
+    text-transform: uppercase;
+    color: var(--color-offwhite);
+    white-space: nowrap;
+    text-box-trim: both;
+    text-box-edge: cap;
+  }
+</style>
