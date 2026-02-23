@@ -180,6 +180,24 @@ export function sectionName(el: HTMLElement) {
   6. `t≈1.53` — **ScrollHint fades in** (0.5s, `power2.out`), then fires cylinder rotation via `_scrollHintTl.play()`
 - **ScrollHint integration:** cylinder timeline created paused in component `<script>`, stored on element as `_scrollHintTl`, played by heroIntro `onComplete`
 
+### Outro (done — animations later)
+- Full viewport section: `width: 100%`, `min-height: 100vh`
+- Flex layout with `outro-inner` stretching to fill (`flex: 1`, `justify-content: center`)
+- Adaptive padding: same pattern as Hero (15px→30px sides, inverse bottom)
+- Contains OutroHeaderContainer ("DROP US"/"PARAŠYK"), OutroStudioContainer ("A LINE"/"MUMS"), OutroBodyTextContainer, EmailUsButton, FollowUsButton via `<slot />`
+- **OutroHeaderContainer**: `width: fit-content`, Anton SC, adaptive font-size 100px→250px, `text-box-trim: both`
+- **OutroStudioContainer**: `width: fit-content`, Anton SC, adaptive font-size 70px→213px, negative margin-top pull-up
+- **OutroBodyTextContainer**: Instrument Serif italic, adaptive font-size `max(18px, calc(16px + 0.556vw))`, line breaks via `<br>` in translations
+- **Centering**: `.outro-content` wrapper with `width: fit-content; margin-inline: auto`, collapses to left-aligned below 400px
+- **Gaps**: body text gap `clamp(24px, calc(432px - 28.333vw), 330px)` (large on mobile, small on desktop); button gap fixed 27px
+- **Team photo**: absolute positioned `<Image>` from `src/assets/images/team/TeamPhoto.png`
+  - `right: calc(-186.99px + 38.141vw)` — px+vw fluid interpolation (overflows right on mobile, inset on desktop)
+  - `top: calc(50% - 138.33px + 3.704vw)` — center-anchored with fluid offset (adapts to container height via 50%, interpolates offset via px+vw)
+  - `width: calc(236.93px + 5.421vw)` — 256px at 360px → 315px at 1440px
+  - `transform: rotate(10.86deg)` — constant rotation matching Figma
+  - No media queries — all properties transition smoothly between 360px and 1440px
+- Translations: EN/LT body text with line breaks, header text
+
 ## Removed
 - All layouts (`src/layouts/`)
 - All animations (`src/lib/animations/`)
