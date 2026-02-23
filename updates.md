@@ -198,6 +198,19 @@ export function sectionName(el: HTMLElement) {
   - No media queries — all properties transition smoothly between 360px and 1440px
 - Translations: EN/LT body text with line breaks, header text
 
+### GalleryLabel
+- Inline text block with two parts: main title + optional subtitle
+- **Main text** (`text` prop): Anton SC, uppercase, offwhite
+  - Adaptive font-size: 50px (360px) → 103px (1440px), scales up
+  - Adaptive line-height: 46px (360px) → 95px (1440px), scales up
+- **Subtitle** (`subtext` prop, optional): Instrument Serif italic, offwhite
+  - Adaptive font-size: 18px (360px) → 37px (1440px), scales up
+  - `line-height: 1`
+  - `display: inline-block` — baseline of last line aligns with main text baseline
+  - Fixed 24px gap (`margin-left`) between main text and subtitle on all screens
+- Both props support HTML via `set:html` (e.g. `<br>` for line breaks)
+- Container: auto width, no background
+
 ## Removed
 - All layouts (`src/layouts/`)
 - All animations (`src/lib/animations/`)

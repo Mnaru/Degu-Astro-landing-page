@@ -3,49 +3,24 @@ import type { GetStaticPaths } from 'astro';
 
 import '../../styles/global.css';
 
-import BodyTextContainer from '@components/BodyTextContainer.astro';
-import ContactUsButton from '@components/ContactUsButton.astro';
-import DeguLogo from '@components/DeguLogo.astro';
+import Hero from '@components/Hero.astro';
 import HeaderContainer from '@components/HeaderContainer.astro';
-import ImageGallery from '@components/ImageGallery.astro';
-import LanguageSwitcher from '@components/LanguageSwitcher.astro';
-import Menu from '@components/Menu.astro';
-import PageDesktop from '@components/PageDesktop.astro';
-import PageMobile from '@components/PageMobile.astro';
-import PageScrollDesktop from '@components/PageScrollDesktop.astro';
-import PageScrollMobile from '@components/PageScrollMobile.astro';
+import HeaderContainerStudio from '@components/HeaderContainerStudio.astro';
+import BodyTextContainer from '@components/BodyTextContainer.astro';
 import ScrollHint from '@components/ScrollHint.astro';
-import TeamImageContainer from '@components/TeamImageContainer.astro';
+
+import SocialMediaGallery from '@components/SocialMediaGallery1.astro';
+import ProductPhotography from '@components/ProductPhotography1.astro';
+import KeyVisuals from '@components/KeyVisuals1.astro';
+
+import Outro from '@components/Outro.astro';
+import OutroHeaderContainer from '@components/OutroHeaderContainer.astro';
+import OutroStudioContainer from '@components/OutroStudioContainer.astro';
+import OutroBodyTextContainer from '@components/OutroBodyTextContainer.astro';
+import EmailUsButton from '@components/EmailUsButton.astro';
+import FollowUsButton from '@components/FollowUsButton.astro';
 
 import { t } from '@i18n/utils';
-
-import socialMediaHero from '@assets/images/pages/social-media-hero.png';
-import productPhotographyHero from '@assets/images/pages/product-photography-hero.png';
-import keyVisualsHero from '@assets/images/pages/key-visuals-hero.png';
-import socialMediaMobile from '@assets/images/pages/Social media assets - Mobile.png';
-import productPhotographyMobile from '@assets/images/pages/Product photography- Mobile.png';
-import keyVisualsMobile from '@assets/images/pages/Key Visuals & OOH - Mobile.png';
-
-import teamPhoto from '@assets/images/team/Team image.png';
-
-// Gallery images — social media
-import sm01 from '@assets/images/gallery/social-media/social-media-1.png';
-import sm02 from '@assets/images/gallery/social-media/social-media-2.png';
-import sm03 from '@assets/images/gallery/social-media/social-media-3.png';
-import sm04 from '@assets/images/gallery/social-media/social-media-4.png';
-import sm05 from '@assets/images/gallery/social-media/social-media-5.png';
-import sm06 from '@assets/images/gallery/social-media/social-media-6.png';
-
-// Gallery images — product photography
-import pp01 from '@assets/images/gallery/product-photography/product-photography-1.png';
-import pp02 from '@assets/images/gallery/product-photography/product-photography-2.png';
-import pp03 from '@assets/images/gallery/product-photography/product-photography-3.png';
-import pp04 from '@assets/images/gallery/product-photography/product-photography-4.png';
-import pp05 from '@assets/images/gallery/product-photography/product-photography-5.png';
-
-// Gallery images — key visuals
-import kv01 from '@assets/images/gallery/key-visuals/key-visuals-1.png';
-import kv02 from '@assets/images/gallery/key-visuals/key-visuals-2.png';
 
 export const getStaticPaths = (() => {
   return [
@@ -55,21 +30,6 @@ export const getStaticPaths = (() => {
 
 const { locale } = Astro.params;
 const i18n = t(locale);
-
-const socialMediaGalleryImages = [sm01, sm02, sm03, sm04, sm05, sm06].map((src, i) => ({
-  src,
-  alt: i18n.work.pages.socialMedia.gallery[i],
-}));
-
-const productPhotographyGalleryImages = [pp01, pp02, pp03, pp04, pp05].map((src, i) => ({
-  src,
-  alt: i18n.work.pages.productPhotography.gallery[i],
-}));
-
-const keyVisualsGalleryImages = [kv01, kv02].map((src, i) => ({
-  src,
-  alt: i18n.work.pages.keyVisuals.gallery[i],
-}));
 ---
 
 <html lang={locale}>
@@ -82,11 +42,56 @@ const keyVisualsGalleryImages = [kv01, kv02].map((src, i) => ({
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Anton+SC&family=Public+Sans:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton+SC&family=Instrument+Serif:ital@1&family=Public+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
-    <!-- Components are available below — layout and animations to be added -->
+    <Hero>
+      <HeaderContainer text={i18n.intro.header1} />
+      <div class="hero-row">
+        <HeaderContainerStudio text={i18n.intro.header2} />
+        <BodyTextContainer text={i18n.intro.body} />
+      </div>
+      <ScrollHint>{i18n.intro.scrollHint}</ScrollHint>
+    </Hero>
+    <SocialMediaGallery />
+    <ProductPhotography />
+    <KeyVisuals />
+    <Outro>
+      <div class="outro-content">
+        <OutroHeaderContainer text={i18n.outro.header1} />
+        <OutroStudioContainer text={i18n.outro.header2} />
+        <OutroBodyTextContainer text={i18n.outro.body} class="outro-body" />
+        <div class="outro-buttons">
+          <EmailUsButton label={i18n.outro.emailButton} />
+          <FollowUsButton />
+        </div>
+      </div>
+    </Outro>
   </body>
 </html>
+
+<style>
+  .outro-content {
+    width: fit-content;
+    margin-inline: auto;
+  }
+
+  @media (max-width: 400px) {
+    .outro-content {
+      margin-inline: 0;
+    }
+  }
+
+  .outro-body {
+    margin-top: clamp(24px, calc(432px - 28.333vw), 330px);
+  }
+
+  .outro-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    margin-top: 27px;
+  }
+</style>

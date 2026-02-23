@@ -7,6 +7,7 @@ import NavTextButton from '@components/NavTextButton.astro';
 import NewMenu from '@components/NewMenu.astro';
 import EmailUsButton from '@components/EmailUsButton.astro';
 import FollowUsButton from '@components/FollowUsButton.astro';
+import GalleryLabel from '@components/GalleryLabel.astro';
 import { translations, type Locale } from '../../i18n/translations';
 
 export const getStaticPaths = (() => {
@@ -56,6 +57,10 @@ const t = translations[locale as Locale];
       <FollowUsButton label="Follow us" />
     </div>
 
+    <div class="gallery-labels">
+      <GalleryLabel text="Social media<br>assets" subtext="for Alita<br>(2023)" />
+    </div>
+
   </body>
 </html>
 
@@ -79,6 +84,10 @@ const t = translations[locale as Locale];
   .cta-buttons {
     display: flex;
     gap: 16px;
+    padding: 40px;
+  }
+
+  .gallery-labels {
     padding: 40px;
   }
 
