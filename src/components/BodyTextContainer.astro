@@ -22,11 +22,12 @@ const { text, class: className, ...attrs } = Astro.props;
     margin: 0;
     margin-left: var(--optical-adjust-serif);
     font-family: var(--font-serif);
-    font-size: max(16px, calc(9px + 1.944vw));
+    font-size: max(20px, calc(9px + 1.944vw));
     font-style: normal;
     font-weight: 400;
-    line-height: max(16px, calc(8.67px + 2.037vw));
+    line-height: 1;
     color: var(--color-offwhite);
     text-align: left;
+    letter-spacing: -0.05em;
   }
 </style>

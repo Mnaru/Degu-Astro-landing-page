@@ -18,11 +18,21 @@ const { locale, class: className, ...attrs } = Astro.props;
 
 <style>
   .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     width: 100%;
     padding: max(15px, calc(10px + 1.389vw));
     padding-bottom: 0;
+    pointer-events: none;
+  }
+
+  .site-header :global(*) {
+    pointer-events: auto;
   }
 </style>

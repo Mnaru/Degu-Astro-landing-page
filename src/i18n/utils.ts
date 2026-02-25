@@ -14,11 +14,8 @@ export function t(locale: string): Translations {
   return translations[locale as Locale] ?? translations[defaultLocale];
 }
 
-/** Build a localized path. Lithuanian (default) has no prefix, English uses /en/ */
+/** Build a localized path. Both locales use /lt/ and /en/ prefixes. */
 export function getLocalizedPath(path: string, locale: string): string {
   const clean = path.replace(/^\/(en|lt)/, '');
-  if (locale === defaultLocale) {
-    return clean || '/';
-  }
   return `/${locale}${clean || '/'}`;
 }
