@@ -47,12 +47,11 @@ const {
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  .follow-us-button:hover {
-    background: var(--color-offwhite);
-  }
-
-  .follow-us-button:hover .follow-us-button__label {
-    color: var(--color-black);
+  @media (hover: hover) {
+    .follow-us-button:hover {
+      background: var(--color-orange);
+      border-color: var(--color-orange);
+    }
   }
 
   .follow-us-button:focus-visible {
@@ -68,7 +67,7 @@ const {
     font-style: normal;
     font-weight: 700;
     line-height: normal;
-    letter-spacing: 2px;
+    letter-spacing: 0;
     text-transform: uppercase;
   }
 </style>

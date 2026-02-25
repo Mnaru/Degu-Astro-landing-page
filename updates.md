@@ -50,14 +50,15 @@
 
 ### EmailUsButton
 - Pill-shaped CTA button: 42px height, border-radius 100px
-- Text: Public Sans, 14px, 500 weight, 2px letter-spacing, uppercase, offwhite
+- Text: Public Sans, 14px, 700 weight, no letter-spacing, uppercase, offwhite
 - Border: 1px solid offwhite, background black
-- Hover: offwhite fill, black text (0.2s transition)
+- Hover: orange (`--color-orange`) fill and border, text stays offwhite (0.2s transition)
+  - Hover styles wrapped in `@media (hover: hover)` to prevent sticky hover on mobile
 - Focus-visible: 2px offwhite outline, 2px offset
 - Click: copies email to clipboard (Clipboard API with `execCommand` fallback)
 - Feedback: shows "💚 Email copied!" for 3s, then reverts to label
   - Emoji detected via `\p{Emoji_Presentation}` regex, rendered at 1.2em with inline-flex wrapper and 8px gap
-  - `.copied` class keeps offwhite fill active during feedback
+  - `.copied` class applies orange fill/border during feedback
   - `.copied` state reduces left padding to 18px
   - `clearTimeout` pattern prevents stale timeouts on rapid clicks
 - Props: `email` (default: monika@nuar.app), `label`, `feedbackText`, `class`
@@ -65,6 +66,8 @@
 
 ### FollowUsButton
 - Pill-shaped CTA button: identical styling to EmailUsButton
+- Hover: orange (`--color-orange`) fill and border, text stays offwhite
+  - Hover styles wrapped in `@media (hover: hover)` to prevent sticky hover on mobile
 - Click: opens Instagram link in new window (`window.open` with `noopener,noreferrer`)
 - Props: `href` (default: https://www.instagram.com/degu.studio/), `label` (default: "Follow us"), `class`
 - No feedback state (simple link action)
@@ -72,10 +75,10 @@
 ### LanguageSwitcher
 - Vertical layout: LT on top, EN below
 - 38px circles with -10deg rotation, 8px gap (fixed sizes)
-- Text: Public Sans, 11px, 700 weight, 1.32px letter-spacing, offwhite
-- Active state: offwhite fill, black text, 800 weight
+- Text: Public Sans, 11px, 700 weight, no letter-spacing, offwhite
+- Active state: offwhite fill, black text, 800 weight, 1.5px black outline (offset -1.5px, hugs button)
 - Hover: offwhite fill, black text (0.2s transition)
-- Inactive: offwhite border and text, no fill
+- Inactive: black fill, offwhite border and text
 
 ### HeaderContainer (DEGU)
 - Anton SC, offwhite color, uppercase, center-aligned
@@ -180,20 +183,37 @@ export function sectionName(el: HTMLElement) {
   6. `t≈1.53` — **ScrollHint fades in** (0.5s, `power2.out`), then fires cylinder rotation via `_scrollHintTl.play()`
 - **ScrollHint integration:** cylinder timeline created paused in component `<script>`, stored on element as `_scrollHintTl`, played by heroIntro `onComplete`
 
+### Hero Outro Animation (`src/lib/animations/heroOutro.ts`)
+- **Trigger:** called by heroIntro's `onComplete` callback
+- **Scroll-driven** via GSAP ScrollTrigger `pin` + `scrub` (replaces manual scroll hijack)
+- **ScrollTrigger config:** `trigger: heroEl`, `pin: true`, `pinSpacing: true`, `scrub: 0.3`, `start: 'top top'`, `end: '+=1500'`
+- **Phase A — Transform origin swap** (instant, no visual jump):
+  - Both DEGU and STUDIO swap from heroIntro origins (`center bottom` / `left top`) to `top left`
+  - Compensation: snapshot `getBoundingClientRect()`, clear transforms, re-measure natural position, apply `x`/`y` offset to keep visual position identical
+- **Phase B — Target scale:** fills viewport height with 2% vertical padding and -40px gap (slight overlap). `targetScale = availableHeight / (deguNaturalH + studioNaturalH + outroGap)`
+- **Phase C — Target positions:** left-aligned with 2% horizontal padding, STUDIO positioned below DEGU
+- **Timeline sequence** (durations are proportions of 1500px scroll distance):
+  1. `t=0` — ScrollHint fades out (0.15), BodyText fades out + slides right 30px (0.3, `power2.in`)
+  2. `t=0` — DEGU and STUDIO scale up to `targetScale` and move to target positions (1.2, `power2.inOut`)
+  3. `t=1.2` — DEGU flies left off-screen, STUDIO flies right off-screen (0.5, `power3.in`)
+- **Cylinder pause/resume:** `onUpdate` callback pauses ScrollHint cylinder (`_scrollHintTl`) when progress > 1%, resumes when reversed back to ~0%
+- **Reverse:** fully automatic via ScrollTrigger scrub — scrolling up reverses the entire animation
+- **Body overflow:** released at start of heroOutro so native scroll drives ScrollTrigger
+
 ### Outro (done — animations later)
-- Full viewport section: `width: 100%`, `min-height: 100vh`
+- Full viewport section: `width: 100%`, `min-height: 100dvh`
 - Flex layout with `outro-inner` stretching to fill (`flex: 1`, `justify-content: center`)
 - Adaptive padding: same pattern as Hero (15px→30px sides, inverse bottom)
 - Contains OutroHeaderContainer ("DROP US"/"PARAŠYK"), OutroStudioContainer ("A LINE"/"MUMS"), OutroBodyTextContainer, EmailUsButton, FollowUsButton via `<slot />`
-- **OutroHeaderContainer**: `width: fit-content`, Anton SC, adaptive font-size 100px→250px, `text-box-trim: both`
-- **OutroStudioContainer**: `width: fit-content`, Anton SC, adaptive font-size 70px→213px, negative margin-top pull-up
-- **OutroBodyTextContainer**: Instrument Serif italic, adaptive font-size `max(18px, calc(16px + 0.556vw))`, line breaks via `<br>` in translations
-- **Centering**: `.outro-content` wrapper with `width: fit-content; margin-inline: auto`, collapses to left-aligned below 400px
-- **Gaps**: body text gap `clamp(24px, calc(432px - 28.333vw), 330px)` (large on mobile, small on desktop); button gap fixed 27px
+- **OutroHeaderContainer**: `width: fit-content`, Anton SC, adaptive font-size 140px (360px) → 250px (1440px), `text-box-trim: both`
+- **OutroStudioContainer**: `width: fit-content`, Anton SC, adaptive font-size 120px (360px) → 177px (1440px), margin-top `calc(8.67px + 0.926vw)` (12px→22px)
+- **OutroBodyTextContainer**: Instrument Serif normal (not italic), 24px flat font-size, `letter-spacing: -0.05em`, `line-height: 1`
+- **Centering**: `.outro-content` wrapper with `width: fit-content; margin-inline: auto`, collapses to left-aligned below 500px
+- **Gaps**: body text gap `clamp(56px, calc(421.33px - 25.37vw), 330px)` (large on mobile, small on desktop); button gap fixed 27px
 - **Team photo**: absolute positioned `<Image>` from `src/assets/images/team/TeamPhoto.png`
-  - `right: calc(-186.99px + 38.141vw)` — px+vw fluid interpolation (overflows right on mobile, inset on desktop)
-  - `top: calc(50% - 138.33px + 3.704vw)` — center-anchored with fluid offset (adapts to container height via 50%, interpolates offset via px+vw)
-  - `width: calc(236.93px + 5.421vw)` — 256px at 360px → 315px at 1440px
+  - `right: calc(-235.68px + 45.181vw)` — px+vw fluid interpolation
+  - `top: calc(50% - 140px + 4.167vw)` — center-anchored with fluid offset
+  - `width: calc(287.56px - 2.608vw)` — fluid width, ~250px at 1440px
   - `transform: rotate(10.86deg)` — constant rotation matching Figma
   - No media queries — all properties transition smoothly between 360px and 1440px
 - Translations: EN/LT body text with line breaks, header text
@@ -216,9 +236,27 @@ export function sectionName(el: HTMLElement) {
 - All animations (`src/lib/animations/`)
 - Page layout markup and animation scripts (pages stripped to imports only)
 
+### FluidBackground
+- Interactive GPU-accelerated fluid simulation background using `gpu-io` (MIT)
+- Renders Navier-Stokes velocity field as directional dashes (grey `0.25` on black)
+- Clean redraw every frame — no trail/ghosting effect
+- Simulation runs at 1/8th canvas resolution for performance
+- Mouse/touch interaction: pointer movement applies force to fluid via `stepSegment()`
+- Pointer events listened on `window` (reacts anywhere on page), wrapper has `pointer-events: none` (clicks pass through)
+- Fixed position, full viewport, `z-index: 0` (behind all content)
+- Lazy-initialized: starts after `document.fonts.ready`
+- Fallbacks: static black for no-WebGL, `prefers-reduced-motion`, or init failure
+- Pauses when tab hidden (Page Visibility API)
+- Mobile: wider dash spacing (16px vs 10px), frame skipping (~30fps)
+- Debounced resize handler (200ms) re-creates simulation layers at new dimensions
+- WebGL context loss handled (pauses simulation)
+- Files: `src/components/FluidBackground.astro`, `src/lib/fluid/fluidSim.ts`, `src/lib/fluid/config.ts`
+- Bundle: ~150 KB (41 KB gzipped)
+
 ## Global changes
 - Background changed to `#000` (pure black)
 - Added `--color-offwhite: #E4E4E4` design token
+- Added `--color-orange: #E82D02` design token
 - Added `--optical-adjust-display: -0.04em` (Anton SC left side bearing)
 - Added `--optical-adjust-serif: 0.02em` (Instrument Serif left side bearing)
 - Added adaptive foundations (fluid media defaults)

@@ -24,12 +24,12 @@ const i18n = t(locale);
   .outro {
     display: flex;
     width: 100%;
-    min-height: 100vh;
+    min-height: 100dvh;
     padding-top: max(15px, calc(10px + 1.389vw));
     padding-right: max(15px, calc(10px + 1.389vw));
     padding-bottom: max(calc(72.67px - 2.963vw), calc(10px + 1.389vw));
     padding-left: max(15px, calc(10px + 1.389vw));
-    background: red;
+    /* background: red; */
   }
 
   .outro-inner {
@@ -43,10 +43,10 @@ const i18n = t(locale);
 
   .team-photo {
     position: absolute;
-    right: calc(-186.99px + 38.141vw);
-    top: calc(50% - 138.33px + 3.704vw);
+    right: calc(-235.68px + 45.181vw);
+    top: calc(50% - 140px + 4.167vw);
     transform: rotate(10.86deg);
-    width: calc(236.93px + 5.421vw);
+    width: calc(287.56px - 2.608vw);
     height: auto;
   }
 
@@ -55,14 +55,14 @@ const i18n = t(locale);
     margin-inline: auto;
   }
 
-  @media (max-width: 400px) {
+  @media (max-width: 500px) {
     .outro-inner :global(.outro-content) {
       margin-inline: 0;
     }
   }
 
   .outro-inner :global(.outro-body) {
-    margin-top: clamp(24px, calc(432px - 28.333vw), 330px);
+    margin-top: clamp(56px, calc(421.33px - 25.37vw), 330px);
   }
 
   .outro-inner :global(.outro-buttons) {

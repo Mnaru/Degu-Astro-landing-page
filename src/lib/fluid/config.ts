@@ -1,0 +1,21 @@
+export const FLUID_CONFIG = {
+  // Simulation
+  VELOCITY_SCALE_FACTOR: 8,
+  NUM_JACOBI_ITERATIONS: 3,
+  MAX_VELOCITY: 30,
+  TOUCH_FORCE_SCALE: 2,
+  TOUCH_FORCE_SCALE_MOBILE: 4,
+  TOUCH_THICKNESS: 30,
+  TOUCH_THICKNESS_MOBILE: 50,
+
+  // Rendering
+  VECTOR_SPACING_DESKTOP: 10,
+  VECTOR_SPACING_MOBILE: 12,
+  VECTOR_SCALE: 2.5,
+  VECTOR_SCALE_MOBILE: 3.5,
+  MARKER_COLOR: [0.25, 0.25, 0.25] as [number, number, number],
+  MARKER_COLOR_MOBILE: [0.4, 0.4, 0.4] as [number, number, number],
+
+  // Performance
+  MOBILE_BREAKPOINT: 768,
+};

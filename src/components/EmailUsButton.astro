@@ -87,18 +87,17 @@ const {
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  .email-us-button:hover,
-  .email-us-button.copied {
-    background: var(--color-offwhite);
+  @media (hover: hover) {
+    .email-us-button:hover {
+      background: var(--color-orange);
+      border-color: var(--color-orange);
+    }
   }
 
   .email-us-button.copied {
+    background: var(--color-orange);
+    border-color: var(--color-orange);
     padding-left: 18px;
-  }
-
-  .email-us-button:hover .email-us-button__label,
-  .email-us-button.copied .email-us-button__label {
-    color: var(--color-black);
   }
 
   .email-us-button:focus-visible {
@@ -114,7 +113,7 @@ const {
     font-style: normal;
     font-weight: 700;
     line-height: normal;
-    letter-spacing: 2px;
+    letter-spacing: 0;
     text-transform: uppercase;
   }
 </style>

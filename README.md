@@ -8,6 +8,7 @@ A fast, modern landing page for Degu Studio built with Astro v5.
 - **Language**: TypeScript (strict mode)
 - **Styling**: Scoped CSS with design tokens + fluid viewport scaling
 - **Animation**: GSAP 3 + ScrollTrigger (scroll-driven Phase B)
+- **Fluid Background**: gpu-io (GPU-accelerated Navier-Stokes velocity field)
 - **Fonts**: Anton SC (display), Public Sans (body) via Google Fonts
 - **i18n**: Lithuanian (default, `/`) and English (`/en/`)
 - **Deployment**: Vercel
@@ -22,6 +23,7 @@ src/
 │   ├── HeaderContainer.astro    # Viewport-scaled display text (vh/vw)
 │   ├── LanguageSwitcher.astro   # EN | LT toggle with locale-aware links
 │   ├── MenuCollapsed.astro      # Animated pill menu with state transitions
+│   ├── FluidBackground.astro     # GPU fluid simulation background (gpu-io)
 │   └── ScrollHint.astro         # Pill button with CSS fill animation
 ├── i18n/
 │   ├── translations.ts          # EN + LT translation strings
@@ -30,9 +32,12 @@ src/
 │   └── BaseLayout.astro         # HTML layout with fonts, OG tags, hreflang
 ├── lib/
 │   ├── analytics/config.ts      # GA4 measurement ID placeholder
-│   └── animations/
-│       ├── config.ts            # TWEAK ZONE — all timing, easing & distance constants
-│       └── intro.ts             # Phase A (time-based) + Phase B (scroll-driven) intro
+│   ├── animations/
+│   │   ├── config.ts            # TWEAK ZONE — all timing, easing & distance constants
+│   │   └── intro.ts             # Phase A (time-based) + Phase B (scroll-driven) intro
+│   └── fluid/
+│       ├── config.ts            # Fluid simulation tunable parameters
+│       └── fluidSim.ts          # FluidSimulation class (gpu-io Navier-Stokes)
 ├── pages/
 │   ├── index.astro              # Lithuanian homepage (default locale, /)
 │   └── [locale]/index.astro     # English homepage (/en/)
@@ -48,6 +53,8 @@ src/
 | `--color-black`    | `#1A1A1A` |
 | `--color-bg`       | `#1A1A1A` (dark) |
 | `--color-text`     | `#FFFFFF` (light) |
+| `--color-offwhite` | `#E4E4E4` |
+| `--color-orange`   | `#E82D02` |
 | `--font-display`   | Anton SC  |
 | `--font-body`      | Public Sans |
 
@@ -83,7 +90,7 @@ The intro layout uses viewport-relative units for consistent scaling:
 - [ ] Step 7: MenuCollapsed — scroll state integration + GSAP migration
 - [ ] Step 8: MenuExpanded overlay
 - [ ] Step 9: ImageGallery
-- [ ] Step 10: Outro section — static layout
+- [x] Step 10: Outro section — static layout
 - [ ] Step 11: OutroAnimation
 - [ ] Step 12: Polish + edge cases
 

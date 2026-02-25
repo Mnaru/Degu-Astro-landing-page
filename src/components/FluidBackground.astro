@@ -1,0 +1,71 @@
+---
+// Global fluid simulation background — renders velocity field dashes on black
+---
+
+<div class="fluid-background" id="fluid-background">
+  <canvas id="fluid-canvas"></canvas>
+</div>
+
+<script>
+  import { FluidSimulation } from '@lib/fluid/fluidSim';
+  import { FLUID_CONFIG } from '@lib/fluid/config';
+
+  function init() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    const canvas = document.getElementById('fluid-canvas') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    try {
+      const isMobile = window.innerWidth < FLUID_CONFIG.MOBILE_BREAKPOINT;
+      const sim = new FluidSimulation(canvas, isMobile);
+
+      if (!sim.isInitialized()) return;
+
+      document.fonts.ready.then(() => {
+        sim.start();
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          sim.pause();
+        } else {
+          sim.resume();
+        }
+      });
+
+      let resizeTimeout: number;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = window.setTimeout(() => sim.resize(), 200);
+      });
+    } catch (e) {
+      console.warn('Fluid background failed to initialize:', e);
+    }
+  }
+
+  init();
+</script>
+
+<style>
+  .fluid-background {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: var(--color-bg);
+    pointer-events: none;
+  }
+
+  #fluid-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #fluid-canvas {
+      display: none;
+    }
+  }
+</style>

@@ -28,9 +28,10 @@ const { class: className, ...attrs } = Astro.props;
   .hero {
     display: flex;
     width: 100%;
-    min-height: 100vh;
+    min-height: 100dvh;
     padding: max(15px, calc(10px + 1.389vw));
-    background: red;
+    padding-bottom: max(32px, calc(10px + 1.389vw));
+
   }
 
   .hero-inner {
@@ -47,11 +48,11 @@ const { class: className, ...attrs } = Astro.props;
     align-items: start;
     justify-content: center;
     gap: max(16px, calc(12.33px + 1.019vw));
-    margin-top: clamp(12px, calc(10.67px + 0.37vw), 16px);
+    margin-top: 16px;
   }
 
   .hero-inner :global(.hero-row) > :global(.body-text-container) {
-    margin-top: max(16px, calc(12.33px + 1.019vw));
+    margin-top: max(22px, calc(4.67px + 3.148vw));
   }
 
   .hero-inner :global(.scroll-hint) {
