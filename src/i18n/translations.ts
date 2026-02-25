@@ -52,6 +52,7 @@ export const translations = {
       body: "Don't be shy - send us an email<br>and we'll get back to you.",
       emailButton: 'Email us',
       emailCopied: '💚 Email copied',
+      followButton: 'Follow us',
       teamImageAlt: 'Degu Studio team',
     },
     menu: {
@@ -123,6 +124,7 @@ export const translations = {
       body: 'Nebūk drovus – parašyk mums<br>el. laišką ir mes susisieksime.',
       emailButton: 'Rašyk mums',
       emailCopied: '💚 Emeilas nukopijuotas!',
+      followButton: 'Sekite mus',
       teamImageAlt: 'Degu Studio komanda',
     },
     menu: {

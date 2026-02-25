@@ -42,6 +42,18 @@ const { class: className, ...attrs } = Astro.props;
     background: grey;
   }
 
+  .hero-inner :global(.hero-row) {
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    gap: max(16px, calc(12.33px + 1.019vw));
+    margin-top: min(-8px, calc(-2.8px - 1.444vw));
+  }
+
+  .hero-inner :global(.hero-row) > :global(.body-text-container) {
+    margin-top: max(16px, calc(12.33px + 1.019vw));
+  }
+
   .hero-inner :global(.scroll-hint) {
     position: absolute;
     bottom: 6px;

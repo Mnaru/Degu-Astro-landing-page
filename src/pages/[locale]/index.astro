@@ -9,10 +9,6 @@ import HeaderContainerStudio from '@components/HeaderContainerStudio.astro';
 import BodyTextContainer from '@components/BodyTextContainer.astro';
 import ScrollHint from '@components/ScrollHint.astro';
 
-import SocialMediaGallery from '@components/SocialMediaGallery1.astro';
-import ProductPhotography from '@components/ProductPhotography1.astro';
-import KeyVisuals from '@components/KeyVisuals1.astro';
-
 import Outro from '@components/Outro.astro';
 import OutroHeaderContainer from '@components/OutroHeaderContainer.astro';
 import OutroStudioContainer from '@components/OutroStudioContainer.astro';
@@ -25,6 +21,7 @@ import { t } from '@i18n/utils';
 export const getStaticPaths = (() => {
   return [
     { params: { locale: 'en' } },
+    { params: { locale: 'lt' } },
   ];
 }) satisfies GetStaticPaths;
 
@@ -39,12 +36,6 @@ const i18n = t(locale);
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{i18n.meta.title}</title>
     <meta name="description" content={i18n.meta.description} />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Anton+SC&family=Instrument+Serif:ital@1&family=Public+Sans:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
   </head>
   <body>
     <Hero>
@@ -55,43 +46,16 @@ const i18n = t(locale);
       </div>
       <ScrollHint>{i18n.intro.scrollHint}</ScrollHint>
     </Hero>
-    <SocialMediaGallery />
-    <ProductPhotography />
-    <KeyVisuals />
-    <Outro>
+    <Outro locale={locale}>
       <div class="outro-content">
         <OutroHeaderContainer text={i18n.outro.header1} />
         <OutroStudioContainer text={i18n.outro.header2} />
         <OutroBodyTextContainer text={i18n.outro.body} class="outro-body" />
         <div class="outro-buttons">
-          <EmailUsButton label={i18n.outro.emailButton} />
-          <FollowUsButton />
+          <EmailUsButton label={i18n.outro.emailButton} feedbackText={i18n.outro.emailCopied} />
+          <FollowUsButton label={i18n.outro.followButton} />
         </div>
       </div>
     </Outro>
   </body>
 </html>
-
-<style>
-  .outro-content {
-    width: fit-content;
-    margin-inline: auto;
-  }
-
-  @media (max-width: 400px) {
-    .outro-content {
-      margin-inline: 0;
-    }
-  }
-
-  .outro-body {
-    margin-top: clamp(24px, calc(432px - 28.333vw), 330px);
-  }
-
-  .outro-buttons {
-    display: flex;
-    flex-direction: row;
-    gap: 12px;
-    margin-top: 27px;
-  }
-</style>

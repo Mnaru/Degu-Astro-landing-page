@@ -2,18 +2,21 @@
 import type { HTMLAttributes } from 'astro/types';
 import { Image } from 'astro:assets';
 import teamPhoto from '../assets/images/team/TeamPhoto.png';
+import { t } from '@i18n/utils';
 
 interface Props extends HTMLAttributes<'section'> {
+  locale: string;
   class?: string;
 }
 
-const { class: className, ...attrs } = Astro.props;
+const { locale, class: className, ...attrs } = Astro.props;
+const i18n = t(locale);
 ---
 
 <section class:list={['outro', className]} {...attrs}>
   <div class="outro-inner">
     <slot />
-    <Image src={teamPhoto} alt="Degu Studio team" class="team-photo" />
+    <Image src={teamPhoto} alt={i18n.outro.teamImageAlt} class="team-photo" />
   </div>
 </section>
 
@@ -45,5 +48,27 @@ const { class: className, ...attrs } = Astro.props;
     transform: rotate(10.86deg);
     width: calc(236.93px + 5.421vw);
     height: auto;
+  }
+
+  .outro-inner :global(.outro-content) {
+    width: fit-content;
+    margin-inline: auto;
+  }
+
+  @media (max-width: 400px) {
+    .outro-inner :global(.outro-content) {
+      margin-inline: 0;
+    }
+  }
+
+  .outro-inner :global(.outro-body) {
+    margin-top: clamp(24px, calc(432px - 28.333vw), 330px);
+  }
+
+  .outro-inner :global(.outro-buttons) {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    margin-top: 27px;
   }
 </style>
