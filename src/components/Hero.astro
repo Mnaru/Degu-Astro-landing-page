@@ -16,11 +16,10 @@ const { class: className, ...attrs } = Astro.props;
 
 <script>
   import { heroIntro } from '@lib/animations/heroIntro';
-  import { heroOutro } from '@lib/animations/heroOutro';
   history.scrollRestoration = 'manual';
   await document.fonts.ready;
   document.querySelectorAll('.hero').forEach((el) => {
-    heroIntro(el as HTMLElement, () => heroOutro(el as HTMLElement));
+    heroIntro(el as HTMLElement);
   });
 </script>
 
@@ -40,7 +39,7 @@ const { class: className, ...attrs } = Astro.props;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: grey;
+    /* background: grey; — temporarily removed */
   }
 
   .hero-inner :global(.hero-row) {

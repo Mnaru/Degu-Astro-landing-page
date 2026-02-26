@@ -1,6 +1,6 @@
 import { gsap } from 'gsap';
 
-export function heroIntro(heroEl: HTMLElement, onComplete?: () => void) {
+export function heroIntro(heroEl: HTMLElement) {
   const ctx = gsap.context(() => {
     const heroInner = heroEl.querySelector('.hero-inner') as HTMLElement;
     const degu = heroEl.querySelector('.header-container') as HTMLElement;
@@ -55,18 +55,15 @@ export function heroIntro(heroEl: HTMLElement, onComplete?: () => void) {
     // Settle rotation to zero
     tl.to([degu, studio], { rotation: 0, duration: 0.3, ease: 'power2.out' }, snapStart + 0.2);
 
-    // Scale down after snap, decelerating to a stop
-    const scaleStart = snapStart + 0.24 + 0.02; // after DEGU finishes
-    tl.to(degu, { scale: 0.98, duration: 3, ease: 'power2.out', transformOrigin: 'center bottom' }, scaleStart);
-    tl.to(studio, { scale: 0.98, duration: 3, ease: 'power2.out', transformOrigin: 'left top' }, scaleStart);
+    const settleEnd = snapStart + 0.24 + 0.02; // after DEGU finishes
 
-    // Body text: appears immediately after STUDIO snaps, then drifts right and scales up
+    // Body text: appears immediately after settle, then drifts into position
     gsap.set(bodyText, { x: -10, y: -8 });
-    tl.to(bodyText, { autoAlpha: 1, duration: 0.05, ease: 'none' }, scaleStart);
-    tl.to(bodyText, { x: 0, y: 0, scale: 1.03, duration: 2, ease: 'power2.out' }, scaleStart);
+    tl.to(bodyText, { autoAlpha: 1, duration: 0.05, ease: 'none' }, settleEnd);
+    tl.to(bodyText, { x: 0, y: 0, duration: 2, ease: 'power2.out' }, settleEnd);
 
     // ScrollHint: fade in 300ms after snap, then start cylinder rotation
-    const scrollHintStart = scaleStart + 0.3;
+    const scrollHintStart = settleEnd + 0.3;
     tl.to(scrollHint, {
       autoAlpha: 1,
       duration: 0.5,
@@ -98,7 +95,7 @@ export function heroIntro(heroEl: HTMLElement, onComplete?: () => void) {
     tl.eventCallback('onComplete', () => {
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('touchmove', onTouchMove);
-      onComplete?.();
+      document.body.style.overflow = '';
     });
 
   }, heroEl);
