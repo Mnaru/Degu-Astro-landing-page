@@ -183,7 +183,7 @@ export function sectionName(el: HTMLElement) {
   6. `t≈1.53` — **ScrollHint fades in** (0.5s, `power2.out`), then fires cylinder rotation via `_scrollHintTl.play()`
 - **ScrollHint integration:** cylinder timeline created paused in component `<script>`, stored on element as `_scrollHintTl`, played by heroIntro `onComplete`
 
-### Hero Outro Animation (`src/lib/animations/heroOutro.ts`)
+### Hero Outro Animation (`src/lib/animations/heroExit.ts`)
 - **Trigger:** called by heroIntro's `onComplete` callback
 - **Scroll-driven** via GSAP ScrollTrigger `pin` + `scrub` (replaces manual scroll hijack)
 - **ScrollTrigger config:** `trigger: heroEl`, `pin: true`, `pinSpacing: true`, `scrub: 0.3`, `start: 'top top'`, `end: '+=1500'`
@@ -198,7 +198,7 @@ export function sectionName(el: HTMLElement) {
   3. `t=1.2` — DEGU flies left off-screen, STUDIO flies right off-screen (0.5, `power3.in`)
 - **Cylinder pause/resume:** `onUpdate` callback pauses ScrollHint cylinder (`_scrollHintTl`) when progress > 1%, resumes when reversed back to ~0%
 - **Reverse:** fully automatic via ScrollTrigger scrub — scrolling up reverses the entire animation
-- **Body overflow:** released at start of heroOutro so native scroll drives ScrollTrigger
+- **Body overflow:** released at start of heroExit so native scroll drives ScrollTrigger
 
 ### Outro (done — animations later)
 - Full viewport section: `width: 100%`, `min-height: 100dvh`

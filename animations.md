@@ -139,11 +139,11 @@ Page scroll is completely locked (`overflow: hidden` on body) from intro start u
 - `history.scrollRestoration = 'manual'` prevents browser restoring previous scroll position
 - `window.scrollTo(0, 0)` resets scroll before measurements
 - `document.body.style.overflow = 'hidden'` locks all scroll methods (wheel, keyboard, scrollbar)
-- Unlocked by heroOutro `onComplete` → `document.body.style.overflow = ''`
+- Unlocked by heroExit `onComplete` → `document.body.style.overflow = ''`
 
 ---
 
-## Hero Outro (`src/lib/animations/heroOutro.ts`)
+## Hero Outro (`src/lib/animations/heroExit.ts`)
 
 Triggered when heroIntro completes. Starts paused, plays on first scroll down.
 
