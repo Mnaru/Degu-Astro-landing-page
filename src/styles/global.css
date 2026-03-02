@@ -41,6 +41,12 @@
   /* Optical alignment — left side bearing compensation per font */
   --optical-adjust-display: -0.02em;
   --optical-adjust-serif: 0.01em;
+
+  /* Gallery */
+  --gallery-gap: 12px;
+  --gallery-overlay-opacity: 0.2;
+  --gallery-scroll-speed: 60;
+  --gallery-name-stagger: 80ms;
 }
 
 /* ===== Reset ===== */
@@ -68,16 +74,6 @@ body {
   max-width: 100vw;
 }
 
-/* ===== Adaptive Foundations ===== */
-img,
-picture,
-video,
-svg {
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
-
 /* ===== GSAP ===== */
 /* Prevent flash of unstyled/unanimated content.
    Elements that GSAP will animate start hidden and
@@ -101,5 +97,16 @@ svg {
 
   [data-gsap] {
     visibility: visible;
+  }
+}
+
+/* ===== Gallery Scroll Snap (mobile) ===== */
+@media (max-width: 1200px) {
+  html {
+    scroll-snap-type: y mandatory;
+  }
+
+  [data-gallery] {
+    scroll-snap-align: center;
   }
 }

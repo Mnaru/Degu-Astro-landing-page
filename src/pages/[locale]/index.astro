@@ -11,6 +11,12 @@ import BodyTextContainer from '@components/BodyTextContainer.astro';
 import ScrollHint from '@components/ScrollHint.astro';
 import FluidBackground from '@components/FluidBackground.astro';
 
+import ManillaGallery from '@components/galleries/ManillaGallery.astro';
+import CrocsGallery from '@components/galleries/CrocsGallery.astro';
+import AlitaGallery from '@components/galleries/AlitaGallery.astro';
+import MixGallery from '@components/galleries/MixGallery.astro';
+import MaximaGallery from '@components/galleries/MaximaGallery.astro';
+
 import Outro from '@components/Outro.astro';
 import OutroHeaderContainer from '@components/OutroHeaderContainer.astro';
 import OutroStudioContainer from '@components/OutroStudioContainer.astro';
@@ -50,6 +56,13 @@ const i18n = t(locale);
       </div>
       <ScrollHint>{i18n.intro.scrollHint}</ScrollHint>
     </Hero>
+
+    <ManillaGallery locale={locale} />
+    <CrocsGallery locale={locale} />
+    <AlitaGallery locale={locale} />
+    <MixGallery locale={locale} />
+    <MaximaGallery locale={locale} />
+
     <Outro locale={locale}>
       <div class="outro-content">
         <OutroHeaderContainer text={i18n.outro.header1} />

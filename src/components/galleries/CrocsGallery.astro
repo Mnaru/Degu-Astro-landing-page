@@ -1,0 +1,113 @@
+---
+import { Image } from 'astro:assets';
+import { t } from '@i18n/utils';
+
+import img01 from '@assets/images/galleries/crocs/01.png';
+import img02 from '@assets/images/galleries/crocs/02.png';
+
+interface Props {
+  locale: string;
+}
+
+const { locale } = Astro.props;
+const i18n = t(locale);
+const galleryName = i18n.galleries.crocs.name;
+const images = [img01, img02];
+---
+
+<section class="gallery gallery--static" data-gallery="crocs">
+  <div class="gallery__images">
+    <div class="gallery__image-wrapper">
+      <Image
+        src={images[0]}
+        alt={`${galleryName} 1`}
+        width={1200}
+        height={800}
+        loading="lazy"
+      />
+    </div>
+    <div class="gallery__image-wrapper">
+      <Image
+        src={images[1]}
+        alt={`${galleryName} 2`}
+        width={1200}
+        height={800}
+        loading="lazy"
+      />
+    </div>
+  </div>
+  <div class="gallery__name">
+    {galleryName}
+  </div>
+</section>
+
+<style>
+  .gallery {
+    position: relative;
+    width: 100%;
+    height: calc((960 / 1440) * 100vw);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .gallery__images {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--gallery-gap);
+    height: 100%;
+  }
+
+  .gallery__image-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: calc((100% - var(--gallery-gap)) / 2);
+    height: 100%;
+    flex-shrink: 0;
+  }
+
+  .gallery__image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .gallery__image-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, var(--gallery-overlay-opacity));
+    pointer-events: none;
+    transition: background 0.3s ease;
+  }
+
+  .gallery__image-wrapper:hover::after {
+    background: rgba(0, 0, 0, 0);
+  }
+
+  .gallery__name {
+    display: none;
+  }
+
+  @media (max-width: 1200px) {
+    .gallery {
+      height: 100vh;
+      padding: 0;
+    }
+
+    .gallery__images {
+      gap: 0;
+      height: 100%;
+    }
+
+    .gallery__image-wrapper {
+      width: 100%;
+      height: 100%;
+    }
+
+    .gallery__image-wrapper:nth-child(2) {
+      display: none;
+    }
+  }
+</style>

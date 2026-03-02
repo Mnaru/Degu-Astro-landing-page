@@ -69,6 +69,13 @@ export const translations = {
     gallery: {
       close: 'Close gallery',
     },
+    galleries: {
+      manilla: { name: 'MANILLA' },
+      crocs: { name: 'CROCS' },
+      alita: { name: 'ALITA' },
+      mix: { name: 'MIX' },
+      maxima: { name: 'MAXIMA' },
+    },
   },
   lt: {
     // TODO: Replace with actual Lithuanian translations
@@ -140,6 +147,13 @@ export const translations = {
     },
     gallery: {
       close: 'Uždaryti galeriją',
+    },
+    galleries: {
+      manilla: { name: 'MANILLA' },
+      crocs: { name: 'CROCS' },
+      alita: { name: 'ALITA' },
+      mix: { name: 'MIX' },
+      maxima: { name: 'MAXIMA' },
     },
   },
 } as const;

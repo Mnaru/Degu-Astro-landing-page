@@ -1,0 +1,133 @@
+---
+import { Image } from 'astro:assets';
+import { t } from '@i18n/utils';
+
+import img01 from '@assets/images/galleries/alita/01.png';
+import img02 from '@assets/images/galleries/alita/02.png';
+import img03 from '@assets/images/galleries/alita/03.png';
+import img04 from '@assets/images/galleries/alita/04.png';
+import img05 from '@assets/images/galleries/alita/05.png';
+import img06 from '@assets/images/galleries/alita/06.png';
+import img07 from '@assets/images/galleries/alita/07.png';
+import img08 from '@assets/images/galleries/alita/08.png';
+
+interface Props {
+  locale: string;
+}
+
+const { locale } = Astro.props;
+const i18n = t(locale);
+const galleryName = i18n.galleries.alita.name;
+const images = [img01, img02, img03, img04, img05, img06, img07, img08];
+---
+
+<section class="gallery gallery--infinite" data-gallery="alita">
+  <div class="gallery__scroll-track">
+    {images.map((img, index) => (
+      <div class="gallery__image-wrapper">
+        <Image
+          src={img}
+          alt={`${galleryName} ${index + 1}`}
+          width={1200}
+          height={800}
+          loading="lazy"
+        />
+      </div>
+    ))}
+    {images.map((img, index) => (
+      <div class="gallery__image-wrapper">
+        <Image
+          src={img}
+          alt={`${galleryName} ${index + 1}`}
+          width={1200}
+          height={800}
+          loading="lazy"
+        />
+      </div>
+    ))}
+  </div>
+  <div class="gallery__name">
+    {galleryName}
+  </div>
+</section>
+
+<script>
+  import { initGalleryScroll } from '@lib/animations/galleryScroll';
+
+  const track = document.querySelector('[data-gallery="alita"] .gallery__scroll-track') as HTMLElement;
+  if (track) {
+    initGalleryScroll({ container: track, speed: 60, direction: 'left' });
+  }
+</script>
+
+<style>
+  .gallery {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    padding: 12px 0;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  .gallery__scroll-track {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--gallery-gap);
+    height: 100%;
+    align-items: stretch;
+    will-change: transform;
+    padding-left: 12px;
+  }
+
+  .gallery__image-wrapper {
+    flex: 0 0 auto;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gallery__image-wrapper img {
+    height: 100%;
+    width: auto;
+    max-width: none;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .gallery__image-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, var(--gallery-overlay-opacity));
+    pointer-events: none;
+    transition: background 0.3s ease;
+  }
+
+  .gallery__image-wrapper:hover::after {
+    background: rgba(0, 0, 0, 0);
+  }
+
+  .gallery__name {
+    display: none;
+  }
+
+  @media (max-width: 1200px) {
+    .gallery__scroll-track {
+      align-items: center;
+      padding-left: 0;
+    }
+
+    .gallery__image-wrapper {
+      flex: 0 0 95vw;
+      width: 95vw;
+      height: auto;
+    }
+
+    .gallery__image-wrapper img {
+      width: 100%;
+      height: auto;
+    }
+  }
+</style>
