@@ -37,9 +37,21 @@ const images = [img01, img02];
     </div>
   </div>
   <div class="gallery__name">
-    {galleryName}
+    {galleryName.split('').map((letter) => (
+      <span class="gallery__name-letter">{letter}</span>
+    ))}
   </div>
 </section>
+
+<script>
+  import { initGalleryName } from '@lib/animations/galleryName';
+
+  const gallery = document.querySelector('[data-gallery="crocs"]') as HTMLElement;
+  const name = gallery?.querySelector('.gallery__name') as HTMLElement;
+  if (gallery && name) {
+    initGalleryName({ galleryEl: gallery, nameEl: name });
+  }
+</script>
 
 <style>
   .gallery {
@@ -87,7 +99,23 @@ const images = [img01, img02];
   }
 
   .gallery__name {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: none;
     display: none;
+  }
+
+  .gallery__name-letter {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: max(100px, calc(66.67px + 9.26vw));
+    font-weight: 390;
+    text-transform: uppercase;
+    color: var(--color-white);
+    line-height: 1;
   }
 
   @media (max-width: 1200px) {

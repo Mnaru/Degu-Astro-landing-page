@@ -1,4 +1,7 @@
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export function heroIntro(heroEl: HTMLElement) {
   const ctx = gsap.context(() => {
@@ -96,6 +99,7 @@ export function heroIntro(heroEl: HTMLElement) {
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('touchmove', onTouchMove);
       document.body.style.overflow = '';
+      ScrollTrigger.refresh();
     });
 
   }, heroEl);
