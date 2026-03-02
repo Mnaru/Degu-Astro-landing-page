@@ -74,5 +74,16 @@ const i18n = t(locale);
         </div>
       </div>
     </Outro>
+    <script>
+      import { initGallerySkew } from '@lib/animations/gallerySkew';
+
+      const galleries = Array.from(
+        document.querySelectorAll('[data-gallery]')
+      ) as HTMLElement[];
+
+      if (galleries.length > 0) {
+        initGallerySkew({ elements: galleries });
+      }
+    </script>
   </body>
 </html>
