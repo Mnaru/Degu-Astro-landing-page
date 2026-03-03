@@ -1,0 +1,148 @@
+---
+import type { GetStaticPaths } from 'astro';
+import type { ImageMetadata } from 'astro';
+
+import '../../../styles/global.css';
+
+import { t } from '@i18n/utils';
+import PhotoStack from '@components/gallery-detail/PhotoStack.astro';
+
+export const getStaticPaths = (() => {
+  const locales = ['en', 'lt'];
+  const slugs = ['manilla', 'crocs', 'alita', 'mix', 'maxima'];
+
+  return locales.flatMap(locale =>
+    slugs.map(slug => ({
+      params: { locale, slug },
+    }))
+  );
+}) satisfies GetStaticPaths;
+
+const { locale, slug } = Astro.params;
+const i18n = t(locale);
+
+const backgrounds: Record<string, string> = {
+  manilla: '#6584A1',
+  crocs: '#A5A196',
+  alita: '#E2B032',
+  mix: '#C70022',
+  maxima: '#D3D5D9',
+};
+
+const bg = backgrounds[slug] ?? '#000000';
+const galleryData = i18n.galleries[slug as keyof typeof i18n.galleries];
+const galleryName = typeof galleryData === 'string' ? '' : galleryData.name;
+const jobDone = typeof galleryData === 'string' ? '' : galleryData.jobDone;
+
+const allGalleryImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/images/galleries/**/*.{png,jpg,jpeg,webp}',
+  { eager: true }
+);
+
+const images = Object.entries(allGalleryImages)
+  .filter(([path]) => path.includes(`/galleries/${slug}/`))
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([, module]) => module.default);
+---
+
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{galleryName} — Degu Studio</title>
+    <meta name="description" content={`${galleryName} — ${jobDone}`} />
+  </head>
+  <body style={`background-color: ${bg}; margin: 0; height: 100vh; overflow: hidden; touch-action: none;`}>
+    <div class="gallery-detail">
+      <div class="gallery-detail__header">
+        <span class="gallery-detail__title">{galleryName}</span>
+        <span class="gallery-detail__job-done">{jobDone}</span>
+        <button class="gallery-detail__close" data-close-gallery data-locale={locale} data-slug={slug}>{i18n.galleries.close}</button>
+      </div>
+    </div>
+    <PhotoStack images={images} galleryName={galleryName} />
+    <script>
+      const closeBtn = document.querySelector('[data-close-gallery]') as HTMLElement;
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          const locale = closeBtn.dataset.locale;
+          const slug = closeBtn.dataset.slug;
+          if (window.history.length > 1) {
+            window.history.back();
+          } else {
+            window.location.href = `/${locale}/#gallery-${slug}`;
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
+
+<style>
+  html {
+    scroll-snap-type: none !important;
+    overflow: hidden;
+  }
+
+  .gallery-detail {
+    height: 100vh;
+    padding: max(15px, calc(10px + 1.3888vw)) max(15px, calc(10px + 1.3888vw)) 0;
+    box-sizing: border-box;
+    color: #fff;
+    font-family: inherit;
+  }
+
+  .gallery-detail__header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: baseline;
+    position: relative;
+    z-index: 50;
+  }
+
+  .gallery-detail__title {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .gallery-detail__job-done {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+
+  .gallery-detail__close {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: right;
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .gallery-detail__close:hover {
+    opacity: 0.7;
+  }
+
+  @media (max-width: 1200px) {
+    .gallery-detail__header {
+      grid-template-columns: 1fr auto;
+    }
+
+    .gallery-detail__job-done {
+      display: none;
+    }
+  }
+</style>

@@ -18,7 +18,7 @@ const galleryName = i18n.galleries.maxima.name;
 const images = [img01, img02, img03, img04, img05];
 ---
 
-<section class="gallery gallery--infinite" data-gallery="maxima">
+<section class="gallery gallery--infinite" data-gallery="maxima" id="gallery-maxima">
   <div class="gallery__scroll-track">
     {images.map((img, index) => (
       <div class="gallery__image-wrapper">
@@ -48,6 +48,11 @@ const images = [img01, img02, img03, img04, img05];
       <span class="gallery__name-letter">{letter}</span>
     ))}
   </div>
+  <a
+    href={`/${locale}/gallery/maxima`}
+    class="gallery__link"
+    aria-label={`View ${galleryName} gallery`}
+  ></a>
 </section>
 
 <script>
@@ -135,6 +140,13 @@ const images = [img01, img02, img03, img04, img05];
     text-transform: uppercase;
     color: var(--color-white);
     line-height: 1;
+  }
+
+  .gallery__link {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    cursor: pointer;
   }
 
   @media (max-width: 1200px) {
