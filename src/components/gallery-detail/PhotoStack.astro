@@ -5,9 +5,10 @@ import { Image } from 'astro:assets';
 interface Props {
   images: ImageMetadata[];
   galleryName: string;
+  fitMode?: 'cover' | 'contain';
 }
 
-const { images, galleryName } = Astro.props;
+const { images, galleryName, fitMode = 'cover' } = Astro.props;
 
 // Desktop: strong horizontal spread, moderate vertical
 const desktopOffsets = [
@@ -50,7 +51,7 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
 }
 ---
 
-<div class="photo-stack" data-photo-stack>
+<div class="photo-stack" data-photo-stack style={`--fit-mode: ${fitMode};`}>
   {images.map((img, index) => (
     <div
       class:list={['photo-stack__card', { 'photo-stack__card--base': index === 0 }]}
@@ -73,13 +74,19 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
 <style>
   .photo-stack {
     position: fixed;
-    top: 50%;
+    top: 48%;
     left: 50%;
     transform: translate(-50%, -50%);
     height: max(320px, calc(255.33px + 17.96vw));
     max-width: 90vw;
     width: auto;
     z-index: 10;
+  }
+
+  @media (min-width: 1201px) {
+    .photo-stack {
+      top: 52%;
+    }
   }
 
   .photo-stack__card--base {
@@ -125,7 +132,7 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
   .photo-stack__card:not(.photo-stack__card--base) .photo-stack__card-inner img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: var(--fit-mode, cover);
     object-position: center;
     display: block;
   }

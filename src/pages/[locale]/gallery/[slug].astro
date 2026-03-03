@@ -26,7 +26,7 @@ const backgrounds: Record<string, string> = {
   crocs: '#A5A196',
   alita: '#E2B032',
   mix: '#C70022',
-  maxima: '#D3D5D9',
+  maxima: '#959CA6',
 };
 
 const bg = backgrounds[slug] ?? '#000000';
@@ -43,6 +43,8 @@ const images = Object.entries(allGalleryImages)
   .filter(([path]) => path.includes(`/galleries/${slug}/`))
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([, module]) => module.default);
+
+const fitMode = slug === 'maxima' ? 'contain' : 'cover';
 ---
 
 <html lang={locale}>
@@ -61,7 +63,7 @@ const images = Object.entries(allGalleryImages)
         <button class="gallery-detail__close" data-close-gallery data-locale={locale} data-slug={slug}>{i18n.galleries.close}</button>
       </div>
     </div>
-    <PhotoStack images={images} galleryName={galleryName} />
+    <PhotoStack images={images} galleryName={galleryName} fitMode={fitMode} />
     <script>
       const closeBtn = document.querySelector('[data-close-gallery]') as HTMLElement;
       if (closeBtn) {
