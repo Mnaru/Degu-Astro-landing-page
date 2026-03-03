@@ -53,6 +53,7 @@ const images = [img01, img02, img03, img04, img05, img06];
     href={`/${locale}/gallery/manilla`}
     class="gallery__link"
     aria-label={`View ${galleryName} gallery`}
+    data-astro-prefetch="hover"
   ></a>
 </section>
 
@@ -151,8 +152,13 @@ const images = [img01, img02, img03, img04, img05, img06];
   }
 
   @media (max-width: 1200px) {
+    .gallery {
+      height: auto;
+      padding: 12px 0;
+    }
+
     .gallery__scroll-track {
-      align-items: center;
+      align-items: stretch;
       padding-left: 0;
     }
 

@@ -14,7 +14,7 @@ export const FLUID_CONFIG = {
   VECTOR_SCALE: 2.5,
   VECTOR_SCALE_MOBILE: 3.5,
   MARKER_COLOR: [0.25, 0.25, 0.25] as [number, number, number],
-  MARKER_COLOR_MOBILE: [0.4, 0.4, 0.4] as [number, number, number],
+  MARKER_COLOR_MOBILE: [0.5, 0.5, 0.5] as [number, number, number],
 
   // Performance
   MOBILE_BREAKPOINT: 768,

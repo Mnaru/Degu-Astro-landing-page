@@ -4,6 +4,10 @@ import react from '@astrojs/react';
 export default defineConfig({
   integrations: [react()],
   site: 'https://degu.lt',
+  prefetch: {
+    prefetchAll: false,
+    defaultStrategy: 'hover',
+  },
   i18n: {
     defaultLocale: 'lt',
     locales: ['en', 'lt'],
