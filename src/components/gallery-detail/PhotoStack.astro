@@ -93,36 +93,6 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
 
   .photo-stack__card {
     opacity: 0;
-    animation: cardIn 0.3s ease-out forwards;
-  }
-
-  .photo-stack__card:nth-child(1) { animation-delay: 0.05s; }
-  .photo-stack__card:nth-child(2) { animation-delay: 0.08s; }
-  .photo-stack__card:nth-child(3) { animation-delay: 0.11s; }
-  .photo-stack__card:nth-child(4) { animation-delay: 0.14s; }
-  .photo-stack__card:nth-child(5) { animation-delay: 0.17s; }
-  .photo-stack__card:nth-child(n+6) { animation-delay: 0.2s; }
-
-  @keyframes cardIn {
-    from {
-      opacity: 0;
-      transform: translate(var(--offset-x), var(--offset-y)) scale(0.97);
-    }
-    to {
-      opacity: 1;
-      transform: translate(var(--offset-x), var(--offset-y)) scale(1);
-    }
-  }
-
-  @keyframes cardInBase {
-    from {
-      opacity: 0;
-      scale: 0.97;
-    }
-    to {
-      opacity: 1;
-      scale: 1;
-    }
   }
 
   .photo-stack__card--base {
@@ -130,7 +100,6 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
     transform: none;
     height: 100%;
     width: auto;
-    animation-name: cardInBase;
   }
 
   .photo-stack__card-inner {
@@ -176,6 +145,7 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
 </style>
 
 <script>
+  import { gsap } from 'gsap';
   import { initPhotoStack } from '@lib/animations/photoStack';
   import { initPhotoPulse } from '@lib/animations/photoPulse';
   import { initPhotoProximity } from '@lib/animations/photoProximity';
@@ -189,6 +159,23 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
   ) as HTMLElement[];
 
   if (container && cards.length > 0) {
+    // Entrance animation — fade in with subtle scale, staggered
+    gsap.fromTo(
+      cards,
+      { opacity: 0, scale: 0.97 },
+      {
+        opacity: 1,
+        scale: 1,
+        duration: 0.5,
+        ease: 'power2.out',
+        stagger: 0.05,
+        onComplete: () => {
+          // Clear inline scale so CSS custom properties (pulse/proximity) take over
+          cards.forEach(card => gsap.set(card, { clearProps: 'scale' }));
+        },
+      }
+    );
+
     initPhotoStack({ container, cards });
     initPhotoPulse({ cards: cardInners });
     initPhotoProximity({ cards: cardInners });
