@@ -84,6 +84,12 @@ const i18n = t(locale);
       if (galleries.length > 0) {
         initGallerySkew({ elements: galleries });
       }
+
+      document.querySelectorAll('.gallery__link').forEach(link => {
+        link.addEventListener('click', () => {
+          sessionStorage.setItem('returning-from-gallery', 'true');
+        });
+      });
     </script>
   </body>
 </html>

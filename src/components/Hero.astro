@@ -16,7 +16,9 @@ const { class: className, ...attrs } = Astro.props;
 
 <script>
   import { heroIntro } from '@lib/animations/heroIntro';
-  history.scrollRestoration = 'manual';
+  if (sessionStorage.getItem('returning-from-gallery') !== 'true') {
+    history.scrollRestoration = 'manual';
+  }
   await document.fonts.ready;
   document.querySelectorAll('.hero').forEach((el) => {
     heroIntro(el as HTMLElement);

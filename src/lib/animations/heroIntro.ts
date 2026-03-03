@@ -4,6 +4,34 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 export function heroIntro(heroEl: HTMLElement) {
+  const isReturning = sessionStorage.getItem('returning-from-gallery') === 'true';
+
+  if (isReturning) {
+    sessionStorage.removeItem('returning-from-gallery');
+    history.scrollRestoration = 'auto';
+
+    const heroInner = heroEl.querySelector('.hero-inner') as HTMLElement;
+    const degu = heroEl.querySelector('.header-container') as HTMLElement;
+    const studio = heroEl.querySelector('.header-container-studio') as HTMLElement;
+    const bodyText = heroEl.querySelector('.body-text-container') as HTMLElement;
+    const scrollHint = heroEl.querySelector('.scroll-hint') as HTMLElement;
+
+    if (!heroInner || !degu || !studio || !bodyText || !scrollHint) return;
+
+    // Set all elements to their post-animation final state
+    gsap.set([degu, studio, bodyText, scrollHint], { clearProps: 'all' });
+    gsap.set(heroInner, { autoAlpha: 1 });
+    gsap.set(bodyText, { autoAlpha: 1 });
+    gsap.set(scrollHint, { autoAlpha: 1 });
+
+    // Start scroll hint cylinder rotation if available
+    const cylTl = (scrollHint as any)._scrollHintTl;
+    if (cylTl) cylTl.play();
+
+    ScrollTrigger.refresh();
+    return;
+  }
+
   const ctx = gsap.context(() => {
     const heroInner = heroEl.querySelector('.hero-inner') as HTMLElement;
     const degu = heroEl.querySelector('.header-container') as HTMLElement;

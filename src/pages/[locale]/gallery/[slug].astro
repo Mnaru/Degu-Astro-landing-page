@@ -71,6 +71,7 @@ const fitMode = slug === 'maxima' ? 'contain' : 'cover';
         closeBtn.addEventListener('click', () => {
           const locale = closeBtn.dataset.locale;
           const slug = closeBtn.dataset.slug;
+          sessionStorage.setItem('returning-from-gallery', 'true');
           if (window.history.length > 1) {
             window.history.back();
           } else {
