@@ -33,7 +33,7 @@ export function initFlameAnimation(svgEl: SVGSVGElement): () => void {
 
   if (!bodyBg || !bodyOutline || !eyeLeft || !eyeRight) return () => {};
 
-  const morphOpts = { type: 'rotational' };
+  const morphOpts = { type: 'rotational' as const };
 
   const tl = gsap.timeline({ repeat: -1 });
 
