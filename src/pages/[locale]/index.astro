@@ -57,11 +57,13 @@ const i18n = t(locale);
       <ScrollHint>{i18n.intro.scrollHint}</ScrollHint>
     </Hero>
 
-    <ManillaGallery locale={locale} />
-    <CrocsGallery locale={locale} />
-    <AlitaGallery locale={locale} />
-    <MixGallery locale={locale} />
-    <MaximaGallery locale={locale} />
+    <div class="galleries-wrapper">
+      <ManillaGallery locale={locale} />
+      <CrocsGallery locale={locale} />
+      <AlitaGallery locale={locale} />
+      <MixGallery locale={locale} />
+      <MaximaGallery locale={locale} />
+    </div>
 
     <Outro locale={locale}>
       <div class="outro-content">

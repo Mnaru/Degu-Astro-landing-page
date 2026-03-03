@@ -1,5 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { initHeroToGallery } from './heroToGallery';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,6 +29,7 @@ export function heroIntro(heroEl: HTMLElement) {
     const cylTl = (scrollHint as any)._scrollHintTl;
     if (cylTl) cylTl.play();
 
+    initHeroToGallery();
     ScrollTrigger.refresh();
     return;
   }
@@ -127,6 +129,7 @@ export function heroIntro(heroEl: HTMLElement) {
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('touchmove', onTouchMove);
       document.body.style.overflow = '';
+      initHeroToGallery();
       ScrollTrigger.refresh();
     });
 
