@@ -4,7 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 export function initFooterReveal(footer: HTMLElement): () => void {
-  gsap.set(footer, { backgroundColor: '#000000' });
+  gsap.set(footer, { backgroundColor: 'transparent' });
 
   const tl = gsap.timeline({
     scrollTrigger: {
