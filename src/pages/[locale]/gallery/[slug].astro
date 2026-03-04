@@ -68,11 +68,17 @@ const fitMode = slug === 'maxima' ? 'contain' : 'cover';
     <script>
       const closeBtn = document.querySelector('[data-close-gallery]') as HTMLElement;
       if (closeBtn) {
+        const locale = closeBtn.dataset.locale;
+        const slug = closeBtn.dataset.slug;
+
         closeBtn.addEventListener('click', () => {
-          const locale = closeBtn.dataset.locale;
-          const slug = closeBtn.dataset.slug;
           sessionStorage.setItem('return-to-gallery', slug!);
-          window.location.href = `/${locale}/`;
+          window.location.replace(`/${locale}/`);
+        });
+
+        // Browser back button: set sessionStorage before unload
+        window.addEventListener('pagehide', () => {
+          sessionStorage.setItem('return-to-gallery', slug!);
         });
       }
     </script>

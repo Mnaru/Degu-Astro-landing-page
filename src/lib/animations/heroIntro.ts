@@ -27,24 +27,36 @@ export function heroIntro(heroEl: HTMLElement) {
     // Init hero-to-gallery at end state (hero hidden, galleries visible)
     initHeroToGallery({ startAtEnd: true });
 
-    // Refresh first so layout reflects tl.progress(1) changes (scale 0.7→1),
-    // then scrollIntoView gets accurate element positions
-    ScrollTrigger.refresh();
+    // Let browser settle layout after ScrollTrigger setup,
+    // then restore exact scroll position
+    requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
 
-    const target = document.querySelector(`[data-gallery="${slug}"]`);
-    if (target) {
-      target.scrollIntoView({ behavior: 'instant' as ScrollBehavior, block: 'start' });
-    }
+      const savedY = sessionStorage.getItem('return-scroll-y');
+      sessionStorage.removeItem('return-scroll-y');
 
-    // Re-enable scroll-snap lazily on user's first interaction
-    // (prevents mandatory snap from fighting our programmatic position)
-    const enableSnap = () => {
-      document.documentElement.classList.remove('skip-hero');
-      window.removeEventListener('wheel', enableSnap);
-      window.removeEventListener('touchstart', enableSnap);
-    };
-    window.addEventListener('wheel', enableSnap, { passive: true });
-    window.addEventListener('touchstart', enableSnap, { passive: true });
+      if (savedY) {
+        window.scrollTo(0, Number(savedY));
+      } else {
+        // No saved position — fall back to scrolling to the gallery
+        const target = document.querySelector(`[data-gallery="${slug}"]`);
+        if (target) {
+          target.scrollIntoView({ behavior: 'instant' as ScrollBehavior, block: 'center' });
+        } else {
+          document.documentElement.classList.remove('skip-hero');
+          return;
+        }
+      }
+
+      // Re-enable scroll-snap on first user interaction
+      const enableSnap = () => {
+        requestAnimationFrame(() => {
+          document.documentElement.classList.remove('skip-hero');
+        });
+      };
+      window.addEventListener('wheel', enableSnap, { passive: true, once: true });
+      window.addEventListener('touchstart', enableSnap, { passive: true, once: true });
+    });
 
     return;
   }
