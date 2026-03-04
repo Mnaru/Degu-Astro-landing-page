@@ -36,11 +36,7 @@ const images = [img01, img02];
       />
     </div>
   </div>
-  <div class="gallery__name">
-    {galleryName.split('').map((letter) => (
-      <span class="gallery__name-letter">{letter}</span>
-    ))}
-  </div>
+  <div class="gallery__name">{galleryName}</div>
   <a
     href={`/${locale}/gallery/crocs`}
     class="gallery__link"
@@ -114,10 +110,6 @@ const images = [img01, img02];
     z-index: 10;
     pointer-events: none;
     display: none;
-  }
-
-  .gallery__name-letter {
-    display: inline-block;
     font-family: var(--font-display);
     font-size: max(100px, calc(66.67px + 9.26vw));
     font-weight: 390;

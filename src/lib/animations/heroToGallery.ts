@@ -16,7 +16,7 @@ interface Elements {
 }
 
 function buildDesktopTimeline(els: Elements) {
-  const { heroInner, degu, studio, bodyText, scrollHint, galleriesWrapper } = els;
+  const { hero, heroInner, degu, studio, bodyText, scrollHint, galleriesWrapper } = els;
 
   // Measure positions for corner-aligned scale animation
   const heroInnerRect = heroInner.getBoundingClientRect();
@@ -49,6 +49,9 @@ function buildDesktopTimeline(els: Elements) {
   tl.to(degu, { xPercent: -500, duration: 0.5, ease: 'power2.in' }, 0.4);
   tl.to(studio, { xPercent: 500, duration: 0.5, ease: 'power2.in' }, 0.4);
 
+  // Letters gone — let clicks pass through to the gallery beneath
+  tl.set(hero, { pointerEvents: 'none' }, 0.9);
+
   // Phase 4: Hero fades out, revealing gallery (85% → 100%)
   tl.to(heroInner, { opacity: 0, duration: 0.15, ease: 'none' }, 0.85);
 
@@ -59,7 +62,7 @@ function buildDesktopTimeline(els: Elements) {
 }
 
 function buildMobileTimeline(els: Elements) {
-  const { heroInner, degu, studio, bodyText, scrollHint, galleriesWrapper } = els;
+  const { hero, heroInner, degu, studio, bodyText, scrollHint, galleriesWrapper } = els;
 
   // Measure positions for mobile layout
   const heroInnerRect = heroInner.getBoundingClientRect();
@@ -90,6 +93,9 @@ function buildMobileTimeline(els: Elements) {
   // Phase 3: Exit DEGU left, STUDIO right (40% → 90%)
   tl.to(degu, { xPercent: -350, duration: 0.5, ease: 'power2.in' }, 0.4);
   tl.to(studio, { xPercent: 350, duration: 0.5, ease: 'power2.in' }, 0.4);
+
+  // Letters gone — let clicks pass through to the gallery beneath
+  tl.set(hero, { pointerEvents: 'none' }, 0.9);
 
   // Phase 4: Hero fades out, revealing gallery (85% → 100%)
   tl.to(heroInner, { opacity: 0, duration: 0.15, ease: 'none' }, 0.85);
@@ -134,6 +140,11 @@ export function initHeroToGallery() {
     pin: true,
     pinSpacing: true,
     anticipatePin: 1,
+    snap: {
+      snapTo: [0, 1],
+      duration: { min: 0.2, max: 0.4 },
+      ease: 'power2.out',
+    },
     animation: tl,
     // markers: true,
     onEnter: () => {
@@ -156,7 +167,7 @@ export function initHeroToGallery() {
   return () => {
     st.kill();
     tl.kill();
-    gsap.set(hero, { clearProps: 'zIndex' });
+    gsap.set(hero, { clearProps: 'zIndex,pointerEvents' });
     gsap.set(heroInner, { clearProps: 'overflow,opacity' });
     gsap.set([degu, studio], { clearProps: 'all' });
     gsap.set([bodyText, scrollHint], { clearProps: 'opacity' });
