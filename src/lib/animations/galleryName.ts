@@ -8,11 +8,18 @@ interface GalleryNameOptions {
 export function initGalleryName({ galleryEl, nameEl }: GalleryNameOptions): () => void {
   gsap.set(nameEl, { display: 'flex', autoAlpha: 0 });
 
+  let isVisible = false;
+
   const update = () => {
     const rect = galleryEl.getBoundingClientRect();
     const vh = window.innerHeight;
-    const visible = rect.top < vh * 0.8 && rect.bottom > vh * 0.2;
-    gsap.set(nameEl, { autoAlpha: visible ? 1 : 0 });
+    const centerY = rect.top + rect.height / 2;
+    const nowVisible = rect.height > 0 && centerY > vh * 0.1 && centerY < vh * 0.9;
+
+    if (nowVisible !== isVisible) {
+      isVisible = nowVisible;
+      gsap.set(nameEl, { autoAlpha: isVisible ? 1 : 0 });
+    }
   };
 
   window.addEventListener('scroll', update, { passive: true });
