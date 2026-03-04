@@ -81,14 +81,6 @@ export const translations = {
       maxima: { name: 'MAXIMA', jobDone: 'Key visuals & OOH' },
       close: 'Close',
     },
-    footer: {
-      email: 'Email',
-      instagram: 'Instagram',
-      location: 'Vilnius, Lithuania',
-      locationShort: 'Vilnius',
-      copyright: '©Degu Studio, 2026',
-      siteBy: 'Site by Monika',
-    },
   },
   lt: {
     // TODO: Replace with actual Lithuanian translations
@@ -172,14 +164,6 @@ export const translations = {
       mix: { name: 'MIX', jobDone: 'Socialinių tinklų turinis' },
       maxima: { name: 'MAXIMA', jobDone: 'Pagrindiniai vizualai ir OOH' },
       close: 'Uždaryti',
-    },
-    footer: {
-      email: 'Emeilas',
-      instagram: 'Instagramas',
-      location: 'Vilnius, Lietuva',
-      locationShort: 'Vilnius',
-      copyright: '©Degu Studio, 2026',
-      siteBy: 'Svetainė: Monika',
     },
   },
 } as const;

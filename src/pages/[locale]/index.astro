@@ -18,7 +18,6 @@ import MaximaGallery from '@components/galleries/MaximaGallery.astro';
 
 import Review from '@components/Review.astro';
 import Outro from '@components/Outro.astro';
-import Footer from '@components/Footer.astro';
 import OutroHeaderContainer from '@components/OutroHeaderContainer.astro';
 import OutroStudioContainer from '@components/OutroStudioContainer.astro';
 import OutroBodyTextContainer from '@components/OutroBodyTextContainer.astro';
@@ -70,10 +69,8 @@ const i18n = t(locale);
       </div>
     </div>
   </Outro> -->
-  <Footer locale={locale} />
   <script>
     import { initGallerySkew } from '@lib/animations/gallerySkew';
-    import { initFooterReveal } from '@lib/animations/footerReveal';
     import { registerCleanup } from '@lib/animations/lifecycle';
 
     document.addEventListener('astro:page-load', () => {
@@ -83,11 +80,6 @@ const i18n = t(locale);
 
       if (galleries.length > 0) {
         registerCleanup(initGallerySkew({ elements: galleries }));
-      }
-
-      const footer = document.querySelector('.footer') as HTMLElement | null;
-      if (footer) {
-        registerCleanup(initFooterReveal(footer));
       }
     });
   </script>

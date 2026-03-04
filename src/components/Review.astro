@@ -1,8 +1,6 @@
 ---
-import { Image } from 'astro:assets';
 import { t } from '@i18n/utils';
 import starIcon from '@assets/icons/Star icon.svg';
-import teamPhoto from '@assets/images/team/TeamPhoto.png';
 
 interface Props {
   locale: string;
@@ -21,9 +19,6 @@ const i18n = t(locale);
     </div>
     <h2 class="review__quote">{i18n.review.quote}</h2>
     <p class="review__source">{i18n.review.source}</p>
-  </div>
-  <div class="review__team-photo">
-    <Image src={teamPhoto} alt="Degu Studio team" />
   </div>
 </section>
 
@@ -95,32 +90,9 @@ const i18n = t(locale);
     color: var(--color-offwhite);
   }
 
-  .review__team-photo {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-    width: clamp(280px, 25vw, 400px);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .review__team-photo::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.3);
-  }
-
-  .review__team-photo img {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
 </style>
 
 <script>
-  import { gsap } from 'gsap';
   import { initReviewReveal } from '@lib/animations/reviewReveal';
   import { registerCleanup } from '@lib/animations/lifecycle';
 
@@ -128,25 +100,6 @@ const i18n = t(locale);
     const section = document.querySelector('.review') as HTMLElement;
     if (section) {
       registerCleanup(initReviewReveal(section));
-
-      // Team photo: instant show/hide on quote hover
-      const photo = section.querySelector('.review__team-photo') as HTMLElement;
-      const quote = section.querySelector('.review__quote') as HTMLElement;
-      if (photo && quote) {
-        gsap.set(photo, { autoAlpha: 0 });
-
-        const show = () => gsap.set(photo, { autoAlpha: 1 });
-        const hide = () => gsap.set(photo, { autoAlpha: 0 });
-
-        quote.addEventListener('mouseenter', show);
-        quote.addEventListener('mouseleave', hide);
-
-        registerCleanup(() => {
-          quote.removeEventListener('mouseenter', show);
-          quote.removeEventListener('mouseleave', hide);
-          gsap.set(photo, { clearProps: 'all' });
-        });
-      }
     }
   });
 </script>
