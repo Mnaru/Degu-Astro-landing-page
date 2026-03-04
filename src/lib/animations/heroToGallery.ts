@@ -32,8 +32,8 @@ function buildDesktopTimeline(els: Elements) {
   const studioTargetY = (heroInnerRect.bottom - studioRect.bottom) * 0.75;
 
   // Set transform origins (no visual change at scale 1)
-  gsap.set(degu, { transformOrigin: 'top left', willChange: 'transform' });
-  gsap.set(studio, { transformOrigin: 'bottom left', willChange: 'transform' });
+  gsap.set(degu, { transformOrigin: 'top left' });
+  gsap.set(studio, { transformOrigin: 'bottom left' });
 
   const tl = gsap.timeline();
 
@@ -42,8 +42,8 @@ function buildDesktopTimeline(els: Elements) {
   tl.to(bodyText, { opacity: 0, duration: 0.2, ease: 'none' }, 0);
 
   // Phase 2: Scale up DEGU → top-left, STUDIO → bottom-left (0% → 40%)
-  tl.to(degu, { scale: 2, x: deguTargetX, y: deguTargetY, duration: 0.4, ease: 'power2.inOut' }, 0);
-  tl.to(studio, { scale: 2, x: studioTargetX, y: studioTargetY, duration: 0.4, ease: 'power2.inOut' }, 0);
+  tl.to(degu, { scale: 2, x: deguTargetX, y: deguTargetY, duration: 0.4, ease: 'power2.inOut', force3D: false }, 0);
+  tl.to(studio, { scale: 2, x: studioTargetX, y: studioTargetY, duration: 0.4, ease: 'power2.inOut', force3D: false }, 0);
 
   // Phase 3: Exit DEGU left, STUDIO right (40% → 90%)
   tl.to(degu, { xPercent: -500, duration: 0.5, ease: 'power2.in' }, 0.4);
@@ -77,8 +77,8 @@ function buildMobileTimeline(els: Elements) {
   const studioTargetX = heroInnerRect.left - studioRect.left + 10;
   const studioTargetY = (heroInnerRect.bottom - studioRect.bottom) * 0.75;
 
-  gsap.set(degu, { transformOrigin: 'top left', willChange: 'transform' });
-  gsap.set(studio, { transformOrigin: 'bottom left', willChange: 'transform' });
+  gsap.set(degu, { transformOrigin: 'top left' });
+  gsap.set(studio, { transformOrigin: 'bottom left' });
 
   const tl = gsap.timeline();
 
@@ -87,8 +87,8 @@ function buildMobileTimeline(els: Elements) {
   tl.to(bodyText, { opacity: 0, duration: 0.2, ease: 'none' }, 0);
 
   // Phase 2: Scale up DEGU and STUDIO — less scale on mobile (0% → 40%)
-  tl.to(degu, { scale: 3.4, x: deguTargetX, y: deguTargetY, duration: 0.4, ease: 'power2.inOut' }, 0);
-  tl.to(studio, { scale: 3.4, x: studioTargetX, y: studioTargetY, duration: 0.4, ease: 'power2.inOut' }, 0);
+  tl.to(degu, { scale: 3.4, x: deguTargetX, y: deguTargetY, duration: 0.4, ease: 'power2.inOut', force3D: false }, 0);
+  tl.to(studio, { scale: 3.4, x: studioTargetX, y: studioTargetY, duration: 0.4, ease: 'power2.inOut', force3D: false }, 0);
 
   // Phase 3: Exit DEGU left, STUDIO right (40% → 90%)
   tl.to(degu, { xPercent: -350, duration: 0.5, ease: 'power2.in' }, 0.4);
