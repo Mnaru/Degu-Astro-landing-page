@@ -1,0 +1,156 @@
+---
+import { Image } from 'astro:assets';
+import { t } from '@i18n/utils';
+import starIcon from '@assets/icons/Star icon.svg';
+import teamPhoto from '@assets/images/team/TeamPhoto.png';
+
+interface Props {
+  locale: string;
+}
+
+const { locale } = Astro.props;
+const i18n = t(locale);
+---
+
+<section class="review">
+  <div class="review__content">
+    <div class="review__stars">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <img class={`review__star review__star--${i}`} src={starIcon.src} alt="" />
+      ))}
+    </div>
+    <h2 class="review__quote">{i18n.review.quote}</h2>
+    <p class="review__source">{i18n.review.source}</p>
+  </div>
+  <div class="review__team-photo">
+    <Image src={teamPhoto} alt="Degu Studio team" />
+  </div>
+</section>
+
+<style>
+  .review {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+
+  }
+
+  .review__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 max(15px, calc(10px + 1.389vw));
+  }
+
+  .review__stars {
+    display: flex;
+    align-items: flex-end;
+    gap: calc(0.67px + 0.370vw);
+  }
+
+
+  .review__star--1,
+  .review__star--5 {
+    width: calc(35.33px + 1.852vw);
+    height: calc(35.33px + 1.852vw);
+  }
+
+  .review__star--2,
+  .review__star--4 {
+    width: calc(55.33px + 1.852vw);
+    height: calc(55.33px + 1.852vw);
+  }
+
+  .review__star--3 {
+    width: calc(65px + 1.944vw);
+    height: calc(65px + 1.944vw);
+  }
+
+  .review__quote {
+    margin: 8px 0 0;
+    font-family: var(--font-display);
+    font-size: max(80px, calc(76.67px + 0.926vw));
+
+    font-weight: 400;
+    line-height: 0.85;
+    text-transform: uppercase;
+
+    color: var(--color-offwhite);
+  }
+
+  .review__source {
+    margin: 24px 0 0;
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.4;
+
+    color: var(--color-offwhite);
+  }
+
+  .review__team-photo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: clamp(280px, 25vw, 400px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .review__team-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .review__team-photo img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { initReviewReveal } from '@lib/animations/reviewReveal';
+  import { registerCleanup } from '@lib/animations/lifecycle';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.addEventListener('astro:page-load', () => {
+    const section = document.querySelector('.review') as HTMLElement;
+    if (section) {
+      registerCleanup(initReviewReveal(section));
+      ScrollTrigger.refresh();
+
+      // Team photo: instant show/hide on quote hover
+      const photo = section.querySelector('.review__team-photo') as HTMLElement;
+      const quote = section.querySelector('.review__quote') as HTMLElement;
+      if (photo && quote) {
+        gsap.set(photo, { autoAlpha: 0 });
+
+        const show = () => gsap.set(photo, { autoAlpha: 1 });
+        const hide = () => gsap.set(photo, { autoAlpha: 0 });
+
+        quote.addEventListener('mouseenter', show);
+        quote.addEventListener('mouseleave', hide);
+
+        registerCleanup(() => {
+          quote.removeEventListener('mouseenter', show);
+          quote.removeEventListener('mouseleave', hide);
+          gsap.set(photo, { clearProps: 'all' });
+        });
+      }
+    }
+  });
+</script>

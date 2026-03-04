@@ -69,6 +69,10 @@ export const translations = {
     gallery: {
       close: 'Close gallery',
     },
+    review: {
+      quote: '"Very easy to work with"',
+      source: 'Anonymous survey, 2025',
+    },
     galleries: {
       manilla: { name: 'MANILLA', jobDone: 'Product Photography' },
       crocs: { name: 'CROCS', jobDone: 'Product Photography' },
@@ -148,6 +152,10 @@ export const translations = {
     },
     gallery: {
       close: 'Uždaryti galeriją',
+    },
+    review: {
+      quote: '"SU JAIS LABAI FAINA DIRBTI"',
+      source: 'Anoniminė apklausa, 2025',
     },
     galleries: {
       manilla: { name: 'MANILLA', jobDone: 'Produktų fotografija' },

@@ -16,6 +16,7 @@ import AlitaGallery from '@components/galleries/AlitaGallery.astro';
 import MixGallery from '@components/galleries/MixGallery.astro';
 import MaximaGallery from '@components/galleries/MaximaGallery.astro';
 
+import Review from '@components/Review.astro';
 import Outro from '@components/Outro.astro';
 import OutroHeaderContainer from '@components/OutroHeaderContainer.astro';
 import OutroStudioContainer from '@components/OutroStudioContainer.astro';
@@ -54,6 +55,8 @@ const i18n = t(locale);
     <MixGallery locale={locale} />
     <MaximaGallery locale={locale} />
   </div>
+
+  <Review locale={locale} />
 
   <Outro locale={locale}>
     <div class="outro-content">
