@@ -35,7 +35,7 @@ const i18n = t(locale);
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 100vh;
+    height: 120vh;
 
   }
 
@@ -121,17 +121,13 @@ const i18n = t(locale);
 
 <script>
   import { gsap } from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
   import { initReviewReveal } from '@lib/animations/reviewReveal';
   import { registerCleanup } from '@lib/animations/lifecycle';
-
-  gsap.registerPlugin(ScrollTrigger);
 
   document.addEventListener('astro:page-load', () => {
     const section = document.querySelector('.review') as HTMLElement;
     if (section) {
       registerCleanup(initReviewReveal(section));
-      ScrollTrigger.refresh();
 
       // Team photo: instant show/hide on quote hover
       const photo = section.querySelector('.review__team-photo') as HTMLElement;

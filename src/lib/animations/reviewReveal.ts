@@ -21,13 +21,8 @@ export function initReviewReveal(section: HTMLElement): () => void {
   gsap.set(quote, { autoAlpha: 0, y: 15 });
   gsap.set(source, { autoAlpha: 0 });
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: section,
-      start: 'top 60%',
-      toggleActions: 'play none none none',
-    },
-  });
+  // Build a paused timeline (decoupled from ScrollTrigger)
+  const tl = gsap.timeline({ paused: true });
 
   // Stars: center-out staggered scale + fade
   orderedStars.forEach((star, i) => {
@@ -54,8 +49,16 @@ export function initReviewReveal(section: HTMLElement): () => void {
     ease: 'power2.out',
   }, 0.9);
 
+  // Standalone ScrollTrigger — more reliable with complex pin layouts
+  const st = ScrollTrigger.create({
+    trigger: section,
+    start: 'top 80%',
+    once: true,
+    onEnter: () => tl.play(),
+  });
+
   return () => {
-    tl.scrollTrigger?.kill();
+    st.kill();
     tl.kill();
     gsap.set([...orderedStars, quote, source], { clearProps: 'all' });
   };
