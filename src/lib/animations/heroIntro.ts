@@ -5,11 +5,10 @@ import { initHeroToGallery } from './heroToGallery';
 gsap.registerPlugin(ScrollTrigger);
 
 export function heroIntro(heroEl: HTMLElement) {
-  const isReturning = sessionStorage.getItem('returning-from-gallery') === 'true';
+  const slug = sessionStorage.getItem('return-to-gallery');
 
-  if (isReturning) {
-    sessionStorage.removeItem('returning-from-gallery');
-    history.scrollRestoration = 'auto';
+  if (slug) {
+    sessionStorage.removeItem('return-to-gallery');
 
     const heroInner = heroEl.querySelector('.hero-inner') as HTMLElement;
     const degu = heroEl.querySelector('.header-container') as HTMLElement;
@@ -19,18 +18,34 @@ export function heroIntro(heroEl: HTMLElement) {
 
     if (!heroInner || !degu || !studio || !bodyText || !scrollHint) return;
 
-    // Set all elements to their post-animation final state
+    // Set hero elements to post-intro final state
     gsap.set([degu, studio, bodyText, scrollHint], { clearProps: 'all' });
     gsap.set(heroInner, { autoAlpha: 1 });
     gsap.set(bodyText, { autoAlpha: 1 });
     gsap.set(scrollHint, { autoAlpha: 1 });
 
-    // Start scroll hint cylinder rotation if available
-    const cylTl = (scrollHint as any)._scrollHintTl;
-    if (cylTl) cylTl.play();
+    // Init hero-to-gallery at end state (hero hidden, galleries visible)
+    initHeroToGallery({ startAtEnd: true });
 
-    initHeroToGallery();
+    // Refresh first so layout reflects tl.progress(1) changes (scale 0.7→1),
+    // then scrollIntoView gets accurate element positions
     ScrollTrigger.refresh();
+
+    const target = document.querySelector(`[data-gallery="${slug}"]`);
+    if (target) {
+      target.scrollIntoView({ behavior: 'instant' as ScrollBehavior, block: 'start' });
+    }
+
+    // Re-enable scroll-snap lazily on user's first interaction
+    // (prevents mandatory snap from fighting our programmatic position)
+    const enableSnap = () => {
+      document.documentElement.classList.remove('skip-hero');
+      window.removeEventListener('wheel', enableSnap);
+      window.removeEventListener('touchstart', enableSnap);
+    };
+    window.addEventListener('wheel', enableSnap, { passive: true });
+    window.addEventListener('touchstart', enableSnap, { passive: true });
+
     return;
   }
 

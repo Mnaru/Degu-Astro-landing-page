@@ -44,6 +44,12 @@ const i18n = t(locale);
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{i18n.meta.title}</title>
     <meta name="description" content={i18n.meta.description} />
+    <script is:inline>
+      if (sessionStorage.getItem('return-to-gallery')) {
+        document.documentElement.classList.add('skip-hero');
+        history.scrollRestoration = 'manual';
+      }
+    </script>
   </head>
   <body>
     <FluidBackground />
@@ -87,11 +93,6 @@ const i18n = t(locale);
         initGallerySkew({ elements: galleries });
       }
 
-      document.querySelectorAll('.gallery__link').forEach(link => {
-        link.addEventListener('click', () => {
-          sessionStorage.setItem('returning-from-gallery', 'true');
-        });
-      });
     </script>
   </body>
 </html>
@@ -108,5 +109,15 @@ const i18n = t(locale);
     to {
       opacity: 1;
     }
+  }
+
+  :global(html.skip-hero .hero) {
+    visibility: hidden;
+  }
+  :global(html.skip-hero) {
+    scroll-snap-type: none !important;
+  }
+  :global(html.skip-hero [data-gallery]) {
+    scroll-snap-align: none;
   }
 </style>

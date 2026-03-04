@@ -106,7 +106,7 @@ function buildMobileTimeline(els: Elements) {
   return tl;
 }
 
-export function initHeroToGallery() {
+export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
   const hero = document.querySelector('.hero') as HTMLElement;
   const degu = hero?.querySelector('.header-container') as HTMLElement;
   const studio = hero?.querySelector('.header-container-studio') as HTMLElement;
@@ -162,6 +162,11 @@ export function initHeroToGallery() {
       gsap.set(hero, { clearProps: 'zIndex' });
     },
   });
+
+  if (options?.startAtEnd) {
+    tl.progress(1);
+    window.scrollTo(0, st.end);
+  }
 
   // --- Cleanup ---
   return () => {
