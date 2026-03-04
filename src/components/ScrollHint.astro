@@ -31,69 +31,71 @@ const { class: className, ...attrs } = Astro.props;
 <script>
   import { gsap } from 'gsap';
 
-  document.querySelectorAll('.scroll-hint').forEach((hint) => {
-    const textEl = hint.querySelector('.roll-text');
-    if (!textEl) return;
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll('.scroll-hint').forEach((hint) => {
+      const textEl = hint.querySelector('.roll-text');
+      if (!textEl) return;
 
-    const content = textEl.textContent || '';
-    hint.removeChild(textEl);
+      const content = textEl.textContent || '';
+      hint.removeChild(textEl);
 
-    // Tube container (holds 3 stacked lines)
-    const tube = document.createElement('div');
-    tube.style.position = 'relative';
-    hint.appendChild(tube);
+      // Tube container (holds 3 stacked lines)
+      const tube = document.createElement('div');
+      tube.style.position = 'relative';
+      hint.appendChild(tube);
 
-    const lineCount = 4;
-    const allLines: HTMLElement[] = [];
-    const charSets: HTMLElement[][] = [];
+      const lineCount = 4;
+      const allLines: HTMLElement[] = [];
+      const charSets: HTMLElement[][] = [];
 
-    for (let i = 0; i < lineCount; i++) {
-      const line = document.createElement('span');
-      line.style.display = 'block';
-      line.style.whiteSpace = 'nowrap';
+      for (let i = 0; i < lineCount; i++) {
+        const line = document.createElement('span');
+        line.style.display = 'block';
+        line.style.whiteSpace = 'nowrap';
 
-      if (i > 0) {
-        line.style.position = 'absolute';
-        line.style.top = '0';
-        line.style.left = '0';
+        if (i > 0) {
+          line.style.position = 'absolute';
+          line.style.top = '0';
+          line.style.left = '0';
+        }
+
+        const chars: HTMLElement[] = [];
+        content.split('').forEach((c) => {
+          const span = document.createElement('span');
+          span.textContent = c;
+          span.style.display = 'inline-block';
+          span.style.backfaceVisibility = 'hidden';
+          line.appendChild(span);
+          chars.push(span);
+        });
+
+        tube.appendChild(line);
+        allLines.push(line);
+        charSets.push(chars);
       }
 
-      const chars: HTMLElement[] = [];
-      content.split('').forEach((c) => {
-        const span = document.createElement('span');
-        span.textContent = c;
-        span.style.display = 'inline-block';
-        span.style.backfaceVisibility = 'hidden';
-        line.appendChild(span);
-        chars.push(span);
+      // 3D setup — depth creates cylinder radius, scaled for 11px font
+      const depth = -7;
+      const transformOrigin = `50% 50% ${depth}px`;
+
+      gsap.set(allLines, { perspective: 200, transformStyle: 'preserve-3d' });
+
+      // Cylinder rotation — starts paused, triggered by parent animation (e.g. heroIntro)
+      // Top-to-bottom: each line rotates from top(90) through front(0) to bottom(-90)
+      // Lines are staggered so one is always visible at the front
+      const animTime = 0.9;
+      const tl = gsap.timeline({ repeat: -1, paused: true });
+
+      charSets.forEach((chars, index) => {
+        tl.fromTo(chars,
+          { rotationX: 90 },
+          { rotationX: -90, stagger: 0.1, duration: animTime, ease: 'none', transformOrigin },
+          index * (animTime * 0.5)
+        );
       });
 
-      tube.appendChild(line);
-      allLines.push(line);
-      charSets.push(chars);
-    }
-
-    // 3D setup — depth creates cylinder radius, scaled for 11px font
-    const depth = -7;
-    const transformOrigin = `50% 50% ${depth}px`;
-
-    gsap.set(allLines, { perspective: 200, transformStyle: 'preserve-3d' });
-
-    // Cylinder rotation — starts paused, triggered by parent animation (e.g. heroIntro)
-    // Top-to-bottom: each line rotates from top(90) through front(0) to bottom(-90)
-    // Lines are staggered so one is always visible at the front
-    const animTime = 0.9;
-    const tl = gsap.timeline({ repeat: -1, paused: true });
-
-    charSets.forEach((chars, index) => {
-      tl.fromTo(chars,
-        { rotationX: 90 },
-        { rotationX: -90, stagger: 0.1, duration: animTime, ease: 'none', transformOrigin },
-        index * (animTime * 0.5)
-      );
+      // Expose timeline so parent animations can trigger it
+      (hint as any)._scrollHintTl = tl;
     });
-
-    // Expose timeline so parent animations can trigger it
-    (hint as any)._scrollHintTl = tl;
   });
 </script>

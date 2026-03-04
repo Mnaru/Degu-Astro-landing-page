@@ -4,12 +4,10 @@ import { initHeroToGallery } from './heroToGallery';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function heroIntro(heroEl: HTMLElement) {
-  const slug = sessionStorage.getItem('return-to-gallery');
+declare global { interface Window { __heroIntroPlayed?: boolean; } }
 
-  if (slug) {
-    sessionStorage.removeItem('return-to-gallery');
-
+export function heroIntro(heroEl: HTMLElement, options?: { skipIntro?: boolean }): (() => void) | undefined {
+  if (options?.skipIntro) {
     const heroInner = heroEl.querySelector('.hero-inner') as HTMLElement;
     const degu = heroEl.querySelector('.header-container') as HTMLElement;
     const studio = heroEl.querySelector('.header-container-studio') as HTMLElement;
@@ -25,41 +23,11 @@ export function heroIntro(heroEl: HTMLElement) {
     gsap.set(scrollHint, { autoAlpha: 1 });
 
     // Init hero-to-gallery at end state (hero hidden, galleries visible)
-    initHeroToGallery({ startAtEnd: true });
-
-    // Let browser settle layout after ScrollTrigger setup,
-    // then restore exact scroll position
-    requestAnimationFrame(() => {
-      ScrollTrigger.refresh();
-
-      const savedY = sessionStorage.getItem('return-scroll-y');
-      sessionStorage.removeItem('return-scroll-y');
-
-      if (savedY) {
-        window.scrollTo(0, Number(savedY));
-      } else {
-        // No saved position — fall back to scrolling to the gallery
-        const target = document.querySelector(`[data-gallery="${slug}"]`);
-        if (target) {
-          target.scrollIntoView({ behavior: 'instant' as ScrollBehavior, block: 'center' });
-        } else {
-          document.documentElement.classList.remove('skip-hero');
-          return;
-        }
-      }
-
-      // Re-enable scroll-snap on first user interaction
-      const enableSnap = () => {
-        requestAnimationFrame(() => {
-          document.documentElement.classList.remove('skip-hero');
-        });
-      };
-      window.addEventListener('wheel', enableSnap, { passive: true, once: true });
-      window.addEventListener('touchstart', enableSnap, { passive: true, once: true });
-    });
-
-    return;
+    const heroToGalleryCleanup = initHeroToGallery({ startAtEnd: true });
+    return heroToGalleryCleanup;
   }
+
+  let heroToGalleryCleanup: (() => void) | undefined;
 
   const ctx = gsap.context(() => {
     const heroInner = heroEl.querySelector('.hero-inner') as HTMLElement;
@@ -156,11 +124,15 @@ export function heroIntro(heroEl: HTMLElement) {
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('touchmove', onTouchMove);
       document.body.style.overflow = '';
-      initHeroToGallery();
+      window.__heroIntroPlayed = true;
+      heroToGalleryCleanup = initHeroToGallery();
       ScrollTrigger.refresh();
     });
 
   }, heroEl);
 
-  return ctx;
+  return () => {
+    ctx.revert();
+    if (heroToGalleryCleanup) heroToGalleryCleanup();
+  };
 }

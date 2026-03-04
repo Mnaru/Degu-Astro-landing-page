@@ -25,10 +25,12 @@ const {
 </button>
 
 <script>
-  document.querySelectorAll<HTMLButtonElement>('.follow-us-button').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const href = btn.dataset.href ?? '';
-      window.open(href, '_blank', 'noopener,noreferrer');
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLButtonElement>('.follow-us-button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const href = btn.dataset.href ?? '';
+        window.open(href, '_blank', 'noopener,noreferrer');
+      });
     });
   });
 </script>

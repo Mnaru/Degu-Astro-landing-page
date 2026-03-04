@@ -29,46 +29,48 @@ const {
 </button>
 
 <script>
-  document.querySelectorAll<HTMLButtonElement>('.email-us-button').forEach((btn) => {
-    let timeoutId: ReturnType<typeof setTimeout>;
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLButtonElement>('.email-us-button').forEach((btn) => {
+      let timeoutId: ReturnType<typeof setTimeout>;
 
-    btn.addEventListener('click', async () => {
-      const email = btn.dataset.email ?? '';
-      const label = btn.dataset.label ?? '';
-      const feedback = btn.dataset.feedback ?? '';
-      const labelEl = btn.querySelector('.email-us-button__label');
-      if (!labelEl) return;
+      btn.addEventListener('click', async () => {
+        const email = btn.dataset.email ?? '';
+        const label = btn.dataset.label ?? '';
+        const feedback = btn.dataset.feedback ?? '';
+        const labelEl = btn.querySelector('.email-us-button__label');
+        if (!labelEl) return;
 
-      clearTimeout(timeoutId);
+        clearTimeout(timeoutId);
 
-      const showFeedback = () => {
-        const emojiMatch = feedback.match(/^(\p{Emoji_Presentation})\s*(.*)/u);
-        if (emojiMatch) {
-          labelEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px"><span style="font-size:1.2em;line-height:1">${emojiMatch[1]}</span>${emojiMatch[2]}</span>`;
-        } else {
-          labelEl.textContent = feedback;
+        const showFeedback = () => {
+          const emojiMatch = feedback.match(/^(\p{Emoji_Presentation})\s*(.*)/u);
+          if (emojiMatch) {
+            labelEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px"><span style="font-size:1.2em;line-height:1">${emojiMatch[1]}</span>${emojiMatch[2]}</span>`;
+          } else {
+            labelEl.textContent = feedback;
+          }
+          btn.classList.add('copied');
+          timeoutId = setTimeout(() => {
+            labelEl.textContent = label;
+            btn.classList.remove('copied');
+          }, 3000);
+        };
+
+        try {
+          await navigator.clipboard.writeText(email);
+          showFeedback();
+        } catch {
+          const textarea = document.createElement('textarea');
+          textarea.value = email;
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+          showFeedback();
         }
-        btn.classList.add('copied');
-        timeoutId = setTimeout(() => {
-          labelEl.textContent = label;
-          btn.classList.remove('copied');
-        }, 3000);
-      };
-
-      try {
-        await navigator.clipboard.writeText(email);
-        showFeedback();
-      } catch {
-        const textarea = document.createElement('textarea');
-        textarea.value = email;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        showFeedback();
-      }
+      });
     });
   });
 </script>

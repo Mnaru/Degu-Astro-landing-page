@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths } from 'astro';
 
-import '../../styles/global.css';
+import BaseLayout from '@layouts/BaseLayout.astro';
 
 import Header from '@components/Header.astro';
 import Hero from '@components/Hero.astro';
@@ -9,7 +9,6 @@ import HeaderContainer from '@components/HeaderContainer.astro';
 import HeaderContainerStudio from '@components/HeaderContainerStudio.astro';
 import BodyTextContainer from '@components/BodyTextContainer.astro';
 import ScrollHint from '@components/ScrollHint.astro';
-import FluidBackground from '@components/FluidBackground.astro';
 
 import ManillaGallery from '@components/galleries/ManillaGallery.astro';
 import CrocsGallery from '@components/galleries/CrocsGallery.astro';
@@ -37,94 +36,48 @@ const { locale } = Astro.params;
 const i18n = t(locale);
 ---
 
-<html lang={locale}>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{i18n.meta.title}</title>
-    <meta name="description" content={i18n.meta.description} />
-    <script is:inline>
-      if (sessionStorage.getItem('return-to-gallery')) {
-        document.documentElement.classList.add('skip-hero');
-        history.scrollRestoration = 'manual';
-      }
-    </script>
-  </head>
-  <body>
-    <FluidBackground />
-    <Header locale={locale} />
-    <Hero>
-      <HeaderContainer text={i18n.intro.header1} />
-      <div class="hero-row">
-        <HeaderContainerStudio text={i18n.intro.header2} />
-        <BodyTextContainer text={i18n.intro.body} />
-      </div>
-      <ScrollHint>{i18n.intro.scrollHint}</ScrollHint>
-    </Hero>
-
-    <div class="galleries-wrapper">
-      <ManillaGallery locale={locale} />
-      <CrocsGallery locale={locale} />
-      <AlitaGallery locale={locale} />
-      <MixGallery locale={locale} />
-      <MaximaGallery locale={locale} />
+<BaseLayout title={i18n.meta.title} description={i18n.meta.description} locale={locale}>
+  <Header locale={locale} />
+  <Hero>
+    <HeaderContainer text={i18n.intro.header1} />
+    <div class="hero-row">
+      <HeaderContainerStudio text={i18n.intro.header2} />
+      <BodyTextContainer text={i18n.intro.body} />
     </div>
+    <ScrollHint>{i18n.intro.scrollHint}</ScrollHint>
+  </Hero>
 
-    <Outro locale={locale}>
-      <div class="outro-content">
-        <OutroHeaderContainer text={i18n.outro.header1} />
-        <OutroStudioContainer text={i18n.outro.header2} />
-        <OutroBodyTextContainer text={i18n.outro.body} class="outro-body" />
-        <div class="outro-buttons">
-          <EmailUsButton label={i18n.outro.emailButton} feedbackText={i18n.outro.emailCopied} />
-          <FollowUsButton label={i18n.outro.followButton} />
-        </div>
+  <div class="galleries-wrapper">
+    <ManillaGallery locale={locale} />
+    <CrocsGallery locale={locale} />
+    <AlitaGallery locale={locale} />
+    <MixGallery locale={locale} />
+    <MaximaGallery locale={locale} />
+  </div>
+
+  <Outro locale={locale}>
+    <div class="outro-content">
+      <OutroHeaderContainer text={i18n.outro.header1} />
+      <OutroStudioContainer text={i18n.outro.header2} />
+      <OutroBodyTextContainer text={i18n.outro.body} class="outro-body" />
+      <div class="outro-buttons">
+        <EmailUsButton label={i18n.outro.emailButton} feedbackText={i18n.outro.emailCopied} />
+        <FollowUsButton label={i18n.outro.followButton} />
       </div>
-    </Outro>
-    <script>
-      import { initGallerySkew } from '@lib/animations/gallerySkew';
+    </div>
+  </Outro>
+  <script>
+    import { initGallerySkew } from '@lib/animations/gallerySkew';
+    import { registerCleanup } from '@lib/animations/lifecycle';
 
+    document.addEventListener('astro:page-load', () => {
       const galleries = Array.from(
         document.querySelectorAll('[data-gallery]')
       ) as HTMLElement[];
 
       if (galleries.length > 0) {
-        initGallerySkew({ elements: galleries });
+        registerCleanup(initGallerySkew({ elements: galleries }));
       }
-
-    </script>
-    <script is:inline>
-      document.querySelectorAll('.gallery__link').forEach(function(link) {
-        link.addEventListener('click', function() {
-          sessionStorage.setItem('return-scroll-y', String(window.scrollY));
-        });
-      });
-    </script>
-  </body>
-</html>
-
-<style>
-  body {
-    animation: pageIn 0.4s ease-out both;
-  }
-
-  @keyframes pageIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  :global(html.skip-hero .hero) {
-    visibility: hidden;
-  }
-  :global(html.skip-hero) {
-    scroll-snap-type: none !important;
-  }
-  :global(html.skip-hero [data-gallery]) {
-    scroll-snap-align: none;
-  }
-</style>
+    });
+  </script>
+</BaseLayout>

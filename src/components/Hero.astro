@@ -16,12 +16,20 @@ const { class: className, ...attrs } = Astro.props;
 
 <script>
   import { heroIntro } from '@lib/animations/heroIntro';
-  history.scrollRestoration = 'manual';
-  if (!sessionStorage.getItem('return-to-gallery')) {
-    await document.fonts.ready;
-  }
-  document.querySelectorAll('.hero').forEach((el) => {
-    heroIntro(el as HTMLElement);
+  import { registerCleanup } from '@lib/animations/lifecycle';
+
+  document.addEventListener('astro:page-load', async () => {
+    const heroEl = document.querySelector('.hero') as HTMLElement;
+    if (!heroEl) return;
+
+    if (!(window as any).__heroIntroPlayed) {
+      await document.fonts.ready;
+      const cleanup = heroIntro(heroEl);
+      if (cleanup) registerCleanup(cleanup);
+    } else {
+      const cleanup = heroIntro(heroEl, { skipIntro: true });
+      if (cleanup) registerCleanup(cleanup);
+    }
   });
 </script>
 

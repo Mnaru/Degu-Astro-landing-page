@@ -47,12 +47,13 @@ const images = [img01, img02];
 
 <script>
   import { initGalleryName } from '@lib/animations/galleryName';
+  import { registerCleanup } from '@lib/animations/lifecycle';
 
-  const gallery = document.querySelector('[data-gallery="crocs"]') as HTMLElement;
-  const name = gallery?.querySelector('.gallery__name') as HTMLElement;
-  if (gallery && name) {
-    initGalleryName({ galleryEl: gallery, nameEl: name });
-  }
+  document.addEventListener('astro:page-load', () => {
+    const gallery = document.querySelector('[data-gallery="crocs"]') as HTMLElement;
+    const name = gallery?.querySelector('.gallery__name') as HTMLElement;
+    if (gallery && name) registerCleanup(initGalleryName({ galleryEl: gallery, nameEl: name }));
+  });
 </script>
 
 <style>

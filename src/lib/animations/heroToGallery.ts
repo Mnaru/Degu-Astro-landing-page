@@ -165,7 +165,6 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
 
   if (options?.startAtEnd) {
     tl.progress(1);
-    window.scrollTo(0, st.end);
   }
 
   // --- Cleanup ---

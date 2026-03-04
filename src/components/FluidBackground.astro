@@ -17,9 +17,13 @@
     const canvas = document.getElementById('fluid-canvas') as HTMLCanvasElement | null;
     if (!canvas) return;
 
+    // Already initialized — persisted across navigation via transition:persist
+    if ((canvas as any).__fluidSim) return;
+
     try {
       const isMobile = window.innerWidth < FLUID_CONFIG.MOBILE_BREAKPOINT;
       const sim = new FluidSimulation(canvas, isMobile);
+      (canvas as any).__fluidSim = sim;
 
       if (!sim.isInitialized()) return;
 

@@ -149,35 +149,25 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
   import { initPhotoStack } from '@lib/animations/photoStack';
   import { initPhotoPulse } from '@lib/animations/photoPulse';
   import { initPhotoProximity } from '@lib/animations/photoProximity';
+  import { registerCleanup } from '@lib/animations/lifecycle';
 
-  const container = document.querySelector('[data-photo-stack]') as HTMLElement;
-  const cards = Array.from(
-    container?.querySelectorAll('.photo-stack__card') ?? []
-  ) as HTMLElement[];
-  const cardInners = Array.from(
-    container?.querySelectorAll('.photo-stack__card-inner') ?? []
-  ) as HTMLElement[];
+  document.addEventListener('astro:page-load', () => {
+    const container = document.querySelector('[data-photo-stack]') as HTMLElement;
+    const cards = Array.from(
+      container?.querySelectorAll('.photo-stack__card') ?? []
+    ) as HTMLElement[];
+    const cardInners = Array.from(
+      container?.querySelectorAll('.photo-stack__card-inner') ?? []
+    ) as HTMLElement[];
 
-  if (container && cards.length > 0) {
-    // Entrance animation — fade in with subtle scale, staggered
-    gsap.fromTo(
-      cards,
-      { opacity: 0, scale: 0.97 },
-      {
-        opacity: 1,
-        scale: 1,
-        duration: 0.5,
-        ease: 'power2.out',
-        stagger: 0.05,
-        onComplete: () => {
-          // Clear inline scale so CSS custom properties (pulse/proximity) take over
-          cards.forEach(card => gsap.set(card, { clearProps: 'scale' }));
-        },
-      }
-    );
-
-    initPhotoStack({ container, cards });
-    initPhotoPulse({ cards: cardInners });
-    initPhotoProximity({ cards: cardInners });
-  }
+    if (container && cards.length > 0) {
+      gsap.fromTo(cards, { opacity: 0, scale: 0.97 }, {
+        opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out', stagger: 0.05,
+        onComplete: () => cards.forEach(card => gsap.set(card, { clearProps: 'scale' })),
+      });
+      registerCleanup(initPhotoStack({ container, cards }));
+      registerCleanup(initPhotoPulse({ cards: cardInners }));
+      registerCleanup(initPhotoProximity({ cards: cardInners }));
+    }
+  });
 </script>

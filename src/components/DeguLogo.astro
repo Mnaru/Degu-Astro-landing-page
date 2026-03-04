@@ -19,11 +19,12 @@ const { class: className, ...attrs } = Astro.props;
 
 <script>
   import { initFlameAnimation } from '@lib/animations/flameLogo';
+  import { registerCleanup } from '@lib/animations/lifecycle';
 
-  const svg = document.querySelector<SVGSVGElement>('.degu-logo .flame-svg');
-  if (svg) {
-    initFlameAnimation(svg);
-  }
+  document.addEventListener('astro:page-load', () => {
+    const svg = document.querySelector<SVGSVGElement>('.degu-logo .flame-svg');
+    if (svg) registerCleanup(initFlameAnimation(svg));
+  });
 </script>
 
 <style>

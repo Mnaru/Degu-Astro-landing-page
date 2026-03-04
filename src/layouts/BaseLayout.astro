@@ -1,0 +1,37 @@
+---
+import { ClientRouter } from 'astro:transitions';
+
+import '../styles/global.css';
+
+import FluidBackground from '@components/FluidBackground.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  locale: string;
+  bodyClass?: string;
+  bodyStyle?: string;
+}
+
+const { title, description, locale, bodyClass, bodyStyle } = Astro.props;
+---
+
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <ClientRouter />
+  </head>
+  <body class={bodyClass} style={bodyStyle}>
+    <div transition:persist="fluid-bg">
+      <FluidBackground />
+    </div>
+    <slot />
+    <script>
+      import '@lib/animations/transitionSetup';
+    </script>
+  </body>
+</html>

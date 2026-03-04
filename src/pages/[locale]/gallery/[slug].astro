@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import type { ImageMetadata } from 'astro';
 
-import '../../../styles/global.css';
+import BaseLayout from '@layouts/BaseLayout.astro';
 
 import { t } from '@i18n/utils';
 import PhotoStack from '@components/gallery-detail/PhotoStack.astro';
@@ -47,64 +47,54 @@ const images = Object.entries(allGalleryImages)
 const fitMode = slug === 'maxima' ? 'contain' : 'cover';
 ---
 
-<html lang={locale}>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{galleryName} — Degu Studio</title>
-    <meta name="description" content={`${galleryName} — ${jobDone}`} />
-    <link rel="prefetch" href={`/${locale}/`} />
-  </head>
-  <body style={`background-color: ${bg}; margin: 0; height: 100vh; overflow: hidden; touch-action: none;`}>
-    <div class="gallery-detail">
-      <div class="gallery-detail__header">
-        <span class="gallery-detail__title">{galleryName}</span>
-        <span class="gallery-detail__job-done">{jobDone}</span>
-        <button class="gallery-detail__close" data-close-gallery data-locale={locale} data-slug={slug}>{i18n.galleries.close}</button>
-      </div>
+<BaseLayout
+  title={`${galleryName} — Degu Studio`}
+  description={`${galleryName} — ${jobDone}`}
+  locale={locale}
+  bodyStyle={`background-color: ${bg}; height: 100vh; overflow: hidden; touch-action: none;`}
+>
+  <div class="gallery-detail__bg" style={`background-color: ${bg};`}></div>
+  <div class="gallery-detail">
+    <div class="gallery-detail__header">
+      <span class="gallery-detail__title">{galleryName}</span>
+      <span class="gallery-detail__job-done">{jobDone}</span>
+      <button class="gallery-detail__close" data-close-gallery data-locale={locale} data-slug={slug}>{i18n.galleries.close}</button>
     </div>
-    <PhotoStack images={images} galleryName={galleryName} fitMode={fitMode} />
-    <script>
+  </div>
+  <PhotoStack images={images} galleryName={galleryName} fitMode={fitMode} />
+  <script>
+    import { navigate } from 'astro:transitions/client';
+
+    document.addEventListener('astro:page-load', () => {
       const closeBtn = document.querySelector('[data-close-gallery]') as HTMLElement;
-      if (closeBtn) {
-        const locale = closeBtn.dataset.locale;
-        const slug = closeBtn.dataset.slug;
+      if (!closeBtn) return;
+      const locale = closeBtn.dataset.locale;
 
-        closeBtn.addEventListener('click', () => {
-          sessionStorage.setItem('return-to-gallery', slug!);
-          window.location.replace(`/${locale}/`);
-        });
-
-        // Browser back button: set sessionStorage before unload
-        window.addEventListener('pagehide', () => {
-          sessionStorage.setItem('return-to-gallery', slug!);
-        });
-      }
-    </script>
-  </body>
-</html>
+      closeBtn.addEventListener('click', () => {
+        if (document.referrer && new URL(document.referrer).origin === location.origin) {
+          history.back();
+        } else {
+          navigate(`/${locale}/`);
+        }
+      });
+    });
+  </script>
+</BaseLayout>
 
 <style>
-  html {
-    scroll-snap-type: none !important;
+  :global(html) {
     overflow: hidden;
   }
 
-  body {
-    animation: pageIn 0.4s ease-out both;
-  }
-
-  @keyframes pageIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+  .gallery-detail__bg {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
   }
 
   .gallery-detail {
+    position: relative;
+    z-index: 2;
     height: 100vh;
     padding: max(15px, calc(10px + 1.3888vw)) max(15px, calc(10px + 1.3888vw)) 0;
     box-sizing: border-box;
