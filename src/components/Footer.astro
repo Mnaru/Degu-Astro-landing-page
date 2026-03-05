@@ -93,7 +93,7 @@ const tickerRepeat = 8;
   .footer__ticker-track {
     display: flex;
     white-space: nowrap;
-    will-change: transform;
+    backface-visibility: hidden;
     animation: ticker 20s linear infinite;
   }
 
@@ -107,10 +107,10 @@ const tickerRepeat = 8;
 
   @keyframes ticker {
     from {
-      transform: translateX(0);
+      transform: translate3d(0, 0, 0);
     }
     to {
-      transform: translateX(-50%);
+      transform: translate3d(-50%, 0, 0);
     }
   }
 

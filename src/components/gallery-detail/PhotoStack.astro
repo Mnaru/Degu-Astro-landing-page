@@ -51,7 +51,7 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
 }
 ---
 
-<div class="photo-stack" data-photo-stack style={`--fit-mode: ${fitMode};`}>
+<div class="photo-stack" data-photo-stack data-fit-mode={fitMode} style={`--fit-mode: ${fitMode};`}>
   {images.map((img, index) => (
     <div
       class:list={['photo-stack__card', { 'photo-stack__card--base': index === 0 }]}
@@ -85,8 +85,16 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
     z-index: 10;
   }
 
+  .photo-stack[data-fit-mode='contain'] {
+    top: 53%;
+  }
+
   @media (min-width: 1201px) {
     .photo-stack {
+      top: 52%;
+    }
+
+    .photo-stack[data-fit-mode='contain'] {
       top: 52%;
     }
   }
