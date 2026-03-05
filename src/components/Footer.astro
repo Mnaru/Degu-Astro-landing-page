@@ -1,0 +1,233 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { Image } from 'astro:assets';
+import { t } from '@i18n/utils';
+import brandImage from '@assets/images/Footer image.png';
+
+interface Props extends HTMLAttributes<'footer'> {
+  locale: string;
+  class?: string;
+}
+
+const { locale, class: className, ...attrs } = Astro.props;
+const i18n = t(locale);
+
+const tickerPhrase = `${i18n.footer.ticker}\u00a0\u00a0\u00a0`;
+const tickerRepeat = 8;
+---
+
+<footer class:list={['footer', className]} aria-label="Site footer" {...attrs}>
+  <div class="footer__cta-row" aria-hidden="true">
+    <div class="footer__ticker-track">
+      {Array.from({ length: tickerRepeat * 2 }).map(() => (
+        <span class="footer__ticker-phrase">{tickerPhrase}</span>
+      ))}
+    </div>
+  </div>
+
+  <div class="footer__content-grid">
+    <div class="footer__col footer__col--tagline">
+      <p class="footer__tagline">{i18n.footer.tagline}</p>
+      <a href="#" class="footer__contact-link">
+        <span aria-hidden="true">&#x2197;</span>
+        {i18n.footer.contactLabel}
+      </a>
+      <a href={`mailto:${i18n.footer.email}`} class="footer__email-link">{i18n.footer.email}</a>
+    </div>
+
+    <nav class="footer__col footer__col--work" aria-label={i18n.footer.workLabel}>
+      <p class="footer__col-label">{i18n.footer.workLabel}</p>
+      <ul class="footer__link-list">
+        <li><a href={`/${locale}/gallery/manilla`}>{i18n.footer.workLink1}</a></li>
+        <li><a href={`/${locale}/gallery/alita`}>{i18n.footer.workLink2}</a></li>
+        <li><a href={`/${locale}/gallery/maxima`}>{i18n.footer.workLink3}</a></li>
+      </ul>
+    </nav>
+
+    <nav class="footer__col footer__col--connect" aria-label={i18n.footer.connectLabel}>
+      <p class="footer__col-label">{i18n.footer.connectLabel}</p>
+      <ul class="footer__link-list">
+        <li><a href="https://www.instagram.com/degu_studio/" target="_blank" rel="noopener noreferrer">{i18n.footer.instagram}</a></li>
+        <li><a href="#" target="_blank" rel="noopener noreferrer">{i18n.footer.linkedin}</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="footer__legal-row">
+    <p class="footer__copyright">
+      {i18n.footer.copyrightPrefix}<a href="https://www.instagram.com/monikanarusyte/" target="_blank" rel="noopener noreferrer" class="footer__monika-link">@Monika</a>{i18n.footer.copyrightSuffix}
+    </p>
+    <p class="footer__location">{i18n.footer.location}</p>
+  </div>
+
+  <Image
+    src={brandImage}
+    alt={i18n.footer.brandImageAlt}
+    width={4320}
+    height={720}
+    loading="lazy"
+    format="webp"
+    class="footer__brand-image"
+  />
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    z-index: 2;
+    background: var(--color-black);
+  }
+
+  /* ── CTA Row / Ticker ── */
+
+  .footer__cta-row {
+    height: 60px;
+    border-top: 1px solid var(--color-offwhite);
+    border-bottom: 1px solid var(--color-offwhite);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    margin: 0 max(15px, calc(10px + 1.389vw));
+  }
+
+  .footer__ticker-track {
+    display: flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: ticker 20s linear infinite;
+  }
+
+  .footer__ticker-phrase {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-offwhite);
+  }
+
+  @keyframes ticker {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* ── Content Grid ── */
+
+  .footer__content-grid {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    column-gap: 120px;
+    row-gap: 40px;
+    padding: 66px max(15px, calc(10px + 1.389vw)) 120px;
+  }
+
+  .footer__tagline {
+    font-family: var(--font-serif);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--color-offwhite);
+    white-space: pre-line;
+    margin: 0;
+  }
+
+  .footer__contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 42px;
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-offwhite);
+    text-decoration: none;
+  }
+
+  .footer__email-link {
+    display: block;
+    margin-top: 16px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 1.32px;
+    text-transform: uppercase;
+    color: var(--color-offwhite);
+    text-decoration: none;
+  }
+
+  .footer__col-label {
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-offwhite);
+    margin: 0;
+  }
+
+  .footer__link-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 18px;
+  }
+
+  .footer__link-list a {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 1.32px;
+    text-transform: uppercase;
+    color: var(--color-offwhite);
+    text-decoration: none;
+  }
+
+  .footer__email-link:hover,
+  .footer__link-list a:hover,
+  .footer__monika-link:hover {
+    color: var(--color-orange);
+  }
+
+  /* ── Legal Row ── */
+
+  .footer__legal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px max(15px, calc(10px + 1.389vw));
+  }
+
+  .footer__copyright,
+  .footer__location {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-offwhite);
+    margin: 0;
+  }
+
+  .footer__monika-link {
+    color: var(--color-offwhite);
+    text-decoration: none;
+  }
+
+  /* ── Brand Image ── */
+
+  .footer__brand-image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ── Mobile ── */
+
+  @media (max-width: 1024px) {
+    .footer__content-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

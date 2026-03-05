@@ -23,6 +23,7 @@ import OutroStudioContainer from '@components/OutroStudioContainer.astro';
 import OutroBodyTextContainer from '@components/OutroBodyTextContainer.astro';
 import EmailUsButton from '@components/EmailUsButton.astro';
 import FollowUsButton from '@components/FollowUsButton.astro';
+import Footer from '@components/Footer.astro';
 
 import { t } from '@i18n/utils';
 
@@ -57,6 +58,8 @@ const i18n = t(locale);
   </div>
 
   <Review locale={locale} />
+
+  <Footer locale={locale} />
 
   <!-- <Outro locale={locale}>
     <div class="outro-content">
