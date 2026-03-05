@@ -26,13 +26,14 @@ function computeScales(degu: HTMLElement, studio: HTMLElement) {
   let deguScale = targetWidth / deguRect.width;
   let studioScale = targetWidth / studioRect.width;
 
-  // Prevent overlap: if combined scaled heights exceed viewport, reduce proportionally
+  // Prevent overlap: if combined scaled heights + gap exceed viewport (minus padding), reduce proportionally
   const deguScaledH = deguRect.height * deguScale;
   const studioScaledH = studioRect.height * studioScale;
-  const availableH = window.innerHeight - OVERLAP_GAP;
+  const availableH = window.innerHeight - SCALE_PADDING; // 30px top + 30px bottom
+  const totalNeeded = deguScaledH + studioScaledH + OVERLAP_GAP; // 30px gap between words
 
-  if (deguScaledH + studioScaledH > availableH) {
-    const ratio = availableH / (deguScaledH + studioScaledH);
+  if (totalNeeded > availableH) {
+    const ratio = (availableH - OVERLAP_GAP) / (deguScaledH + studioScaledH);
     deguScale *= ratio;
     studioScale *= ratio;
   }
@@ -204,6 +205,7 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
   // --- Debounced resize: tear down and rebuild with fresh measurements ---
   let resizeTimer: ReturnType<typeof setTimeout>;
   const onResize = () => {
+    if (window.innerWidth <= MOBILE_BREAKPOINT) return;
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
       cleanup();
