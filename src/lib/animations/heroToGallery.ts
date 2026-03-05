@@ -131,6 +131,12 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
   const els: Elements = { hero, heroInner, degu, studio, bodyText, scrollHint, galleriesWrapper };
   const tl = isMobile ? buildMobileTimeline(els) : buildDesktopTimeline(els);
 
+  const snapConfig = {
+    snapTo: [0, 1],
+    duration: { min: 0.2, max: 0.4 },
+    ease: 'power2.out',
+  };
+
   // --- ScrollTrigger ---
   const st = ScrollTrigger.create({
     trigger: hero,
@@ -140,19 +146,14 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
     pin: true,
     pinSpacing: true,
     anticipatePin: 1,
-    snap: {
-      snapTo: [0, 1],
-      duration: { min: 0.2, max: 0.4 },
-      ease: 'power2.out',
-    },
+    // Skip snap when restoring scroll position; re-enable after settle
+    snap: options?.startAtEnd ? undefined : snapConfig,
     animation: tl,
     // markers: true,
     onEnter: () => {
-      console.log('heroToGallery: onEnter');
       gsap.set(hero, { zIndex: 20 });
     },
     onLeave: () => {
-      console.log('heroToGallery: onLeave');
       gsap.set(hero, { clearProps: 'zIndex' });
     },
     onEnterBack: () => {
@@ -165,6 +166,11 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
 
   if (options?.startAtEnd) {
     tl.progress(1);
+    // Re-enable snap after scroll position has settled
+    requestAnimationFrame(() => {
+      st.vars.snap = snapConfig;
+      ScrollTrigger.refresh();
+    });
   }
 
   // --- Cleanup ---
