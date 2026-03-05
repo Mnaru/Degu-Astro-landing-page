@@ -194,11 +194,24 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
   });
 
   if (options?.startAtEnd) {
-    tl.progress(1);
-    // Re-enable snap after scroll position has settled
-    requestAnimationFrame(() => {
-      st.vars.snap = snapConfig;
-      ScrollTrigger.refresh();
+    // Wait for all gallery images to load before revealing
+    const imgs = galleriesWrapper.querySelectorAll<HTMLImageElement>('img');
+    const loadPromises = Array.from(imgs).map(img => {
+      if (img.loading === 'lazy') img.loading = 'eager';
+      if (img.complete) return Promise.resolve();
+      return new Promise<void>(resolve => {
+        img.addEventListener('load', () => resolve(), { once: true });
+        img.addEventListener('error', () => resolve(), { once: true });
+      });
+    });
+
+    Promise.all(loadPromises).then(() => {
+      tl.progress(1);
+      // Re-enable snap after scroll position has settled
+      requestAnimationFrame(() => {
+        st.vars.snap = snapConfig;
+        ScrollTrigger.refresh();
+      });
     });
   }
 
