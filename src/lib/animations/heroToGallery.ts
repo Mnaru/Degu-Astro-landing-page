@@ -4,6 +4,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const MOBILE_BREAKPOINT = 1200;
+const SCALE_PADDING = 60; // 30px left + 30px right
+const OVERLAP_GAP = 30;
+const RESIZE_DEBOUNCE_MS = 200;
 
 interface Elements {
   hero: HTMLElement;
@@ -15,6 +18,28 @@ interface Elements {
   galleriesWrapper: HTMLElement;
 }
 
+function computeScales(degu: HTMLElement, studio: HTMLElement) {
+  const deguRect = degu.getBoundingClientRect();
+  const studioRect = studio.getBoundingClientRect();
+  const targetWidth = window.innerWidth - SCALE_PADDING;
+
+  let deguScale = targetWidth / deguRect.width;
+  let studioScale = targetWidth / studioRect.width;
+
+  // Prevent overlap: if combined scaled heights exceed viewport, reduce proportionally
+  const deguScaledH = deguRect.height * deguScale;
+  const studioScaledH = studioRect.height * studioScale;
+  const availableH = window.innerHeight - OVERLAP_GAP;
+
+  if (deguScaledH + studioScaledH > availableH) {
+    const ratio = availableH / (deguScaledH + studioScaledH);
+    deguScale *= ratio;
+    studioScale *= ratio;
+  }
+
+  return { deguScale, studioScale };
+}
+
 function buildDesktopTimeline(els: Elements) {
   const { hero, heroInner, degu, studio, bodyText, scrollHint, galleriesWrapper } = els;
 
@@ -22,6 +47,9 @@ function buildDesktopTimeline(els: Elements) {
   const heroInnerRect = heroInner.getBoundingClientRect();
   const deguRect = degu.getBoundingClientRect();
   const studioRect = studio.getBoundingClientRect();
+
+  // Dynamic scale based on viewport width
+  const { deguScale, studioScale } = computeScales(degu, studio);
 
   // DEGU → top-left: anchor top-left, move to hero-inner's top-left corner
   const deguTargetX = heroInnerRect.left - deguRect.left + 40;
@@ -42,8 +70,8 @@ function buildDesktopTimeline(els: Elements) {
   tl.to(bodyText, { opacity: 0, duration: 0.2, ease: 'none' }, 0);
 
   // Phase 2: Scale up DEGU → top-left, STUDIO → bottom-left (0% → 40%)
-  tl.to(degu, { scale: 2, x: deguTargetX, y: deguTargetY, duration: 0.4, ease: 'power2.inOut', force3D: false }, 0);
-  tl.to(studio, { scale: 2, x: studioTargetX, y: studioTargetY, duration: 0.4, ease: 'power2.inOut', force3D: false }, 0);
+  tl.to(degu, { scale: deguScale, x: deguTargetX, y: deguTargetY, duration: 0.4, ease: 'power2.inOut', force3D: false }, 0);
+  tl.to(studio, { scale: studioScale, x: studioTargetX, y: studioTargetY, duration: 0.4, ease: 'power2.inOut', force3D: false }, 0);
 
   // Phase 3: Exit DEGU left, STUDIO right (40% → 90%)
   tl.to(degu, { xPercent: -500, duration: 0.5, ease: 'power2.in' }, 0.4);
@@ -173,8 +201,27 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
     });
   }
 
+  // --- Debounced resize: tear down and rebuild with fresh measurements ---
+  let resizeTimer: ReturnType<typeof setTimeout>;
+  const onResize = () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      cleanup();
+      // Re-init after teardown; preserve scroll position by starting at end if past hero
+      const pastHero = st.progress >= 1;
+      const rebuilt = initHeroToGallery(pastHero ? { startAtEnd: true } : options);
+      // Patch the outer cleanup so it tears down the rebuilt instance
+      rebuildCleanup = rebuilt;
+    }, RESIZE_DEBOUNCE_MS);
+  };
+  window.addEventListener('resize', onResize);
+
+  let rebuildCleanup: (() => void) | undefined;
+
   // --- Cleanup ---
-  return () => {
+  const cleanup = () => {
+    window.removeEventListener('resize', onResize);
+    clearTimeout(resizeTimer);
     st.kill();
     tl.kill();
     gsap.set(hero, { clearProps: 'zIndex,pointerEvents' });
@@ -182,5 +229,13 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
     gsap.set([degu, studio], { clearProps: 'all' });
     gsap.set([bodyText, scrollHint], { clearProps: 'opacity' });
     gsap.set(galleriesWrapper, { clearProps: 'opacity,scale,transformOrigin,position,zIndex,marginTop' });
+  };
+
+  return () => {
+    if (rebuildCleanup) {
+      rebuildCleanup();
+    } else {
+      cleanup();
+    }
   };
 }

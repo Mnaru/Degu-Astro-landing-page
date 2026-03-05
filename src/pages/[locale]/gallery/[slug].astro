@@ -71,7 +71,15 @@ const fitMode = slug === 'maxima' ? 'contain' : 'cover';
       const locale = closeBtn.dataset.locale;
 
       closeBtn.addEventListener('click', () => {
-        if (document.referrer && new URL(document.referrer).origin === location.origin) {
+        // Use history.back() when there's a previous page to go back to.
+        // document.referrer is NOT updated by Astro's ClientRouter (pushState),
+        // so we check the Navigation API or fall back to history.length.
+        const nav = (window as any).navigation;
+        const canGoBack = nav?.currentEntry
+          ? nav.currentEntry.index > 0
+          : history.length > 1;
+
+        if (canGoBack) {
           history.back();
         } else {
           navigate(`/${locale}/`);
@@ -93,9 +101,11 @@ const fitMode = slug === 'maxima' ? 'contain' : 'cover';
   }
 
   .gallery-detail {
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 2;
-    height: 100vh;
     padding: max(15px, calc(10px + 1.3888vw)) max(15px, calc(10px + 1.3888vw)) 0;
     box-sizing: border-box;
     color: #fff;
