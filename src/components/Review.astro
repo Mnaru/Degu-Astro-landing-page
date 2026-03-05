@@ -1,6 +1,5 @@
 ---
 import { t } from '@i18n/utils';
-import starIcon from '@assets/icons/Star icon.svg';
 
 interface Props {
   locale: string;
@@ -14,7 +13,9 @@ const i18n = t(locale);
   <div class="review__content">
     <div class="review__stars">
       {[1, 2, 3, 4, 5].map((i) => (
-        <img class={`review__star review__star--${i}`} src={starIcon.src} alt="" />
+        <svg class={`review__star review__star--${i}`} width="89" height="85" viewBox="0 0 89 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M54.4492 31.6982L54.6201 32.1914L55.1426 32.2021L86.2764 32.8359L61.4609 51.6504L61.0449 51.9658L61.1963 52.4648L70.2139 82.2705L44.6533 64.4844L44.2246 64.1865L43.7959 64.4844L18.2344 82.2705L27.2529 52.4648L27.4043 51.9658L26.9883 51.6504L2.17188 32.8359L33.3066 32.2021L33.8291 32.1914L34 31.6982L44.2246 2.28223L54.4492 31.6982Z" stroke="#D9D9D9" stroke-width="1.5"/>
+        </svg>
       ))}
     </div>
     <h2 class="review__quote">{i18n.review.quote}</h2>
@@ -68,6 +69,15 @@ const i18n = t(locale);
     height: calc(65px + 1.944vw);
   }
 
+  .review__star {
+    cursor: pointer;
+  }
+
+  .review__star.active path {
+    stroke: #FF8A00;
+    fill: #FF8A00;
+  }
+
   .review__quote {
     margin: 8px 0 0;
     font-family: var(--font-display);
@@ -101,5 +111,11 @@ const i18n = t(locale);
     if (section) {
       registerCleanup(initReviewReveal(section));
     }
+
+    document.querySelectorAll('.review__star').forEach((star) => {
+      star.addEventListener('click', () => {
+        star.classList.toggle('active');
+      });
+    });
   });
 </script>
