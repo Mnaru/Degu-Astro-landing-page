@@ -85,7 +85,7 @@ function buildDesktopTimeline(els: Elements) {
   tl.to(heroInner, { opacity: 0, duration: 0.15, ease: 'none' }, 0.85);
 
   // Phase 5: Gallery fades in and scales up (65% → 125%)
-  tl.to(galleriesWrapper, { opacity: 1, scale: 1, duration: 0.6, ease: 'power2.out' }, 0.65);
+  tl.to(galleriesWrapper, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'power2.out' }, 0.65);
 
   return tl;
 }
@@ -130,7 +130,7 @@ function buildMobileTimeline(els: Elements) {
   tl.to(heroInner, { opacity: 0, duration: 0.15, ease: 'none' }, 0.85);
 
   // Phase 5: Gallery fades in and scales up (65% → 125%)
-  tl.to(galleriesWrapper, { opacity: 1, scale: 1, duration: 0.6, ease: 'power2.out' }, 0.65);
+  tl.to(galleriesWrapper, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'power2.out' }, 0.65);
 
   return tl;
 }
@@ -155,7 +155,7 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
   // --- Shared initial states ---
   gsap.set(heroInner, { overflow: 'hidden' });
   // Pull gallery up behind the pinned hero (pinSpacing adds 100vh gap)
-  gsap.set(galleriesWrapper, { opacity: 0, scale: 0.7, transformOrigin: 'center top', position: 'relative', zIndex: 1, marginTop: '-100vh' });
+  gsap.set(galleriesWrapper, { autoAlpha: 0, scale: 0.7, transformOrigin: 'center top', position: 'relative', zIndex: 1, marginTop: '-100vh' });
 
   const els: Elements = { hero, heroInner, degu, studio, bodyText, scrollHint, galleriesWrapper };
   const tl = isMobile ? buildMobileTimeline(els) : buildDesktopTimeline(els);
@@ -243,7 +243,7 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
     gsap.set(heroInner, { clearProps: 'overflow,opacity' });
     gsap.set([degu, studio], { clearProps: 'all' });
     gsap.set([bodyText, scrollHint], { clearProps: 'opacity' });
-    gsap.set(galleriesWrapper, { clearProps: 'opacity,scale,transformOrigin,position,zIndex,marginTop' });
+    gsap.set(galleriesWrapper, { clearProps: 'opacity,visibility,scale,transformOrigin,position,zIndex,marginTop' });
   };
 
   return () => {
