@@ -79,6 +79,14 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
           />
         ) : (
           <>
+            <img
+              class="photo-stack__poster"
+              src={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
+              alt=""
+              loading="eager"
+              decoding="async"
+              aria-hidden="true"
+            />
             <mux-video
               playback-id={item.playbackId}
               poster={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
@@ -88,14 +96,6 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
               muted
               aria-label={`${galleryName} video ${index + 1}`}
             ></mux-video>
-            <img
-              class="photo-stack__poster"
-              src={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
-              alt=""
-              loading="eager"
-              decoding="async"
-              aria-hidden="true"
-            />
           </>
         )}
       </div>
@@ -208,16 +208,6 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
     display: block;
   }
 
-  .photo-stack__card-inner mux-video {
-    display: block;
-    width: 100%;
-    height: 100%;
-    position: relative;
-    z-index: 2;
-    --media-object-fit: var(--fit-mode, cover);
-    --media-object-position: center;
-  }
-
   .photo-stack__card-inner img.photo-stack__poster {
     position: absolute;
     inset: 0;
@@ -225,8 +215,23 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
     height: 100%;
     object-fit: var(--fit-mode, cover);
     object-position: center;
-    z-index: 1;
     pointer-events: none;
+  }
+
+  .photo-stack__card-inner mux-video {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.15s linear;
+    --media-object-fit: var(--fit-mode, cover);
+    --media-object-position: center;
+  }
+
+  .photo-stack__card-inner mux-video.is-playing {
+    opacity: 1;
   }
 </style>
 
@@ -273,6 +278,12 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
       registerCleanup(initPhotoStack({ container, cards, onTopCardChange }));
       registerCleanup(initPhotoPulse({ cards: cardInners }));
       registerCleanup(initPhotoProximity({ cards: cardInners }));
+
+      container.querySelectorAll<HTMLElement>('mux-video').forEach(video => {
+        const onPlay = () => video.classList.add('is-playing');
+        video.addEventListener('playing', onPlay, { once: true });
+        registerCleanup(() => video.removeEventListener('playing', onPlay));
+      });
     }
   });
 </script>

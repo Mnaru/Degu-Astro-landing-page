@@ -45,18 +45,6 @@ const loop = [...mediaItems, ...mediaItems];
           />
         ) : (
           <>
-            <mux-video
-              playback-id={item.playbackId}
-              poster={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
-              width="1200"
-              height="1500"
-              muted
-              autoplay
-              loop
-              playsinline
-              preload="auto"
-              aria-label={item.alt}
-            ></mux-video>
             <img
               class="gallery__poster"
               src={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
@@ -65,6 +53,16 @@ const loop = [...mediaItems, ...mediaItems];
               decoding="async"
               aria-hidden="true"
             />
+            <mux-video
+              playback-id={item.playbackId}
+              poster={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
+              muted
+              autoplay
+              loop
+              playsinline
+              preload="auto"
+              aria-label={item.alt}
+            ></mux-video>
           </>
         )}
       </div>
@@ -100,6 +98,12 @@ const loop = [...mediaItems, ...mediaItems];
       }, { rootMargin: '200px 0px' });
       observer.observe(gallery);
       registerCleanup(() => observer.disconnect());
+
+      gallery.querySelectorAll<HTMLElement>('mux-video').forEach(video => {
+        const onPlay = () => video.classList.add('is-playing');
+        video.addEventListener('playing', onPlay, { once: true });
+        registerCleanup(() => video.removeEventListener('playing', onPlay));
+      });
     }
   });
 </script>
@@ -142,27 +146,35 @@ const loop = [...mediaItems, ...mediaItems];
     display: block;
   }
 
-  .gallery__image-wrapper mux-video {
-    display: block;
-    height: 100%;
-    width: auto;
-    aspect-ratio: 4 / 5;
+  .gallery__image-wrapper--video {
     position: relative;
-    z-index: 2;
-    --media-object-fit: cover;
-    --media-object-position: center;
-    --controls: none;
+    aspect-ratio: 4 / 5;
   }
 
-  .gallery__poster {
+  .gallery__image-wrapper--video .gallery__poster {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
-    z-index: 1;
     pointer-events: none;
+  }
+
+  .gallery__image-wrapper--video mux-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.15s linear;
+    --media-object-fit: cover;
+    --media-object-position: center;
+    --controls: none;
+  }
+
+  .gallery__image-wrapper--video mux-video.is-playing {
+    opacity: 1;
   }
 
   .gallery__image-wrapper::after {
@@ -226,9 +238,7 @@ const loop = [...mediaItems, ...mediaItems];
       height: auto;
     }
 
-    .gallery__image-wrapper mux-video {
-      width: 100%;
-      height: auto;
+    .gallery__image-wrapper--video {
       aspect-ratio: 3 / 2;
     }
   }
