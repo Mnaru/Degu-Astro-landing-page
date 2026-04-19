@@ -8,9 +8,10 @@ interface Props {
   items?: StackMedia[];
   galleryName: string;
   fitMode?: 'cover' | 'contain';
+  slug?: string;
 }
 
-const { images, items, galleryName, fitMode = 'cover' } = Astro.props;
+const { images, items, galleryName, fitMode = 'cover', slug } = Astro.props;
 
 const media: StackMedia[] =
   items ??
@@ -59,7 +60,14 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
 }
 ---
 
-<div class="photo-stack" data-photo-stack data-fit-mode={fitMode} data-has-video={hasVideo ? 'true' : 'false'} style={`--fit-mode: ${fitMode};`}>
+<div
+  class="photo-stack"
+  data-photo-stack
+  data-fit-mode={fitMode}
+  data-has-video={hasVideo ? 'true' : 'false'}
+  style={`--fit-mode: ${fitMode};`}
+  transition:persist={`photostack-${slug ?? 'default'}`}
+>
   {media.map((item, index) => (
     <div
       class:list={['photo-stack__card', { 'photo-stack__card--base': index === 0, 'photo-stack__card--video': item.kind === 'video', 'photo-stack__card--covered': index > 0 }]}
@@ -244,17 +252,24 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
 
   document.addEventListener('astro:page-load', async () => {
     const container = document.querySelector('[data-photo-stack]') as HTMLElement;
-    if (container?.dataset.hasVideo === 'true') {
+    if (!container) return;
+    // PhotoStack is persisted across navigation. Skip re-init on a return
+    // visit — the entrance animation, draggable state, and listeners are
+    // all preserved from the first init.
+    if ((container as any).__photoStackInit) return;
+    (container as any).__photoStackInit = true;
+
+    if (container.dataset.hasVideo === 'true') {
       await import('@mux/mux-video');
     }
     const cards = Array.from(
-      container?.querySelectorAll('.photo-stack__card') ?? []
+      container.querySelectorAll('.photo-stack__card')
     ) as HTMLElement[];
     const cardInners = Array.from(
-      container?.querySelectorAll('.photo-stack__card-inner') ?? []
+      container.querySelectorAll('.photo-stack__card-inner')
     ) as HTMLElement[];
 
-    if (container && cards.length > 0) {
+    if (cards.length > 0) {
       gsap.fromTo(cards, { opacity: 0, scale: 0.97 }, {
         opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out', stagger: 0.05,
         onComplete: () => cards.forEach(card => gsap.set(card, { clearProps: 'scale' })),
@@ -275,14 +290,14 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
         }
       };
 
-      registerCleanup(initPhotoStack({ container, cards, onTopCardChange }));
-      registerCleanup(initPhotoPulse({ cards: cardInners }));
-      registerCleanup(initPhotoProximity({ cards: cardInners }));
+      registerCleanup(initPhotoStack({ container, cards, onTopCardChange }), { persistent: true });
+      registerCleanup(initPhotoPulse({ cards: cardInners }), { persistent: true });
+      registerCleanup(initPhotoProximity({ cards: cardInners }), { persistent: true });
 
       container.querySelectorAll<HTMLElement>('mux-video').forEach(video => {
         const onPlay = () => video.classList.add('is-playing');
         video.addEventListener('playing', onPlay, { once: true });
-        registerCleanup(() => video.removeEventListener('playing', onPlay));
+        registerCleanup(() => video.removeEventListener('playing', onPlay), { persistent: true });
       });
     }
   });

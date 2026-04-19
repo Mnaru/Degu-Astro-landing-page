@@ -111,8 +111,8 @@ const fitMode = 'cover';
     <DeguLogo />
   </div>
   {stackItems
-    ? <PhotoStack items={stackItems} galleryName={galleryName} fitMode={fitMode} />
-    : <PhotoStack images={images} galleryName={galleryName} fitMode={fitMode} />
+    ? <PhotoStack items={stackItems} galleryName={galleryName} fitMode={fitMode} slug={slug} />
+    : <PhotoStack images={images} galleryName={galleryName} fitMode={fitMode} slug={slug} />
   }
   <script>
     import { navigate } from 'astro:transitions/client';
@@ -139,7 +139,12 @@ const fitMode = 'cover';
 
       const bg = document.querySelector<HTMLElement>('.gallery-detail__bg');
       const endLogo = document.querySelector<HTMLElement>('[data-end-logo]');
-      let complete = false;
+      // PhotoStack is persisted across navigation, so on a return visit
+      // the container may already carry .photo-stack--complete from a
+      // previous swipe-through. Reflect that state in the (fresh) endLogo.
+      const stack = document.querySelector('.photo-stack');
+      let complete = stack?.classList.contains('photo-stack--complete') ?? false;
+      if (complete) endLogo?.classList.add('gallery-detail__end-logo--visible');
 
       const onComplete = () => {
         complete = true;
