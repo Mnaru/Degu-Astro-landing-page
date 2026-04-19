@@ -114,6 +114,14 @@ const fitMode = 'cover';
     ? <PhotoStack items={stackItems} galleryName={galleryName} fitMode={fitMode} slug={slug} />
     : <PhotoStack images={images} galleryName={galleryName} fitMode={fitMode} slug={slug} />
   }
+  {/* Hidden anchors so transition:persist actually works bidirectionally.
+      Astro requires the directive on both source and destination — without
+      these, the home gallery wrapper is discarded on home → detail, and
+      return navigation re-renders fresh (visibly painting in on mobile). */}
+  <div style="display: none;" aria-hidden="true">
+    <div class="galleries-wrapper" transition:persist={`galleries-${locale}`}></div>
+    <div class="gallery-cursor" transition:persist={`gallery-cursor-${locale}`}></div>
+  </div>
   <script>
     import { navigate } from 'astro:transitions/client';
 

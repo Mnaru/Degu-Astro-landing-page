@@ -176,6 +176,57 @@ load. Independent of return/outbound work.
 
 ---
 
+### Stage 6 — Bidirectional persist anchor on detail page (mobile fix)
+
+**Why this exists:** After Stages 1–5 shipped, the user reported that on
+**mobile only**, returning from a gallery still showed images/videos
+painting in. Investigation against Astro's official docs confirmed that
+`transition:persist` requires the directive to exist on **both** the
+source and destination pages. Stage 1 only added it to home, so
+navigating `home → detail` actually discarded the persisted wrapper —
+on return, home rendered fresh. Desktop hid the symptom because faster
+CPUs decoded cached images quickly and the morph animation masked the
+fade-in. Mobile (slower decode, less RAM, lighter masking) showed it.
+
+**Goal:** make `transition:persist` actually work end-to-end so the
+home wrapper truly survives the round trip on every device.
+
+**Files:**
+- `src/pages/[locale]/gallery/[slug].astro`
+
+**Steps:**
+17. Inside `<BaseLayout>` on the detail page, add a `display:none`
+    container holding empty placeholders with the matching persist keys:
+    ```astro
+    <div style="display: none;" aria-hidden="true">
+      <div class="galleries-wrapper" transition:persist={`galleries-${locale}`}></div>
+      <div class="gallery-cursor" transition:persist={`gallery-cursor-${locale}`}></div>
+    </div>
+    ```
+    On `home → detail`, Astro moves the populated wrapper from home into
+    this hidden container (invisible, zero layout impact). On
+    `detail → home`, it moves it back to home's slot — fully populated,
+    images decoded, videos still playing, GSAP state intact.
+
+**Validation:**
+- Design: zero impact. The persisted wrapper inherits `display: none`
+  from its parent on the detail page; the home page is unchanged.
+- Animations: zero impact. GSAP state and init guards (`__galleryInit`,
+  `__heroToGalleryInit`) survive on the persisted DOM nodes, so the
+  initial-hide + entrance animations don't re-run on return.
+
+**Edge cases:**
+- iOS Safari memory pressure can still evict the persisted DOM under
+  low-memory conditions — that's an OS-level decision. If observed in
+  practice, follow up with a Layer 2 idle-time preload of all gallery
+  images so cache hits make the fresh render fast.
+- Locale switch (en ↔ lt) uses different persist keys by design, so
+  the wrapper is dropped and re-rendered. Same behavior as before.
+
+**Rollback:** revert one commit.
+
+---
+
 ## Order of execution
 
 1. **Stage 1 first.** Biggest win, hardest to roll back if wrong.
