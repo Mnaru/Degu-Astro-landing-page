@@ -44,7 +44,7 @@ const i18n = t(locale);
     <ScrollHint>{i18n.intro.scrollHint}</ScrollHint>
   </Hero>
 
-  <div class="galleries-wrapper" data-gsap>
+  <div class="galleries-wrapper" data-gsap transition:persist={`galleries-${locale}`}>
     <BottleryGallery locale={locale} />
     <ManillaGallery locale={locale} />
     <EckesGraniniGallery locale={locale} />
@@ -53,7 +53,7 @@ const i18n = t(locale);
     <Alita2Gallery locale={locale} />
   </div>
 
-  <div class="gallery-cursor" aria-hidden="true">
+  <div class="gallery-cursor" aria-hidden="true" transition:persist={`gallery-cursor-${locale}`}>
     <span class="gallery-cursor__label">{i18n.galleries.view}</span>
   </div>
 
@@ -71,16 +71,20 @@ const i18n = t(locale);
         document.querySelectorAll('[data-gallery]')
       ) as HTMLElement[];
 
-      if (galleries.length > 0) {
-        registerCleanup(initGallerySkew({ elements: galleries }));
+      // Galleries are persisted across navigation. Skip re-init if already initialized.
+      const galleriesWrapper = document.querySelector('.galleries-wrapper') as any;
+      if (galleries.length > 0 && !galleriesWrapper?.__skewInit) {
+        if (galleriesWrapper) galleriesWrapper.__skewInit = true;
+        registerCleanup(initGallerySkew({ elements: galleries }), { persistent: true });
       }
 
       const cursor = document.querySelector('.gallery-cursor') as HTMLElement | null;
       const links = Array.from(
         document.querySelectorAll('.gallery__link')
       ) as HTMLElement[];
-      if (cursor && links.length > 0) {
-        registerCleanup(initGalleryCursor({ cursor, links }));
+      if (cursor && links.length > 0 && !(cursor as any).__cursorInit) {
+        (cursor as any).__cursorInit = true;
+        registerCleanup(initGalleryCursor({ cursor, links }), { persistent: true });
       }
     });
   </script>

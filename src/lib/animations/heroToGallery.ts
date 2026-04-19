@@ -151,10 +151,18 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
 
   const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
 
+  // Galleries-wrapper is persisted across navigation. On a return navigation
+  // it's already in its end state (autoAlpha:1, scale:1, marginTop:-100vh).
+  // Skip the initial-hide setup so we don't visually hide the persisted DOM.
+  const galleriesPersisted = (galleriesWrapper as any).__heroToGalleryInit === true;
+
   // --- Shared initial states ---
   gsap.set(heroInner, { overflow: 'hidden' });
-  // Pull gallery up behind the pinned hero (pinSpacing adds 100vh gap)
-  gsap.set(galleriesWrapper, { autoAlpha: 0, scale: 0.7, transformOrigin: 'center top', position: 'relative', zIndex: 1, marginTop: '-100vh' });
+  if (!galleriesPersisted) {
+    // First-time init: pull gallery up behind the pinned hero (pinSpacing adds 100vh gap)
+    gsap.set(galleriesWrapper, { autoAlpha: 0, scale: 0.7, transformOrigin: 'center top', position: 'relative', zIndex: 1, marginTop: '-100vh' });
+    (galleriesWrapper as any).__heroToGalleryInit = true;
+  }
 
   const els: Elements = { hero, heroInner, degu, studio, bodyText, scrollHint, galleriesWrapper };
   const tl = isMobile ? buildMobileTimeline(els) : buildDesktopTimeline(els);
@@ -193,30 +201,38 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
   });
 
   if (options?.startAtEnd) {
-    // Wait for gallery photos to load before revealing.
-    // Exclude video poster overlays — they sit behind <mux-video> and don't
-    // need to gate the reveal; otherwise the wrapper waits on Mux CDN for
-    // decorative frames and the home page visibly hangs on return navigation.
-    const imgs = galleriesWrapper.querySelectorAll<HTMLImageElement>(
-      'img:not(.gallery__poster):not(.photo-stack__poster)'
-    );
-    const loadPromises = Array.from(imgs).map(img => {
-      if (img.loading === 'lazy') img.loading = 'eager';
-      if (img.complete) return Promise.resolve();
-      return new Promise<void>(resolve => {
-        img.addEventListener('load', () => resolve(), { once: true });
-        img.addEventListener('error', () => resolve(), { once: true });
-      });
-    });
-
-    Promise.all(loadPromises).then(() => {
+    if (galleriesPersisted) {
+      // Galleries are persisted DOM — already in end state with images
+      // already decoded and videos already playing. Just place the timeline
+      // at progress 1 and re-enable snap after the scroll position settles.
       tl.progress(1);
-      // Re-enable snap after scroll position has settled
       requestAnimationFrame(() => {
         st.vars.snap = snapConfig;
         ScrollTrigger.refresh();
       });
-    });
+    } else {
+      // First-time init at end state (cold load with restored scroll past hero):
+      // wait for gallery photos to load before revealing. Exclude video poster
+      // overlays — they sit behind <mux-video> and don't need to gate.
+      const imgs = galleriesWrapper.querySelectorAll<HTMLImageElement>(
+        'img:not(.gallery__poster):not(.photo-stack__poster)'
+      );
+      const loadPromises = Array.from(imgs).map((img) => {
+        if (img.loading === 'lazy') img.loading = 'eager';
+        if (img.complete) return Promise.resolve();
+        return new Promise<void>((resolve) => {
+          img.addEventListener('load', () => resolve(), { once: true });
+          img.addEventListener('error', () => resolve(), { once: true });
+        });
+      });
+      Promise.all(loadPromises).then(() => {
+        tl.progress(1);
+        requestAnimationFrame(() => {
+          st.vars.snap = snapConfig;
+          ScrollTrigger.refresh();
+        });
+      });
+    }
   }
 
   // --- Debounced resize: tear down and rebuild with fresh measurements ---

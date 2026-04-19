@@ -51,8 +51,10 @@ const images = [img01, img02];
 
   document.addEventListener('astro:page-load', () => {
     const gallery = document.querySelector('[data-gallery="open24"]') as HTMLElement;
-    const name = gallery?.querySelector('.gallery__name') as HTMLElement;
-    if (gallery && name) registerCleanup(initGalleryName({ galleryEl: gallery, nameEl: name }));
+    if (!gallery || (gallery as any).__galleryInit) return;
+    (gallery as any).__galleryInit = true;
+    const name = gallery.querySelector('.gallery__name') as HTMLElement;
+    if (name) registerCleanup(initGalleryName({ galleryEl: gallery, nameEl: name }), { persistent: true });
   });
 </script>
 

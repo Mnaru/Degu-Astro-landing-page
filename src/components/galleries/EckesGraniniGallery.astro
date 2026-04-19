@@ -84,27 +84,27 @@ const loop = [...mediaItems, ...mediaItems];
 
   document.addEventListener('astro:page-load', () => {
     const gallery = document.querySelector('[data-gallery="eckes-granini"]') as HTMLElement;
-    const track = gallery?.querySelector('.gallery__scroll-track') as HTMLElement;
-    const name = gallery?.querySelector('.gallery__name') as HTMLElement;
-    if (track) registerCleanup(initGalleryScroll({ container: track, speed: 60, direction: 'left' }));
-    if (gallery && name) registerCleanup(initGalleryName({ galleryEl: gallery, nameEl: name }));
+    if (!gallery || (gallery as any).__galleryInit) return;
+    (gallery as any).__galleryInit = true;
+    const track = gallery.querySelector('.gallery__scroll-track') as HTMLElement;
+    const name = gallery.querySelector('.gallery__name') as HTMLElement;
+    if (track) registerCleanup(initGalleryScroll({ container: track, speed: 60, direction: 'left' }), { persistent: true });
+    if (name) registerCleanup(initGalleryName({ galleryEl: gallery, nameEl: name }), { persistent: true });
 
-    if (gallery) {
-      const observer = new IntersectionObserver((entries, obs) => {
-        if (entries.some(e => e.isIntersecting)) {
-          import('@mux/mux-video');
-          obs.disconnect();
-        }
-      }, { rootMargin: '200px 0px' });
-      observer.observe(gallery);
-      registerCleanup(() => observer.disconnect());
+    const observer = new IntersectionObserver((entries, obs) => {
+      if (entries.some(e => e.isIntersecting)) {
+        import('@mux/mux-video');
+        obs.disconnect();
+      }
+    }, { rootMargin: '200px 0px' });
+    observer.observe(gallery);
+    registerCleanup(() => observer.disconnect(), { persistent: true });
 
-      gallery.querySelectorAll<HTMLElement>('mux-video').forEach(video => {
-        const onPlay = () => video.classList.add('is-playing');
-        video.addEventListener('playing', onPlay, { once: true });
-        registerCleanup(() => video.removeEventListener('playing', onPlay));
-      });
-    }
+    gallery.querySelectorAll<HTMLElement>('mux-video').forEach(video => {
+      const onPlay = () => video.classList.add('is-playing');
+      video.addEventListener('playing', onPlay, { once: true });
+      registerCleanup(() => video.removeEventListener('playing', onPlay), { persistent: true });
+    });
   });
 </script>
 

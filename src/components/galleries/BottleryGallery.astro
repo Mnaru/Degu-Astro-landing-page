@@ -59,10 +59,12 @@ const images = [img01, img02, img03, img04, img05];
 
   document.addEventListener('astro:page-load', () => {
     const gallery = document.querySelector('[data-gallery="bottlery"]') as HTMLElement;
-    const track = gallery?.querySelector('.gallery__scroll-track') as HTMLElement;
-    const name = gallery?.querySelector('.gallery__name') as HTMLElement;
-    if (track) registerCleanup(initGalleryScroll({ container: track, speed: 60, direction: 'left' }));
-    if (gallery && name) registerCleanup(initGalleryName({ galleryEl: gallery, nameEl: name }));
+    if (!gallery || (gallery as any).__galleryInit) return;
+    (gallery as any).__galleryInit = true;
+    const track = gallery.querySelector('.gallery__scroll-track') as HTMLElement;
+    const name = gallery.querySelector('.gallery__name') as HTMLElement;
+    if (track) registerCleanup(initGalleryScroll({ container: track, speed: 60, direction: 'left' }), { persistent: true });
+    if (name) registerCleanup(initGalleryName({ galleryEl: gallery, nameEl: name }), { persistent: true });
   });
 </script>
 
