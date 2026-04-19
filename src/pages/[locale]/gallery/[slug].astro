@@ -102,7 +102,7 @@ const fitMode = 'cover';
   <div class="gallery-detail__bg" style={`background-color: ${bg};`}></div>
   <div class="gallery-detail" style={`color: ${fg};`}>
     <div class="gallery-detail__header">
-      <span class="gallery-detail__title">{galleryName}</span>
+      <span class="gallery-detail__title" transition:name={`gallery-name-${slug}`}>{galleryName}</span>
       <span class="gallery-detail__job-done">{jobDone}</span>
       <button class="gallery-detail__close" data-close-gallery data-locale={locale} data-slug={slug}>{i18n.galleries.close}</button>
     </div>

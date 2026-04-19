@@ -121,3 +121,39 @@ body {
 .gallery--infinite + script + .gallery--infinite {
   margin-top: -12px;
 }
+
+/* ===== Gallery name → detail title morph =====
+   The home gallery name is huge (~150px) and the detail title is small
+   (~18px). The default 250ms morph makes the size change too visible.
+   Soften it: keep the morph duration short and cross-fade the captures
+   with no overlap so the giant text vanishes before the small text
+   arrives — the eye reads it as a quick handoff, not a flying shrink. */
+::view-transition-old(gallery-name-bottlery),
+::view-transition-old(gallery-name-manilla),
+::view-transition-old(gallery-name-eckes-granini),
+::view-transition-old(gallery-name-alita),
+::view-transition-old(gallery-name-open24),
+::view-transition-old(gallery-name-alita-2) {
+  animation: gallery-name-out 180ms ease-out forwards;
+}
+
+::view-transition-new(gallery-name-bottlery),
+::view-transition-new(gallery-name-manilla),
+::view-transition-new(gallery-name-eckes-granini),
+::view-transition-new(gallery-name-alita),
+::view-transition-new(gallery-name-open24),
+::view-transition-new(gallery-name-alita-2) {
+  animation: gallery-name-in 180ms ease-out forwards;
+}
+
+@keyframes gallery-name-out {
+  0%   { opacity: 1; }
+  40%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes gallery-name-in {
+  0%   { opacity: 0; }
+  60%  { opacity: 0; }
+  100% { opacity: 1; }
+}
