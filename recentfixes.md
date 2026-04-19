@@ -101,8 +101,93 @@ Revert both files. No migrations, no state, no shared helpers affected. The prev
 
 ---
 
+## Navigation persistence batch (Stages 1–6)
+
+**Date:** 2026-04-20
+**Goal:** make `home → /gallery/[slug] → home` feel instant — no
+visible images/videos painting in on return, and the click into a
+gallery masked behind a continuous motion. Full plan, validation
+notes, and rollback per stage in
+[contextoptimization.md](contextoptimization.md).
+
+### Stage 1 — Persist galleries-wrapper across navigation
+Commit `652002d`. `transition:persist="galleries-${locale}"` on
+`.galleries-wrapper` and `.gallery-cursor`. Required cleanup-system
+rework: `registerCleanup(fn, { persistent: true })` so animations on
+persisted DOM survive `astro:before-swap`; `transitionSetup` only
+kills ScrollTriggers attached to non-persisted DOM (selector
+`[data-astro-transition-persist]`). Each gallery script tags its
+node with `__galleryInit` and skips re-init on subsequent page-loads.
+`heroToGallery` detects `__heroToGalleryInit` on the persisted
+wrapper and skips the initial-hide + image-load wait.
+
+### Stage 2 — Prefetch detail HTML on viewport entry
+Commit `e0dbb32`. All 6 gallery `<a>` links flipped from
+`data-astro-prefetch="hover"` to `viewport`. PhotoStack already had
+`fetchpriority="high"` on the first card.
+
+### Stage 3 — Morph gallery name into detail title
+Commit `9e4c6b6`. Each home `.gallery__name` and the matching detail
+`.gallery-detail__title` share `transition:name="gallery-name-${slug}"`.
+Default morph timing made the giant→tiny shrink too prominent;
+softened with custom keyframes in `global.css` that cross-fade
+captures with no overlap (old fades out by 40 %, new fades in from
+60 %) so the eye reads it as a quick handoff. Falls back to default
+fade on touch and on browsers without View Transitions support.
+
+### Stage 4 — Persist detail PhotoStack
+Commit `c49c3bf`. PhotoStack root now uses
+`transition:persist={`photostack-${slug}`}`. Init-guard pattern via
+`__photoStackInit` skips the entrance animation and listener
+re-attach on a return visit. `[slug].astro` reads
+`.photo-stack--complete` on init to restore the endLogo visibility
+state for galleries the user already swiped through.
+
+### Stage 5 — Responsive image variants
+Commit `3650835`. Replaced fixed `width={1200} height={800}` with
+`widths={[400, 800, 1200, 1600]}` + `sizes` hints across all home
+galleries (`(max-width: 1200px) 95vw, 50vw`) and PhotoStack
+(`(max-width: 1200px) 90vw, 50vw`). Mobile cold-load payload drops
+~50–70 %; desktop unchanged.
+
+### Stage 6 — Bidirectional persist anchor (mobile fix)
+Commit `b91b6f3`. After Stages 1–5 mobile still showed images
+painting in on return. Astro docs confirm `transition:persist`
+requires the directive on **both** source and destination — Stage 1
+only added it to home, so `home → detail` actually discarded the
+persisted wrapper. Detail page now contains a `display:none` anchor
+with empty `.galleries-wrapper` and `.gallery-cursor` placeholders
+carrying matching persist keys; Astro moves the populated home
+wrapper into this anchor (zero pixels rendered) and back to home's
+slot on return.
+
+### Stage 6.1 — Mobile address-bar correction on return
+Commit `34a7f3b`. After Stage 6 fixed the persistence, mobile still
+showed a black gap above the gallery on return — hero stayed at
+`opacity: 0` (its post-scroll end state) and scroll-up didn't drive
+the ScrollTrigger to reverse it. Three causes:
+
+1. The detail page's `overflow:hidden; height:100vh` collapses the
+   mobile address bar; on return it can re-expand, so the persisted
+   `marginTop: -100vh` resolves to a different pixel value than the
+   one in force when it was set. `gsap.set(galleriesWrapper, { marginTop: '-100vh' })`
+   on the persisted-return path forces a fresh resolve against the
+   current viewport.
+2. `requestAnimationFrame` fires before ClientRouter's scroll
+   restoration settles on a real device, so the pin range was
+   computed against `scroll = 0`. Switched to a 150 ms `setTimeout`.
+3. Snap was re-enabled before the hard refresh saw the right range,
+   sometimes catching the user at progress 1 and preventing
+   scroll-up. Use `ScrollTrigger.refresh(true)` and re-enable snap
+   after the same delay.
+
+**Rollback:** `git revert b91b6f3 34a7f3b 3650835 c49c3bf 9e4c6b6 e0dbb32 652002d` undoes the whole batch in dependency order.
+
+---
+
 ## Follow-ups not in this batch
 
 - `<Picture>` + AVIF/WebP for gallery sources (optional, ~20–30 % smaller per image).
 - `layout="constrained"` on `<Image>` for responsive srcset (optional, mobile wins).
 - Extract repeated gallery CSS into a shared stylesheet (DRY; ~1–2 KB gzipped).
+- Idle-time preload of all gallery images on first home visit (Layer 2 from contextoptimization.md follow-up plan) if iOS evicts the persisted wrapper under memory pressure in the wild.
