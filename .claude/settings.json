@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /tmp/optimized-galleries)",
+      "Bash(cp -R src/assets/images/galleries/. /tmp/optimized-galleries/)",
+      "Read(//tmp/**)",
+      "Bash(git cherry-pick *)"
+    ]
+  }
+}

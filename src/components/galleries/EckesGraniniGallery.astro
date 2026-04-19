@@ -1,12 +1,11 @@
 ---
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import { t } from '@i18n/utils';
 
-import img01 from '@assets/images/galleries/alita/Alita_01.png';
-import img02 from '@assets/images/galleries/alita/Alita_02.png';
-import img03 from '@assets/images/galleries/alita/Alita_03.png';
-import img04 from '@assets/images/galleries/alita/Alita_04.png';
-import img05 from '@assets/images/galleries/alita/Alita_05.png';
+import eckes02 from '@assets/images/galleries/eckes-granini/Eckes_02.png';
+import eckes04 from '@assets/images/galleries/eckes-granini/Eckes_04.png';
+import eckes06 from '@assets/images/galleries/eckes-granini/Eckes_06.png';
 
 interface Props {
   locale: string;
@@ -14,38 +13,55 @@ interface Props {
 
 const { locale } = Astro.props;
 const i18n = t(locale);
-const galleryName = i18n.galleries.alita.name;
-const images = [img01, img02, img03, img04, img05];
+const galleryName = i18n.galleries['eckes-granini'].name;
+
+type HomeMedia =
+  | { kind: 'image'; src: ImageMetadata; alt: string }
+  | { kind: 'video'; playbackId: string; alt: string };
+
+const mediaItems: HomeMedia[] = [
+  { kind: 'video', playbackId: 'ZjZlATUFk01g9dX8ILrKQ00wZqUVQipg79MBG6VXFFCJg', alt: `${galleryName} video 1` },
+  { kind: 'image', src: eckes06, alt: `${galleryName} 1` },
+  { kind: 'video', playbackId: '14E5o7fTxLPNZLbgPSOHimIJ9o201y02HOR8X41gPV01H8', alt: `${galleryName} video 2` },
+  { kind: 'image', src: eckes04, alt: `${galleryName} 2` },
+  { kind: 'video', playbackId: 'Y5eDdnqx5oUx3aS3mGFw101xZXnHD01CmXPKzRvK3WSrc', alt: `${galleryName} video 3` },
+  { kind: 'image', src: eckes02, alt: `${galleryName} 3` },
+];
+
+const loop = [...mediaItems, ...mediaItems];
 ---
 
-<section class="gallery gallery--infinite" data-gallery="alita" id="gallery-alita">
+<section class="gallery gallery--infinite" data-gallery="eckes-granini" id="gallery-eckes-granini">
   <div class="gallery__scroll-track">
-    {images.map((img, index) => (
-      <div class="gallery__image-wrapper">
-        <Image
-          src={img}
-          alt={`${galleryName} ${index + 1}`}
-          width={1200}
-          height={800}
-          loading="lazy"
-        />
-      </div>
-    ))}
-    {images.map((img, index) => (
-      <div class="gallery__image-wrapper">
-        <Image
-          src={img}
-          alt={`${galleryName} ${index + 1}`}
-          width={1200}
-          height={800}
-          loading="lazy"
-        />
+    {loop.map((item) => (
+      <div class:list={['gallery__image-wrapper', { 'gallery__image-wrapper--video': item.kind === 'video' }]}>
+        {item.kind === 'image' ? (
+          <Image
+            src={item.src}
+            alt={item.alt}
+            width={1200}
+            height={800}
+            loading="lazy"
+          />
+        ) : (
+          <mux-video
+            playback-id={item.playbackId}
+            width="1200"
+            height="1500"
+            muted
+            autoplay
+            loop
+            playsinline
+            preload="auto"
+            aria-label={item.alt}
+          ></mux-video>
+        )}
       </div>
     ))}
   </div>
   <div class="gallery__name">{galleryName}</div>
   <a
-    href={`/${locale}/gallery/alita`}
+    href={`/${locale}/gallery/eckes-granini`}
     class="gallery__link"
     aria-label={`View ${galleryName} gallery`}
     data-astro-prefetch="hover"
@@ -53,15 +69,16 @@ const images = [img01, img02, img03, img04, img05];
 </section>
 
 <script>
+  import '@mux/mux-video';
   import { initGalleryScroll } from '@lib/animations/galleryScroll';
   import { initGalleryName } from '@lib/animations/galleryName';
   import { registerCleanup } from '@lib/animations/lifecycle';
 
   document.addEventListener('astro:page-load', () => {
-    const gallery = document.querySelector('[data-gallery="alita"]') as HTMLElement;
+    const gallery = document.querySelector('[data-gallery="eckes-granini"]') as HTMLElement;
     const track = gallery?.querySelector('.gallery__scroll-track') as HTMLElement;
     const name = gallery?.querySelector('.gallery__name') as HTMLElement;
-    if (track) registerCleanup(initGalleryScroll({ container: track, speed: 60, direction: 'left', startOffsetRatio: 0.5 }));
+    if (track) registerCleanup(initGalleryScroll({ container: track, speed: 60, direction: 'left' }));
     if (gallery && name) registerCleanup(initGalleryName({ galleryEl: gallery, nameEl: name }));
   });
 </script>
@@ -104,6 +121,16 @@ const images = [img01, img02, img03, img04, img05];
     display: block;
   }
 
+  .gallery__image-wrapper mux-video {
+    display: block;
+    height: 100%;
+    width: auto;
+    aspect-ratio: 4 / 5;
+    --media-object-fit: cover;
+    --media-object-position: center;
+    --controls: none;
+  }
+
   .gallery__image-wrapper::after {
     content: '';
     position: absolute;
@@ -111,6 +138,7 @@ const images = [img01, img02, img03, img04, img05];
     background: rgba(0, 0, 0, var(--gallery-overlay-opacity));
     pointer-events: none;
     transition: background 0.3s ease;
+    z-index: 2;
   }
 
   .gallery:hover .gallery__image-wrapper::after {
@@ -131,6 +159,7 @@ const images = [img01, img02, img03, img04, img05];
     text-transform: uppercase;
     color: var(--color-white);
     line-height: 1;
+    white-space: nowrap;
   }
 
   .gallery__link {
@@ -160,6 +189,12 @@ const images = [img01, img02, img03, img04, img05];
     .gallery__image-wrapper img {
       width: 100%;
       height: auto;
+    }
+
+    .gallery__image-wrapper mux-video {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4 / 5;
     }
   }
 </style>

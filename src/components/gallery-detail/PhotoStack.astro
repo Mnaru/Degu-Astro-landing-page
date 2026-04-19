@@ -1,14 +1,22 @@
 ---
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
+import type { StackMedia } from './types';
 
 interface Props {
-  images: ImageMetadata[];
+  images?: ImageMetadata[];
+  items?: StackMedia[];
   galleryName: string;
   fitMode?: 'cover' | 'contain';
 }
 
-const { images, galleryName, fitMode = 'cover' } = Astro.props;
+const { images, items, galleryName, fitMode = 'cover' } = Astro.props;
+
+const media: StackMedia[] =
+  items ??
+  (images ?? []).map((img) => ({ kind: 'image', src: img }));
+
+const hasVideo = media.some((m) => m.kind === 'video');
 
 // Desktop: strong horizontal spread, moderate vertical
 const desktopOffsets = [
@@ -51,23 +59,34 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
 }
 ---
 
-<div class="photo-stack" data-photo-stack data-fit-mode={fitMode} style={`--fit-mode: ${fitMode};`}>
-  {images.map((img, index) => (
+<div class="photo-stack" data-photo-stack data-fit-mode={fitMode} data-has-video={hasVideo ? 'true' : 'false'} style={`--fit-mode: ${fitMode};`}>
+  {media.map((item, index) => (
     <div
-      class:list={['photo-stack__card', { 'photo-stack__card--base': index === 0 }]}
+      class:list={['photo-stack__card', { 'photo-stack__card--base': index === 0, 'photo-stack__card--video': item.kind === 'video' }]}
       data-card-index={index}
-      style={`--offset-x-d: ${getOffset(desktopOffsets, index, 'x')}px; --offset-y-d: ${getOffset(desktopOffsets, index, 'y')}px; --offset-x-m: ${getOffset(mobileOffsets, index, 'x')}px; --offset-y-m: ${getOffset(mobileOffsets, index, 'y')}px; z-index: ${images.length - index};`}
+      style={`--offset-x-d: ${getOffset(desktopOffsets, index, 'x')}px; --offset-y-d: ${getOffset(desktopOffsets, index, 'y')}px; --offset-x-m: ${getOffset(mobileOffsets, index, 'x')}px; --offset-y-m: ${getOffset(mobileOffsets, index, 'y')}px; z-index: ${media.length - index};`}
     >
       <div class="photo-stack__card-inner">
-        <Image
-          src={img}
-          alt={`${galleryName} ${index + 1}`}
-          width={1200}
-          height={800}
-          loading={index < 3 ? 'eager' : 'lazy'}
-          decoding="async"
-          {...(index === 0 ? { fetchpriority: 'high' } : {})}
-        />
+        {item.kind === 'image' ? (
+          <Image
+            src={item.src}
+            alt={`${galleryName} ${index + 1}`}
+            width={1200}
+            height={800}
+            loading={index < 3 ? 'eager' : 'lazy'}
+            decoding="async"
+            {...(index === 0 ? { fetchpriority: 'high' } : {})}
+          />
+        ) : (
+          <mux-video
+            playback-id={item.playbackId}
+            loop
+            playsinline
+            preload="auto"
+            muted
+            aria-label={`${galleryName} video ${index + 1}`}
+          ></mux-video>
+        )}
       </div>
     </div>
   ))}
@@ -110,6 +129,10 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
     width: auto;
   }
 
+  .photo-stack__card--base.photo-stack__card--video {
+    width: calc((4 / 5) * max(320px, calc(255.33px + 17.96vw)));
+  }
+
   .photo-stack__card-inner {
     width: 100%;
     height: 100%;
@@ -150,6 +173,14 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
     object-position: center;
     display: block;
   }
+
+  .photo-stack__card-inner mux-video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    --media-object-fit: var(--fit-mode, cover);
+    --media-object-position: center;
+  }
 </style>
 
 <script>
@@ -159,8 +190,11 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
   import { initPhotoProximity } from '@lib/animations/photoProximity';
   import { registerCleanup } from '@lib/animations/lifecycle';
 
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:page-load', async () => {
     const container = document.querySelector('[data-photo-stack]') as HTMLElement;
+    if (container?.dataset.hasVideo === 'true') {
+      await import('@mux/mux-video');
+    }
     const cards = Array.from(
       container?.querySelectorAll('.photo-stack__card') ?? []
     ) as HTMLElement[];
@@ -173,7 +207,18 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
         opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out', stagger: 0.05,
         onComplete: () => cards.forEach(card => gsap.set(card, { clearProps: 'scale' })),
       });
-      registerCleanup(initPhotoStack({ container, cards }));
+
+      const getVideo = (card: HTMLElement | undefined) =>
+        card?.querySelector('mux-video') as (HTMLElement & { play?: () => Promise<void>; pause?: () => void }) | null;
+
+      const onTopCardChange = (newIndex: number, prevIndex: number) => {
+        const prev = getVideo(cards[prevIndex]);
+        prev?.pause?.();
+        const next = getVideo(cards[newIndex]);
+        next?.play?.().catch(() => {});
+      };
+
+      registerCleanup(initPhotoStack({ container, cards, onTopCardChange }));
       registerCleanup(initPhotoPulse({ cards: cardInners }));
       registerCleanup(initPhotoProximity({ cards: cardInners }));
     }

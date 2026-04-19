@@ -6,10 +6,21 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 
 import { t } from '@i18n/utils';
 import PhotoStack from '@components/gallery-detail/PhotoStack.astro';
+import type { StackMedia } from '@components/gallery-detail/types';
+
+import eckesE02 from '@assets/images/galleries/eckes-granini/E_02.png';
+import eckesE03 from '@assets/images/galleries/eckes-granini/E_03.png';
+import eckesE05 from '@assets/images/galleries/eckes-granini/E_05.png';
+import eckesE06 from '@assets/images/galleries/eckes-granini/E_06.png';
+import eckesE08 from '@assets/images/galleries/eckes-granini/E_08.png';
+import eckesE10 from '@assets/images/galleries/eckes-granini/E_10.png';
+import eckesE12 from '@assets/images/galleries/eckes-granini/E_12.png';
+import eckesE13 from '@assets/images/galleries/eckes-granini/E_13.png';
+import eckesE14 from '@assets/images/galleries/eckes-granini/E_14.png';
 
 export const getStaticPaths = (() => {
   const locales = ['en', 'lt'];
-  const slugs = ['manilla', 'crocs', 'alita', 'mix', 'maxima'];
+  const slugs = ['bottlery', 'manilla', 'eckes-granini', 'alita', 'open24', 'alita-2', 'crocs', 'mix', 'maxima'];
 
   return locales.flatMap(locale =>
     slugs.map(slug => ({
@@ -22,9 +33,13 @@ const { locale, slug } = Astro.params;
 const i18n = t(locale);
 
 const backgrounds: Record<string, string> = {
+  bottlery: '#000000',
   manilla: '#6584A1',
-  crocs: '#A5A196',
+  'eckes-granini': '#000000',
   alita: '#E2B032',
+  open24: '#000000',
+  'alita-2': '#E2B032',
+  crocs: '#A5A196',
   mix: '#C70022',
   maxima: '#959CA6',
 };
@@ -39,10 +54,40 @@ const allGalleryImages = import.meta.glob<{ default: ImageMetadata }>(
   { eager: true }
 );
 
+const detailFilenamePatterns: Record<string, RegExp> = {
+  bottlery: /\/B_[^/]+$/,
+  manilla: /\/M_[^/]+$/,
+  alita: /\/A_[^/]+$/,
+  open24: /\/O_[^/]+$/,
+  'alita-2': /\/A2_[^/]+$/,
+};
+const detailPattern = detailFilenamePatterns[slug];
+
 const images = Object.entries(allGalleryImages)
   .filter(([path]) => path.includes(`/galleries/${slug}/`))
+  .filter(([path]) => !detailPattern || detailPattern.test(path))
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([, module]) => module.default);
+
+const mixedMedia: Record<string, StackMedia[]> = {
+  'eckes-granini': [
+    { kind: 'video', playbackId: 'ZjZlATUFk01g9dX8ILrKQ00wZqUVQipg79MBG6VXFFCJg' },
+    { kind: 'image', src: eckesE02 },
+    { kind: 'image', src: eckesE03 },
+    { kind: 'video', playbackId: 'p5FIDPbd01cG00H1OPGbVR9wFIOKJ8IyEMWhqofPzIUPU' },
+    { kind: 'image', src: eckesE05 },
+    { kind: 'image', src: eckesE06 },
+    { kind: 'video', playbackId: 'Y5eDdnqx5oUx3aS3mGFw101xZXnHD01CmXPKzRvK3WSrc' },
+    { kind: 'image', src: eckesE08 },
+    { kind: 'video', playbackId: 'JZiPb00hxLZ9X7P3D5FyoJ200qXe8Lg015NXYI4S7T01On00' },
+    { kind: 'image', src: eckesE10 },
+    { kind: 'video', playbackId: '14E5o7fTxLPNZLbgPSOHimIJ9o201y02HOR8X41gPV01H8' },
+    { kind: 'image', src: eckesE12 },
+    { kind: 'image', src: eckesE13 },
+    { kind: 'image', src: eckesE14 },
+  ],
+};
+const stackItems = mixedMedia[slug];
 
 const fitMode = slug === 'maxima' ? 'contain' : 'cover';
 ---
@@ -61,7 +106,10 @@ const fitMode = slug === 'maxima' ? 'contain' : 'cover';
       <button class="gallery-detail__close" data-close-gallery data-locale={locale} data-slug={slug}>{i18n.galleries.close}</button>
     </div>
   </div>
-  <PhotoStack images={images} galleryName={galleryName} fitMode={fitMode} />
+  {stackItems
+    ? <PhotoStack items={stackItems} galleryName={galleryName} fitMode={fitMode} />
+    : <PhotoStack images={images} galleryName={galleryName} fitMode={fitMode} />
+  }
   <script>
     import { navigate } from 'astro:transitions/client';
 
@@ -114,7 +162,7 @@ const fitMode = slug === 'maxima' ? 'contain' : 'cover';
 
   .gallery-detail__header {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: 1fr auto;
     align-items: baseline;
     position: relative;
     z-index: 50;
@@ -129,11 +177,7 @@ const fitMode = slug === 'maxima' ? 'contain' : 'cover';
   }
 
   .gallery-detail__job-done {
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    text-align: center;
+    display: none;
   }
 
   .gallery-detail__close {
@@ -155,13 +199,4 @@ const fitMode = slug === 'maxima' ? 'contain' : 'cover';
     opacity: 0.7;
   }
 
-  @media (max-width: 1200px) {
-    .gallery-detail__header {
-      grid-template-columns: 1fr auto;
-    }
-
-    .gallery-detail__job-done {
-      display: none;
-    }
-  }
 </style>

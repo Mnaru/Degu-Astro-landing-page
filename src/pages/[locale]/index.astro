@@ -10,11 +10,12 @@ import HeaderContainerStudio from '@components/HeaderContainerStudio.astro';
 import BodyTextContainer from '@components/BodyTextContainer.astro';
 import ScrollHint from '@components/ScrollHint.astro';
 
+import BottleryGallery from '@components/galleries/BottleryGallery.astro';
 import ManillaGallery from '@components/galleries/ManillaGallery.astro';
-import CrocsGallery from '@components/galleries/CrocsGallery.astro';
+import EckesGraniniGallery from '@components/galleries/EckesGraniniGallery.astro';
 import AlitaGallery from '@components/galleries/AlitaGallery.astro';
-import MixGallery from '@components/galleries/MixGallery.astro';
-import MaximaGallery from '@components/galleries/MaximaGallery.astro';
+import Open24Gallery from '@components/galleries/Open24Gallery.astro';
+import Alita2Gallery from '@components/galleries/Alita2Gallery.astro';
 
 import Review from '@components/Review.astro';
 import Outro from '@components/Outro.astro';
@@ -50,11 +51,12 @@ const i18n = t(locale);
   </Hero>
 
   <div class="galleries-wrapper" data-gsap>
+    <BottleryGallery locale={locale} />
     <ManillaGallery locale={locale} />
-    <CrocsGallery locale={locale} />
+    <EckesGraniniGallery locale={locale} />
     <AlitaGallery locale={locale} />
-    <MixGallery locale={locale} />
-    <MaximaGallery locale={locale} />
+    <Open24Gallery locale={locale} />
+    <Alita2Gallery locale={locale} />
   </div>
 
   <Review locale={locale} />

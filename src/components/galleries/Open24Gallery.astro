@@ -2,8 +2,8 @@
 import { Image } from 'astro:assets';
 import { t } from '@i18n/utils';
 
-import img01 from '@assets/images/galleries/manilla/Manilla_01.png';
-import img02 from '@assets/images/galleries/manilla/Manilla_02.png';
+import img01 from '@assets/images/galleries/open24/Open_01.png';
+import img02 from '@assets/images/galleries/open24/Open_02.png';
 
 interface Props {
   locale: string;
@@ -11,11 +11,11 @@ interface Props {
 
 const { locale } = Astro.props;
 const i18n = t(locale);
-const galleryName = i18n.galleries.manilla.name;
+const galleryName = i18n.galleries.open24.name;
 const images = [img01, img02];
 ---
 
-<section class="gallery gallery--static" data-gallery="manilla" id="gallery-manilla">
+<section class="gallery gallery--static" data-gallery="open24" id="gallery-open24">
   <div class="gallery__images">
     <div class="gallery__image-wrapper">
       <Image
@@ -38,7 +38,7 @@ const images = [img01, img02];
   </div>
   <div class="gallery__name">{galleryName}</div>
   <a
-    href={`/${locale}/gallery/manilla`}
+    href={`/${locale}/gallery/open24`}
     class="gallery__link"
     aria-label={`View ${galleryName} gallery`}
     data-astro-prefetch="hover"
@@ -50,7 +50,7 @@ const images = [img01, img02];
   import { registerCleanup } from '@lib/animations/lifecycle';
 
   document.addEventListener('astro:page-load', () => {
-    const gallery = document.querySelector('[data-gallery="manilla"]') as HTMLElement;
+    const gallery = document.querySelector('[data-gallery="open24"]') as HTMLElement;
     const name = gallery?.querySelector('.gallery__name') as HTMLElement;
     if (gallery && name) registerCleanup(initGalleryName({ galleryEl: gallery, nameEl: name }));
   });

@@ -3,10 +3,11 @@ interface GalleryScrollOptions {
   speed?: number;
   direction?: 'left' | 'right';
   resumeDelay?: number;
+  startOffsetRatio?: number;
 }
 
 export function initGalleryScroll(options: GalleryScrollOptions): () => void {
-  const { container, speed = 60, direction = 'left', resumeDelay = 3000 } = options;
+  const { container, speed = 60, direction = 'left', resumeDelay = 3000, startOffsetRatio = 0 } = options;
   const gallerySection = container.closest('[data-gallery]') as HTMLElement;
 
   let animationId: number;
@@ -35,6 +36,15 @@ export function initGalleryScroll(options: GalleryScrollOptions): () => void {
   function start() {
     singleSetWidth = measureSetWidth();
     if (singleSetWidth <= 0) return;
+    if (startOffsetRatio !== 0) {
+      const firstItem = container.querySelector<HTMLElement>('.gallery__image-wrapper');
+      if (firstItem) {
+        offset = firstItem.offsetWidth * startOffsetRatio;
+        wrapOffset();
+        const translateValue = direction === 'left' ? -offset : offset;
+        container.style.transform = `translateX(${translateValue}px)`;
+      }
+    }
     animationId = requestAnimationFrame(animate);
   }
 

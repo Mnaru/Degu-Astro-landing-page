@@ -2,8 +2,11 @@
 import { Image } from 'astro:assets';
 import { t } from '@i18n/utils';
 
-import img01 from '@assets/images/galleries/manilla/Manilla_01.png';
-import img02 from '@assets/images/galleries/manilla/Manilla_02.png';
+import img01 from '@assets/images/galleries/bottlery/Bottlery_01.png';
+import img02 from '@assets/images/galleries/bottlery/Bottlery_02.png';
+import img03 from '@assets/images/galleries/bottlery/Bottlery_03.png';
+import img04 from '@assets/images/galleries/bottlery/Bottlery_04.png';
+import img05 from '@assets/images/galleries/bottlery/Bottlery_05.png';
 
 interface Props {
   locale: string;
@@ -11,34 +14,38 @@ interface Props {
 
 const { locale } = Astro.props;
 const i18n = t(locale);
-const galleryName = i18n.galleries.manilla.name;
-const images = [img01, img02];
+const galleryName = i18n.galleries.bottlery.name;
+const images = [img01, img02, img03, img04, img05];
 ---
 
-<section class="gallery gallery--static" data-gallery="manilla" id="gallery-manilla">
-  <div class="gallery__images">
-    <div class="gallery__image-wrapper">
-      <Image
-        src={images[0]}
-        alt={`${galleryName} 1`}
-        width={1200}
-        height={800}
-        loading="lazy"
-      />
-    </div>
-    <div class="gallery__image-wrapper">
-      <Image
-        src={images[1]}
-        alt={`${galleryName} 2`}
-        width={1200}
-        height={800}
-        loading="lazy"
-      />
-    </div>
+<section class="gallery gallery--infinite" data-gallery="bottlery" id="gallery-bottlery">
+  <div class="gallery__scroll-track">
+    {images.map((img, index) => (
+      <div class="gallery__image-wrapper">
+        <Image
+          src={img}
+          alt={`${galleryName} ${index + 1}`}
+          width={1200}
+          height={800}
+          loading="lazy"
+        />
+      </div>
+    ))}
+    {images.map((img, index) => (
+      <div class="gallery__image-wrapper">
+        <Image
+          src={img}
+          alt={`${galleryName} ${index + 1}`}
+          width={1200}
+          height={800}
+          loading="lazy"
+        />
+      </div>
+    ))}
   </div>
   <div class="gallery__name">{galleryName}</div>
   <a
-    href={`/${locale}/gallery/manilla`}
+    href={`/${locale}/gallery/bottlery`}
     class="gallery__link"
     aria-label={`View ${galleryName} gallery`}
     data-astro-prefetch="hover"
@@ -46,12 +53,15 @@ const images = [img01, img02];
 </section>
 
 <script>
+  import { initGalleryScroll } from '@lib/animations/galleryScroll';
   import { initGalleryName } from '@lib/animations/galleryName';
   import { registerCleanup } from '@lib/animations/lifecycle';
 
   document.addEventListener('astro:page-load', () => {
-    const gallery = document.querySelector('[data-gallery="manilla"]') as HTMLElement;
+    const gallery = document.querySelector('[data-gallery="bottlery"]') as HTMLElement;
+    const track = gallery?.querySelector('.gallery__scroll-track') as HTMLElement;
     const name = gallery?.querySelector('.gallery__name') as HTMLElement;
+    if (track) registerCleanup(initGalleryScroll({ container: track, speed: 60, direction: 'left' }));
     if (gallery && name) registerCleanup(initGalleryName({ galleryEl: gallery, nameEl: name }));
   });
 </script>
@@ -60,31 +70,35 @@ const images = [img01, img02];
   .gallery {
     position: relative;
     width: 100%;
-    height: calc((960 / 1440) * 100vw);
-    padding: 0;
+    height: 100vh;
+    padding: 12px 0;
     overflow: hidden;
+    touch-action: pan-y;
     will-change: transform;
     transform-origin: center center;
   }
 
-  .gallery__images {
+  .gallery__scroll-track {
     display: flex;
     flex-wrap: nowrap;
     gap: var(--gallery-gap);
     height: 100%;
+    align-items: stretch;
+    will-change: transform;
+    padding-left: 12px;
   }
 
   .gallery__image-wrapper {
+    flex: 0 0 auto;
+    height: 100%;
     position: relative;
     overflow: hidden;
-    width: calc((100% - var(--gallery-gap)) / 2);
-    height: 100%;
-    flex-shrink: 0;
   }
 
   .gallery__image-wrapper img {
-    width: 100%;
     height: 100%;
+    width: auto;
+    max-width: none;
     object-fit: cover;
     object-position: center;
     display: block;
@@ -128,22 +142,24 @@ const images = [img01, img02];
 
   @media (max-width: 1200px) {
     .gallery {
-      height: 100vh;
-      padding: 0;
+      height: auto;
+      padding: 12px 0;
     }
 
-    .gallery__images {
-      gap: 0;
-      height: 100%;
+    .gallery__scroll-track {
+      align-items: stretch;
+      padding-left: 0;
     }
 
     .gallery__image-wrapper {
-      width: 100%;
-      height: 100%;
+      flex: 0 0 95vw;
+      width: 95vw;
+      height: auto;
     }
 
-    .gallery__image-wrapper:nth-child(2) {
-      display: none;
+    .gallery__image-wrapper img {
+      width: 100%;
+      height: auto;
     }
   }
 </style>

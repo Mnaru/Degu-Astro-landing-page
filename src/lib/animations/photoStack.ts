@@ -7,9 +7,10 @@ gsap.registerPlugin(Draggable);
 interface PhotoStackOptions {
   container: HTMLElement;
   cards: HTMLElement[];
+  onTopCardChange?: (newIndex: number, prevIndex: number) => void;
 }
 
-export function initPhotoStack({ cards }: PhotoStackOptions): () => void {
+export function initPhotoStack({ cards, onTopCardChange }: PhotoStackOptions): () => void {
   if (cards.length === 0) return () => {};
 
   let topCardIndex = 0;
@@ -23,7 +24,9 @@ export function initPhotoStack({ cards }: PhotoStackOptions): () => void {
 
     card.style.pointerEvents = 'none';
 
+    const prevIndex = topCardIndex;
     topCardIndex++;
+    onTopCardChange?.(topCardIndex, prevIndex);
     if (topCardIndex < cards.length) {
       makeTopCardDraggable(cards[topCardIndex]);
     }
@@ -76,6 +79,7 @@ export function initPhotoStack({ cards }: PhotoStackOptions): () => void {
   }
 
   makeTopCardDraggable(cards[0]);
+  onTopCardChange?.(0, -1);
 
   return () => {
     if (activeDraggable) activeDraggable.kill();
