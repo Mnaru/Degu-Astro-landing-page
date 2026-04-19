@@ -59,6 +59,10 @@ const i18n = t(locale);
     <Alita2Gallery locale={locale} />
   </div>
 
+  <div class="gallery-cursor" aria-hidden="true">
+    <span class="gallery-cursor__label">{i18n.galleries.view}</span>
+  </div>
+
   <Review locale={locale} />
 
   <Footer locale={locale} />
@@ -76,6 +80,7 @@ const i18n = t(locale);
   </Outro> -->
   <script>
     import { initGallerySkew } from '@lib/animations/gallerySkew';
+    import { initGalleryCursor } from '@lib/animations/galleryCursor';
     import { registerCleanup } from '@lib/animations/lifecycle';
 
     document.addEventListener('astro:page-load', () => {
@@ -86,6 +91,58 @@ const i18n = t(locale);
       if (galleries.length > 0) {
         registerCleanup(initGallerySkew({ elements: galleries }));
       }
+
+      const cursor = document.querySelector('.gallery-cursor') as HTMLElement | null;
+      const links = Array.from(
+        document.querySelectorAll('.gallery__link')
+      ) as HTMLElement[];
+      if (cursor && links.length > 0) {
+        registerCleanup(initGalleryCursor({ cursor, links }));
+      }
     });
   </script>
+
+  <style>
+    :global(.gallery--infinite + .gallery--infinite) {
+      margin-top: -12px;
+    }
+
+    .gallery-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--color-orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      visibility: hidden;
+      z-index: 1000;
+      will-change: transform, opacity;
+    }
+
+    .gallery-cursor__label {
+      color: var(--color-white);
+      font-family: var(--font-body);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1;
+    }
+
+    @media (hover: hover) {
+      :global(.galleries-wrapper .gallery__link) {
+        cursor: none;
+      }
+    }
+
+    @media (hover: none), (max-width: 1200px) {
+      .gallery-cursor {
+        display: none;
+      }
+    }
+  </style>
 </BaseLayout>

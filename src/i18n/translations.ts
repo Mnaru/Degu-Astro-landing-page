@@ -84,6 +84,7 @@ export const translations = {
       mix: { name: 'MIX', jobDone: 'Social media assets' },
       maxima: { name: 'MAXIMA', jobDone: 'Key visuals & OOH' },
       close: 'Close',
+      view: 'View',
     },
     footer: {
       ticker: "LET'S WORK TOGERTHER",
@@ -189,6 +190,7 @@ export const translations = {
       mix: { name: 'MIX', jobDone: 'Socialinių tinklų turinis' },
       maxima: { name: 'MAXIMA', jobDone: 'Pagrindiniai vizualai ir OOH' },
       close: 'Uždaryti',
+      view: 'Žiūrėti',
     },
     footer: {
       ticker: 'DIRBKIM KARTU?',
