@@ -193,8 +193,13 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
   });
 
   if (options?.startAtEnd) {
-    // Wait for all gallery images to load before revealing
-    const imgs = galleriesWrapper.querySelectorAll<HTMLImageElement>('img');
+    // Wait for gallery photos to load before revealing.
+    // Exclude video poster overlays — they sit behind <mux-video> and don't
+    // need to gate the reveal; otherwise the wrapper waits on Mux CDN for
+    // decorative frames and the home page visibly hangs on return navigation.
+    const imgs = galleriesWrapper.querySelectorAll<HTMLImageElement>(
+      'img:not(.gallery__poster):not(.photo-stack__poster)'
+    );
     const loadPromises = Array.from(imgs).map(img => {
       if (img.loading === 'lazy') img.loading = 'eager';
       if (img.complete) return Promise.resolve();

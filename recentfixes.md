@@ -90,6 +90,17 @@ Revert both files. No migrations, no state, no shared helpers affected. The prev
 
 ---
 
+## Fix: home page hangs on return navigation
+
+**Date:** 2026-04-20
+**Problem:** After the layered `<img>` poster change above, returning home from a gallery felt slow — the entire `.galleries-wrapper` stayed hidden for a noticeable beat and you could see images paint in.
+**Root cause:** [src/lib/animations/heroToGallery.ts](src/lib/animations/heroToGallery.ts) gates the wrapper reveal on `Promise.all` of every `<img loading>` event. The new `.gallery__poster` (12 in Eckes home) and `.photo-stack__poster` overlays were eligible — so the wrapper waited on Mux CDN for decorative frames before showing real content.
+**Fix:** narrowed the selector to `img:not(.gallery__poster):not(.photo-stack__poster)`. Posters still load eagerly and paint behind `<mux-video>`; they just don't gate the reveal.
+
+**Rollback:** restore the original `'img'` selector.
+
+---
+
 ## Follow-ups not in this batch
 
 - `<Picture>` + AVIF/WebP for gallery sources (optional, ~20–30 % smaller per image).
