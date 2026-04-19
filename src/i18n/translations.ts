@@ -2,12 +2,12 @@ export const translations = {
   en: {
     meta: {
       title: 'Degu Studio',
-      description: 'Fresh visuals to feed your ads & socials',
+      description: 'Fresh visuals to feed your socials',
     },
     intro: {
       header1: 'DEGU',
       header2: 'STUDIO',
-      body: 'Fresh visuals to feed<br>your ads & socials.',
+      body: 'Fresh visuals to<br>feed your socials.',
       scrollHint: 'Scroll',
     },
     outro: {
@@ -49,7 +49,7 @@ export const translations = {
     },
     footer: {
       ticker: "LET'S WORK TOGERTHER",
-      tagline: 'Fresh visuals to feed\nyour ads & socials.',
+      tagline: 'Fresh visuals to feed\nyour socials.',
       contactLabel: 'CONTACT',
       email: 'info@degu.lt',
       workLabel: 'WORK',
@@ -69,12 +69,12 @@ export const translations = {
     // TODO: Replace with actual Lithuanian translations
     meta: {
       title: 'Degu Studio',
-      description: 'Vizualika reklamai ir socialiniams tinklams',
+      description: 'Švieži vizualai jūsų socialiniams tinklams',
     },
     intro: {
       header1: 'DEGU',
       header2: 'STUDIO',
-      body: 'Vizualika reklamai ir<br>socialiniams tinklams.',
+      body: '<span class="lt-body-sm">Švieži vizualai<br>jūsų socialiniams<br>tinklams.</span><span class="lt-body-lg">Švieži vizualai jūsų<br>socialiniams tinklams.</span>',
       scrollHint: 'Slinkite',
     },
     outro: {
@@ -116,7 +116,7 @@ export const translations = {
     },
     footer: {
       ticker: 'DIRBKIM KARTU?',
-      tagline: 'Vizualika reklamai ir\nsocialiniams tinklams.',
+      tagline: 'Švieži vizualai jūsų\nsocialiniams tinklams.',
       contactLabel: 'KONTAKTAI',
       email: 'info@degu.lt',
       workLabel: 'DARBAI',

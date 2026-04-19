@@ -4,7 +4,14 @@
       "Bash(mkdir -p /tmp/optimized-galleries)",
       "Bash(cp -R src/assets/images/galleries/. /tmp/optimized-galleries/)",
       "Read(//tmp/**)",
-      "Bash(git cherry-pick *)"
+      "Bash(git cherry-pick *)",
+      "Bash(git rev-list *)",
+      "Bash(awk '{print $1}')",
+      "Bash(git cat-file *)",
+      "Bash(awk '{s+=$1} END {printf \"%.1f MB\\\\n\", s/1048576}')",
+      "Bash(npx astro *)",
+      "Bash(git push *)",
+      "WebFetch(domain:developer.chrome.com)"
     ]
   }
 }

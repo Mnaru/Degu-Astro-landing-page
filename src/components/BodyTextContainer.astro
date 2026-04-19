@@ -22,12 +22,26 @@ const { text, class: className, ...attrs } = Astro.props;
     margin: 0;
     margin-left: var(--optical-adjust-serif);
     font-family: var(--font-serif);
-    font-size: max(20px, calc(9px + 1.944vw));
+    font-size: max(24px, calc(9px + 1.944vw));
     font-style: normal;
     font-weight: 400;
     line-height: 1;
     color: var(--color-offwhite);
     text-align: left;
     letter-spacing: -0.05em;
+    white-space: nowrap;
+  }
+
+  p :global(.lt-body-sm) {
+    display: none;
+  }
+
+  @media (max-width: 389px) {
+    p :global(.lt-body-sm) {
+      display: inline;
+    }
+    p :global(.lt-body-lg) {
+      display: none;
+    }
   }
 </style>

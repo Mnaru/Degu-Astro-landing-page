@@ -21,10 +21,16 @@ const { class: className, ...attrs } = Astro.props;
     font-style: normal;
     font-weight: 700;
     line-height: 1;
-    letter-spacing: 1.32px;
+    letter-spacing: 0.12em;
     text-align: center;
     text-transform: uppercase;
     color: var(--color-offwhite);
+  }
+
+  @media (max-width: 767px) {
+    .scroll-hint {
+      font-size: 16.1051px;
+    }
   }
 </style>
 
@@ -74,8 +80,9 @@ const { class: className, ...attrs } = Astro.props;
         charSets.push(chars);
       }
 
-      // 3D setup — depth creates cylinder radius, scaled for 11px font
-      const depth = -7;
+      // 3D setup — depth scales with font-size (cylinder radius proportional to glyph height)
+      const fontSize = parseFloat(getComputedStyle(hint).fontSize) || 11;
+      const depth = -(fontSize * 7) / 11;
       const transformOrigin = `50% 50% ${depth}px`;
 
       gsap.set(allLines, { perspective: 200, transformStyle: 'preserve-3d' });
