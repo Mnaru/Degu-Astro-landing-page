@@ -80,6 +80,7 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
         ) : (
           <mux-video
             playback-id={item.playbackId}
+            poster={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
             loop
             playsinline
             preload="auto"

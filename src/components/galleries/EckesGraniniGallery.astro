@@ -46,6 +46,7 @@ const loop = [...mediaItems, ...mediaItems];
         ) : (
           <mux-video
             playback-id={item.playbackId}
+            poster={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
             width="1200"
             height="1500"
             muted
@@ -195,7 +196,7 @@ const loop = [...mediaItems, ...mediaItems];
     .gallery__image-wrapper mux-video {
       width: 100%;
       height: auto;
-      aspect-ratio: 4 / 5;
+      aspect-ratio: 3 / 2;
     }
   }
 </style>
