@@ -21,8 +21,8 @@ const images = [img01, img02];
       <Image
         src={images[0]}
         alt={`${galleryName} 1`}
-        width={1200}
-        height={800}
+        widths={[400, 800, 1200, 1600]}
+        sizes="(max-width: 1200px) 95vw, 50vw"
         loading="lazy"
       />
     </div>
@@ -30,8 +30,8 @@ const images = [img01, img02];
       <Image
         src={images[1]}
         alt={`${galleryName} 2`}
-        width={1200}
-        height={800}
+        widths={[400, 800, 1200, 1600]}
+        sizes="(max-width: 1200px) 95vw, 50vw"
         loading="lazy"
       />
     </div>

@@ -79,8 +79,8 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
           <Image
             src={item.src}
             alt={`${galleryName} ${index + 1}`}
-            width={1200}
-            height={800}
+            widths={[400, 800, 1200, 1600]}
+            sizes="(max-width: 1200px) 90vw, 50vw"
             loading={index < 3 ? 'eager' : 'lazy'}
             decoding="async"
             {...(index === 0 ? { fetchpriority: 'high' } : {})}
