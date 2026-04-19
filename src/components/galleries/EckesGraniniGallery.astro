@@ -137,7 +137,7 @@ const loop = [...mediaItems, ...mediaItems];
     inset: 0;
     background: rgba(0, 0, 0, var(--gallery-overlay-opacity));
     pointer-events: none;
-    transition: background 0.3s ease;
+    transition: background 0.6s ease-out;
     z-index: 2;
   }
 
@@ -160,6 +160,7 @@ const loop = [...mediaItems, ...mediaItems];
     color: var(--color-white);
     line-height: 1;
     white-space: nowrap;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35);
   }
 
   .gallery__link {

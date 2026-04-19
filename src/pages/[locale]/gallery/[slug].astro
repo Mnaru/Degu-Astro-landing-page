@@ -20,7 +20,7 @@ import eckesE14 from '@assets/images/galleries/eckes-granini/E_14.png';
 
 export const getStaticPaths = (() => {
   const locales = ['en', 'lt'];
-  const slugs = ['bottlery', 'manilla', 'eckes-granini', 'alita', 'open24', 'alita-2', 'crocs', 'mix', 'maxima'];
+  const slugs = ['bottlery', 'manilla', 'eckes-granini', 'alita', 'open24', 'alita-2'];
 
   return locales.flatMap(locale =>
     slugs.map(slug => ({
@@ -39,9 +39,6 @@ const backgrounds: Record<string, string> = {
   alita: '#E2B032',
   open24: '#000000',
   'alita-2': '#E2B032',
-  crocs: '#A5A196',
-  mix: '#C70022',
-  maxima: '#959CA6',
 };
 
 const bg = backgrounds[slug] ?? '#000000';
@@ -89,7 +86,7 @@ const mixedMedia: Record<string, StackMedia[]> = {
 };
 const stackItems = mixedMedia[slug];
 
-const fitMode = slug === 'maxima' ? 'contain' : 'cover';
+const fitMode = 'cover';
 ---
 
 <BaseLayout

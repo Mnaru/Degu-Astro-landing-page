@@ -110,3 +110,11 @@ body {
     scroll-snap-align: center;
   }
 }
+
+/* Collapse doubled vertical padding when two infinite galleries are adjacent.
+   Second selector handles Astro dev mode, which inserts a <script> between
+   sections; in production those scripts are hoisted to <head>. */
+.gallery--infinite + .gallery--infinite,
+.gallery--infinite + script + .gallery--infinite {
+  margin-top: -12px;
+}
