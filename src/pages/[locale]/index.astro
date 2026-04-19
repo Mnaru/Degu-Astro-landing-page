@@ -18,12 +18,6 @@ import Open24Gallery from '@components/galleries/Open24Gallery.astro';
 import Alita2Gallery from '@components/galleries/Alita2Gallery.astro';
 
 import Review from '@components/Review.astro';
-import Outro from '@components/Outro.astro';
-import OutroHeaderContainer from '@components/OutroHeaderContainer.astro';
-import OutroStudioContainer from '@components/OutroStudioContainer.astro';
-import OutroBodyTextContainer from '@components/OutroBodyTextContainer.astro';
-import EmailUsButton from '@components/EmailUsButton.astro';
-import FollowUsButton from '@components/FollowUsButton.astro';
 import Footer from '@components/Footer.astro';
 
 import { t } from '@i18n/utils';
@@ -67,17 +61,6 @@ const i18n = t(locale);
 
   <Footer locale={locale} />
 
-  <!-- <Outro locale={locale}>
-    <div class="outro-content">
-      <OutroHeaderContainer text={i18n.outro.header1} />
-      <OutroStudioContainer text={i18n.outro.header2} />
-      <OutroBodyTextContainer text={i18n.outro.body} class="outro-body" />
-      <div class="outro-buttons">
-        <EmailUsButton label={i18n.outro.emailButton} feedbackText={i18n.outro.emailCopied} />
-        <FollowUsButton label={i18n.outro.followButton} />
-      </div>
-    </div>
-  </Outro> -->
   <script>
     import { initGallerySkew } from '@lib/animations/gallerySkew';
     import { initGalleryCursor } from '@lib/animations/galleryCursor';

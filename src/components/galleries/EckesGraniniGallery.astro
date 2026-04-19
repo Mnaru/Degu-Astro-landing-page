@@ -44,18 +44,28 @@ const loop = [...mediaItems, ...mediaItems];
             loading="lazy"
           />
         ) : (
-          <mux-video
-            playback-id={item.playbackId}
-            poster={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
-            width="1200"
-            height="1500"
-            muted
-            autoplay
-            loop
-            playsinline
-            preload="auto"
-            aria-label={item.alt}
-          ></mux-video>
+          <>
+            <mux-video
+              playback-id={item.playbackId}
+              poster={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
+              width="1200"
+              height="1500"
+              muted
+              autoplay
+              loop
+              playsinline
+              preload="auto"
+              aria-label={item.alt}
+            ></mux-video>
+            <img
+              class="gallery__poster"
+              src={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
+              alt=""
+              loading="eager"
+              decoding="async"
+              aria-hidden="true"
+            />
+          </>
         )}
       </div>
     ))}
@@ -70,7 +80,6 @@ const loop = [...mediaItems, ...mediaItems];
 </section>
 
 <script>
-  import '@mux/mux-video';
   import { initGalleryScroll } from '@lib/animations/galleryScroll';
   import { initGalleryName } from '@lib/animations/galleryName';
   import { registerCleanup } from '@lib/animations/lifecycle';
@@ -81,6 +90,17 @@ const loop = [...mediaItems, ...mediaItems];
     const name = gallery?.querySelector('.gallery__name') as HTMLElement;
     if (track) registerCleanup(initGalleryScroll({ container: track, speed: 60, direction: 'left' }));
     if (gallery && name) registerCleanup(initGalleryName({ galleryEl: gallery, nameEl: name }));
+
+    if (gallery) {
+      const observer = new IntersectionObserver((entries, obs) => {
+        if (entries.some(e => e.isIntersecting)) {
+          import('@mux/mux-video');
+          obs.disconnect();
+        }
+      }, { rootMargin: '200px 0px' });
+      observer.observe(gallery);
+      registerCleanup(() => observer.disconnect());
+    }
   });
 </script>
 
@@ -127,9 +147,22 @@ const loop = [...mediaItems, ...mediaItems];
     height: 100%;
     width: auto;
     aspect-ratio: 4 / 5;
+    position: relative;
+    z-index: 2;
     --media-object-fit: cover;
     --media-object-position: center;
     --controls: none;
+  }
+
+  .gallery__poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 1;
+    pointer-events: none;
   }
 
   .gallery__image-wrapper::after {

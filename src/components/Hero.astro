@@ -23,7 +23,10 @@ const { class: className, ...attrs } = Astro.props;
     if (!heroEl) return;
 
     if (!(window as any).__heroIntroPlayed) {
-      await document.fonts.ready;
+      await Promise.race([
+        document.fonts.load('1em "ObviouslyDemo"'),
+        new Promise(r => setTimeout(r, 500)),
+      ]);
       const cleanup = heroIntro(heroEl);
       if (cleanup) registerCleanup(cleanup);
     } else {

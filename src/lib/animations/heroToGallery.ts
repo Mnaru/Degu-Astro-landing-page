@@ -150,7 +150,6 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
   }
 
   const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-  console.log('heroToGallery: init', isMobile ? '(mobile)' : '(desktop)');
 
   // --- Shared initial states ---
   gsap.set(heroInner, { overflow: 'hidden' });

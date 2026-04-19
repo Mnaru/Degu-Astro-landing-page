@@ -78,15 +78,25 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
             {...(index === 0 ? { fetchpriority: 'high' } : {})}
           />
         ) : (
-          <mux-video
-            playback-id={item.playbackId}
-            poster={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
-            loop
-            playsinline
-            preload="auto"
-            muted
-            aria-label={`${galleryName} video ${index + 1}`}
-          ></mux-video>
+          <>
+            <mux-video
+              playback-id={item.playbackId}
+              poster={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
+              loop
+              playsinline
+              preload="auto"
+              muted
+              aria-label={`${galleryName} video ${index + 1}`}
+            ></mux-video>
+            <img
+              class="photo-stack__poster"
+              src={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
+              alt=""
+              loading="eager"
+              decoding="async"
+              aria-hidden="true"
+            />
+          </>
         )}
       </div>
     </div>
@@ -202,8 +212,21 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
     display: block;
     width: 100%;
     height: 100%;
+    position: relative;
+    z-index: 2;
     --media-object-fit: var(--fit-mode, cover);
     --media-object-position: center;
+  }
+
+  .photo-stack__card-inner img.photo-stack__poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--fit-mode, cover);
+    object-position: center;
+    z-index: 1;
+    pointer-events: none;
   }
 </style>
 
