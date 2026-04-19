@@ -35,15 +35,6 @@ const tickerRepeat = 8;
       <a href={`mailto:${i18n.footer.email}`} class="footer__email-link">{i18n.footer.email}</a>
     </div>
 
-    <nav class="footer__col footer__col--work" aria-label={i18n.footer.workLabel}>
-      <p class="footer__col-label">{i18n.footer.workLabel}</p>
-      <ul class="footer__link-list">
-        <li><a href={`/${locale}/gallery/manilla`}>{i18n.footer.workLink1}</a></li>
-        <li><a href={`/${locale}/gallery/alita`}>{i18n.footer.workLink2}</a></li>
-        <li><a href={`/${locale}/gallery/maxima`}>{i18n.footer.workLink3}</a></li>
-      </ul>
-    </nav>
-
     <nav class="footer__col footer__col--connect" aria-label={i18n.footer.connectLabel}>
       <p class="footer__col-label">{i18n.footer.connectLabel}</p>
       <ul class="footer__link-list">
@@ -118,7 +109,7 @@ const tickerRepeat = 8;
 
   .footer__content-grid {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: auto auto 1fr;
     column-gap: 120px;
     row-gap: 40px;
     padding: 66px max(15px, calc(10px + 1.389vw)) 120px;

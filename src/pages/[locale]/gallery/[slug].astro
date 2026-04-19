@@ -7,6 +7,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import { t } from '@i18n/utils';
 import PhotoStack from '@components/gallery-detail/PhotoStack.astro';
 import type { StackMedia } from '@components/gallery-detail/types';
+import DeguLogo from '@components/DeguLogo.astro';
 
 import eckesE02 from '@assets/images/galleries/eckes-granini/E_02.png';
 import eckesE03 from '@assets/images/galleries/eckes-granini/E_03.png';
@@ -33,15 +34,20 @@ const { locale, slug } = Astro.params;
 const i18n = t(locale);
 
 const backgrounds: Record<string, string> = {
-  bottlery: '#000000',
+  bottlery: '#E0948E',
   manilla: '#6584A1',
-  'eckes-granini': '#000000',
-  alita: '#E2B032',
-  open24: '#000000',
+  'eckes-granini': '#EE8442',
+  alita: '#FEFFE7',
+  open24: '#A5A196',
   'alita-2': '#E2B032',
 };
 
+const foregrounds: Record<string, string> = {
+  alita: '#000000',
+};
+
 const bg = backgrounds[slug] ?? '#000000';
+const fg = foregrounds[slug] ?? '#ffffff';
 const galleryData = i18n.galleries[slug as keyof typeof i18n.galleries];
 const galleryName = typeof galleryData === 'string' ? '' : galleryData.name;
 const jobDone = typeof galleryData === 'string' ? '' : galleryData.jobDone;
@@ -93,15 +99,18 @@ const fitMode = 'cover';
   title={`${galleryName} — Degu Studio`}
   description={`${galleryName} — ${jobDone}`}
   locale={locale}
-  bodyStyle={`background-color: ${bg}; height: 100vh; overflow: hidden; touch-action: none;`}
+  bodyStyle={`background-color: ${bg}; --gallery-bg: ${bg}; height: 100vh; overflow: hidden; touch-action: none;`}
 >
   <div class="gallery-detail__bg" style={`background-color: ${bg};`}></div>
-  <div class="gallery-detail">
+  <div class="gallery-detail" style={`color: ${fg};`}>
     <div class="gallery-detail__header">
       <span class="gallery-detail__title">{galleryName}</span>
       <span class="gallery-detail__job-done">{jobDone}</span>
       <button class="gallery-detail__close" data-close-gallery data-locale={locale} data-slug={slug}>{i18n.galleries.close}</button>
     </div>
+  </div>
+  <div class="gallery-detail__end-logo" data-end-logo data-logo-no-click aria-hidden="true">
+    <DeguLogo />
   </div>
   {stackItems
     ? <PhotoStack items={stackItems} galleryName={galleryName} fitMode={fitMode} />
@@ -115,10 +124,7 @@ const fitMode = 'cover';
       if (!closeBtn) return;
       const locale = closeBtn.dataset.locale;
 
-      closeBtn.addEventListener('click', () => {
-        // Use history.back() when there's a previous page to go back to.
-        // document.referrer is NOT updated by Astro's ClientRouter (pushState),
-        // so we check the Navigation API or fall back to history.length.
+      const closeGallery = () => {
         const nav = (window as any).navigation;
         const canGoBack = nav?.currentEntry
           ? nav.currentEntry.index > 0
@@ -129,7 +135,26 @@ const fitMode = 'cover';
         } else {
           navigate(`/${locale}/`);
         }
-      });
+      };
+
+      closeBtn.addEventListener('click', closeGallery);
+
+      const bg = document.querySelector<HTMLElement>('.gallery-detail__bg');
+      const endLogo = document.querySelector<HTMLElement>('[data-end-logo]');
+      let complete = false;
+
+      const onComplete = () => {
+        complete = true;
+        endLogo?.classList.add('gallery-detail__end-logo--visible');
+      };
+
+      const onMaybeClose = () => {
+        if (complete) closeGallery();
+      };
+
+      document.addEventListener('photostack:complete', onComplete);
+      bg?.addEventListener('click', onMaybeClose);
+      endLogo?.addEventListener('click', onMaybeClose);
     });
   </script>
 </BaseLayout>
@@ -143,6 +168,28 @@ const fitMode = 'cover';
     position: fixed;
     inset: 0;
     z-index: 1;
+  }
+
+  .gallery-detail__end-logo {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease-out;
+  }
+
+  .gallery-detail__end-logo--visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .gallery-detail__end-logo :global(.flame-svg) {
+    height: clamp(50px, 9vh, 100px);
+    width: auto;
   }
 
   .gallery-detail {

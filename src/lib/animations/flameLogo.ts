@@ -49,7 +49,15 @@ export function initFlameAnimation(svgEl: SVGSVGElement): () => void {
       .to(eyeRight, { attr: eyes.right[next], duration: dur, ease }, label + '+=' + eyeLag);
   }
 
+  const hoverTarget = svgEl.parentElement;
+  const onEnter = () => gsap.to(tl, { timeScale: 3, duration: 0.25, ease: 'power2.out', overwrite: true });
+  const onLeave = () => gsap.to(tl, { timeScale: 1, duration: 0.4, ease: 'power2.out', overwrite: true });
+  hoverTarget?.addEventListener('mouseenter', onEnter);
+  hoverTarget?.addEventListener('mouseleave', onLeave);
+
   return () => {
     tl.kill();
+    hoverTarget?.removeEventListener('mouseenter', onEnter);
+    hoverTarget?.removeEventListener('mouseleave', onLeave);
   };
 }

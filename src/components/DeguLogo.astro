@@ -20,15 +20,34 @@ const { class: className, ...attrs } = Astro.props;
 <script>
   import { initFlameAnimation } from '@lib/animations/flameLogo';
   import { registerCleanup } from '@lib/animations/lifecycle';
+  import { navigate } from 'astro:transitions/client';
 
   document.addEventListener('astro:page-load', () => {
-    const svg = document.querySelector<SVGSVGElement>('.degu-logo .flame-svg');
-    if (svg) registerCleanup(initFlameAnimation(svg));
+    const logos = document.querySelectorAll<HTMLElement>('.degu-logo');
+    logos.forEach(logo => {
+      const svg = logo.querySelector<SVGSVGElement>('.flame-svg');
+      if (svg) registerCleanup(initFlameAnimation(svg));
+
+      if (logo.closest('[data-logo-no-click]')) return;
+
+      const onClick = () => {
+        const locale = document.documentElement.lang || 'lt';
+        const homePath = `/${locale}/`;
+        if (window.location.pathname === homePath) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          navigate(homePath);
+        }
+      };
+      logo.addEventListener('click', onClick);
+      registerCleanup(() => logo.removeEventListener('click', onClick));
+    });
   });
 </script>
 
 <style>
   .degu-logo {
+    cursor: pointer;
   }
 
   .flame-svg {

@@ -62,7 +62,7 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
 <div class="photo-stack" data-photo-stack data-fit-mode={fitMode} data-has-video={hasVideo ? 'true' : 'false'} style={`--fit-mode: ${fitMode};`}>
   {media.map((item, index) => (
     <div
-      class:list={['photo-stack__card', { 'photo-stack__card--base': index === 0, 'photo-stack__card--video': item.kind === 'video' }]}
+      class:list={['photo-stack__card', { 'photo-stack__card--base': index === 0, 'photo-stack__card--video': item.kind === 'video', 'photo-stack__card--covered': index > 0 }]}
       data-card-index={index}
       style={`--offset-x-d: ${getOffset(desktopOffsets, index, 'x')}px; --offset-y-d: ${getOffset(desktopOffsets, index, 'y')}px; --offset-x-m: ${getOffset(mobileOffsets, index, 'x')}px; --offset-y-m: ${getOffset(mobileOffsets, index, 'y')}px; z-index: ${media.length - index};`}
     >
@@ -104,6 +104,10 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
     z-index: 10;
   }
 
+  .photo-stack--complete {
+    pointer-events: none;
+  }
+
   .photo-stack[data-fit-mode='contain'] {
     top: 53%;
   }
@@ -120,6 +124,25 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
 
   .photo-stack__card {
     opacity: 0;
+  }
+
+  .photo-stack__card-inner {
+    position: relative;
+  }
+
+  .photo-stack__card-inner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gallery-bg, #000);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease-out;
+    z-index: 20;
+  }
+
+  .photo-stack__card--covered .photo-stack__card-inner::after {
+    opacity: 0.6;
   }
 
   .photo-stack__card--base {
@@ -216,6 +239,11 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
         prev?.pause?.();
         const next = getVideo(cards[newIndex]);
         next?.play?.().catch(() => {});
+        cards[newIndex]?.classList.remove('photo-stack__card--covered');
+        if (newIndex >= cards.length) {
+          container.classList.add('photo-stack--complete');
+          container.dispatchEvent(new CustomEvent('photostack:complete', { bubbles: true }));
+        }
       };
 
       registerCleanup(initPhotoStack({ container, cards, onTopCardChange }));
