@@ -176,7 +176,7 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
     scale: calc(var(--pulse-scale) * var(--proximity-scale));
   }
 
-  .photo-stack__card--base .photo-stack__card-inner img {
+  .photo-stack__card--base .photo-stack__card-inner img:not(.photo-stack__poster) {
     height: 100%;
     width: auto;
     display: block;
