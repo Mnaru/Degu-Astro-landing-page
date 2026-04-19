@@ -16,6 +16,36 @@ const { locale, class: className, ...attrs } = Astro.props;
   <DeguLogo />
 </header>
 
+<script>
+  import { registerCleanup } from '@lib/animations/lifecycle';
+
+  document.addEventListener('astro:page-load', () => {
+    const header = document.querySelector<HTMLElement>('.site-header');
+    const vv = window.visualViewport;
+    if (!header || !vv) return;
+
+    let rafId = 0;
+    const sync = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        header.style.transform = `translateY(${vv.offsetTop}px)`;
+        rafId = 0;
+      });
+    };
+
+    vv.addEventListener('resize', sync);
+    vv.addEventListener('scroll', sync);
+    sync();
+
+    registerCleanup(() => {
+      vv.removeEventListener('resize', sync);
+      vv.removeEventListener('scroll', sync);
+      if (rafId) cancelAnimationFrame(rafId);
+      header.style.transform = '';
+    });
+  });
+</script>
+
 <style>
   .site-header {
     position: fixed;
