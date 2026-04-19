@@ -203,13 +203,22 @@ export function initHeroToGallery(options?: { startAtEnd?: boolean }) {
   if (options?.startAtEnd) {
     if (galleriesPersisted) {
       // Galleries are persisted DOM — already in end state with images
-      // already decoded and videos already playing. Just place the timeline
-      // at progress 1 and re-enable snap after the scroll position settles.
+      // decoded and videos playing. Mobile-specific care:
+      //   1. Re-apply layout-critical props in case the viewport-relative
+      //      values recomputed while away (mobile address bar collapses
+      //      under detail page's `overflow:hidden; height:100vh`, changing
+      //      what `100vh` resolves to between visits).
+      //   2. Delay ScrollTrigger.refresh() long enough for ClientRouter's
+      //      scroll restoration to settle, otherwise pin range is computed
+      //      against scroll=0 and the hero won't reverse-fade on scroll up.
+      //   3. Hard refresh + snap re-enable after the same delay so the snap
+      //      doesn't catch on a stale range.
+      gsap.set(galleriesWrapper, { marginTop: '-100vh', position: 'relative', zIndex: 1 });
       tl.progress(1);
-      requestAnimationFrame(() => {
+      setTimeout(() => {
+        ScrollTrigger.refresh(true);
         st.vars.snap = snapConfig;
-        ScrollTrigger.refresh();
-      });
+      }, 150);
     } else {
       // First-time init at end state (cold load with restored scroll past hero):
       // wait for gallery photos to load before revealing. Exclude video poster
