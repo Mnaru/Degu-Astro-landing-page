@@ -37,6 +37,10 @@ export const translations = {
       quote: '"Very fun to work with"',
       source: 'Anonymous survey, 2025',
     },
+    aboutVideo: {
+      text1: 'Degu is a content production studio in Vilnius, Lithuania, with a big thing for making drinks and products look incredible on social media.',
+      text2: 'We shoot photo and video for beverage, beauty, and e-commerce brands — people like Eckes Granini, Alita, Manilla, and Bottlery. From concept to final cut, we move fast without cutting corners.',
+    },
     galleries: {
       bottlery: { name: 'BOTTLERY', jobDone: 'Social media assets' },
       manilla: { name: 'MANILLA', jobDone: 'Product Photography' },
@@ -103,6 +107,10 @@ export const translations = {
     review: {
       quote: '"SU JAIS LABAI FAINA DIRBTI"',
       source: 'Anoniminė apklausa, 2025',
+    },
+    aboutVideo: {
+      text1: 'Degu – socialinio turinio studija Vilniuje. Fotografuojame ir filmuojame socialinių tinklų turinį gėrimų, grožio ir e-komercijos prekių ženklams, tokiems kaip Eckes Granini, Alita, Manilla ir Bottlery.',
+      text2: 'Nuo koncepto iki galutinio montažo pasirūpiname, kad jūsų produktas atrodytų puikiai tiek gyvenime, tiek internete.',
     },
     galleries: {
       bottlery: { name: 'BOTTLERY', jobDone: 'Socialinių tinklų turinis' },

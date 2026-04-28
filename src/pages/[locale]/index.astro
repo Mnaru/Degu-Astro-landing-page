@@ -17,6 +17,7 @@ import AlitaGallery from '@components/galleries/AlitaGallery.astro';
 import Open24Gallery from '@components/galleries/Open24Gallery.astro';
 import Alita2Gallery from '@components/galleries/Alita2Gallery.astro';
 
+import AboutVideo from '@components/AboutVideo.astro';
 import Review from '@components/Review.astro';
 import Footer from '@components/Footer.astro';
 
@@ -56,6 +57,8 @@ const i18n = t(locale);
   <div class="gallery-cursor" aria-hidden="true" transition:persist={`gallery-cursor-${locale}`}>
     <span class="gallery-cursor__label">{i18n.galleries.view}</span>
   </div>
+
+  <AboutVideo locale={locale} />
 
   <Review locale={locale} />
 

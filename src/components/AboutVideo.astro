@@ -1,0 +1,193 @@
+---
+import { t } from '@i18n/utils';
+
+interface Props {
+  locale: string;
+  class?: string;
+}
+
+const { locale, class: className } = Astro.props;
+const i18n = t(locale);
+
+const PLAYBACK_ID = 'HFkln3TxiJnKWngKaM00GmqPekjyRbK00xooqXOqm1qlI';
+const POSTER_URL = `https://image.mux.com/${PLAYBACK_ID}/thumbnail.webp?time=0`;
+---
+
+<section class:list={['about-video', className]} data-gsap aria-label="About Degu">
+  <div class="about-video__sticky">
+    <div class="about-video__video-wrap">
+      <img
+        class="about-video__poster"
+        src={POSTER_URL}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        aria-hidden="true"
+      />
+      <mux-video
+        playback-id={PLAYBACK_ID}
+        poster={POSTER_URL}
+        muted
+        autoplay
+        loop
+        playsinline
+        preload="auto"
+        aria-label="Degu studio reel"
+      ></mux-video>
+      <div class="about-video__overlay" aria-hidden="true"></div>
+    </div>
+    <div class="about-video__text-track" aria-hidden="false">
+      <div class="about-video__text-block">
+        <p class="about-video__text-paragraph">{i18n.aboutVideo.text1}</p>
+        <p class="about-video__text-paragraph">{i18n.aboutVideo.text2}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-video {
+    position: relative;
+    width: 100%;
+    z-index: 2;
+  }
+
+  .about-video__sticky {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .about-video__video-wrap {
+    position: relative;
+    width: 60vw;
+    height: 60vh;
+    transform-origin: center center;
+    overflow: hidden;
+  }
+
+  .about-video__poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    pointer-events: none;
+  }
+
+  .about-video__video-wrap mux-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.2s linear;
+    --media-object-fit: cover;
+    --media-object-position: center;
+    --controls: none;
+  }
+
+  .about-video__video-wrap mux-video.is-playing {
+    opacity: 1;
+  }
+
+  .about-video__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .about-video__text-track {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100vw;
+    height: 100vh;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .about-video__text-block {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-width: 60%;
+    margin: 0 auto;
+    font-family: var(--font-display);
+    font-size: max(80px, calc(76.67px + 0.926vw));
+    font-weight: 400;
+    line-height: 0.95;
+    text-transform: uppercase;
+    color: var(--color-offwhite);
+    text-align: center;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    will-change: transform;
+  }
+
+  .about-video__text-paragraph + .about-video__text-paragraph {
+    margin-top: 1em;
+  }
+
+  @media (max-width: 768px) {
+    .about-video__video-wrap {
+      width: 75vw;
+      height: 75vh;
+    }
+    .about-video__text-track {
+      width: 100vw;
+      height: 100vh;
+    }
+    .about-video__text-block {
+      max-width: 80%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about-video__video-wrap mux-video {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { initAboutVideo } from '@lib/animations/aboutVideo';
+  import { registerCleanup } from '@lib/animations/lifecycle';
+
+  document.addEventListener('astro:page-load', () => {
+    const section = document.querySelector('.about-video') as HTMLElement | null;
+    if (!section || (section as any).__aboutVideoInit) return;
+    (section as any).__aboutVideoInit = true;
+
+    // Lazy-load the mux-video custom element when the section is near the viewport.
+    const loadObserver = new IntersectionObserver(
+      (entries, obs) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          import('@mux/mux-video');
+          obs.disconnect();
+        }
+      },
+      { rootMargin: '200px 0px' }
+    );
+    loadObserver.observe(section);
+    registerCleanup(() => loadObserver.disconnect());
+
+    // Toggle is-playing class once the video begins playback (fade poster → video).
+    section.querySelectorAll<HTMLElement>('mux-video').forEach((video) => {
+      const onPlay = () => video.classList.add('is-playing');
+      video.addEventListener('playing', onPlay, { once: true });
+      registerCleanup(() => video.removeEventListener('playing', onPlay));
+    });
+
+    registerCleanup(initAboutVideo(section));
+  });
+</script>
