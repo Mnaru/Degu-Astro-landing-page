@@ -96,7 +96,9 @@ export function initAboutVideo(section: HTMLElement): () => void {
     pin: sticky,
     // Numeric scrub adds smoothing: animation eases toward the scroll position
     // over N seconds instead of locking 1:1 with the scroll wheel. Higher = laggier.
-    scrub: 2.5,
+    // Desktop reads tighter so the text settles when the user stops to read; mobile
+    // keeps the heavier value to absorb fling overshoot.
+    scrub: isMobile ? 2.5 : 1,
     invalidateOnRefresh: true,
     // Refresh after default-priority pins (e.g. hero) so this trigger's start
     // is measured against the post-pinSpacing layout. Without this, on cold
