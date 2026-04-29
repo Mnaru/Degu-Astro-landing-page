@@ -82,12 +82,9 @@ const i18n = t(locale);
       }
 
       const cursor = document.querySelector('.gallery-cursor') as HTMLElement | null;
-      const links = Array.from(
-        document.querySelectorAll('.gallery__link')
-      ) as HTMLElement[];
-      if (cursor && links.length > 0 && !(cursor as any).__cursorInit) {
+      if (cursor && !(cursor as any).__cursorInit) {
         (cursor as any).__cursorInit = true;
-        registerCleanup(initGalleryCursor({ cursor, links }), { persistent: true });
+        registerCleanup(initGalleryCursor({ cursor }), { persistent: true });
       }
     });
   </script>
@@ -101,8 +98,8 @@ const i18n = t(locale);
       position: fixed;
       top: 0;
       left: 0;
-      width: 120px;
-      height: 120px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       background: var(--color-orange);
       display: flex;
@@ -117,7 +114,7 @@ const i18n = t(locale);
     .gallery-cursor__label {
       color: var(--color-white);
       font-family: var(--font-body);
-      font-size: 20px;
+      font-size: 14px;
       font-weight: 700;
       letter-spacing: 0;
       line-height: 1;

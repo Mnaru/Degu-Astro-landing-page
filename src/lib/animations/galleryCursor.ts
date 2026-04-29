@@ -2,10 +2,13 @@ import { gsap } from 'gsap';
 
 interface GalleryCursorOptions {
   cursor: HTMLElement;
-  links: HTMLElement[];
+  selector?: string;
 }
 
-export function initGalleryCursor({ cursor, links }: GalleryCursorOptions): () => void {
+export function initGalleryCursor({
+  cursor,
+  selector = '.gallery__link',
+}: GalleryCursorOptions): () => void {
   const canHover = window.matchMedia('(hover: hover)').matches;
   if (!canHover) return () => {};
 
@@ -14,38 +17,39 @@ export function initGalleryCursor({ cursor, links }: GalleryCursorOptions): () =
   const quickX = gsap.quickTo(cursor, 'x', { duration: 0.25, ease: 'power3' });
   const quickY = gsap.quickTo(cursor, 'y', { duration: 0.25, ease: 'power3' });
 
-  let active = 0;
+  let shown = false;
+
+  const setShown = (next: boolean) => {
+    if (next === shown) return;
+    shown = next;
+    gsap.to(cursor, {
+      autoAlpha: shown ? 1 : 0,
+      scale: shown ? 1 : 0.6,
+      duration: shown ? 0.25 : 0.2,
+      ease: 'power3.out',
+    });
+  };
 
   const onMove = (e: MouseEvent) => {
     quickX(e.clientX);
     quickY(e.clientY);
   };
 
-  const onEnter = (e: MouseEvent) => {
-    active += 1;
-    gsap.set(cursor, { x: e.clientX, y: e.clientY });
-    gsap.to(cursor, { scale: 1, autoAlpha: 1, duration: 0.25, ease: 'power3.out' });
+  const onOver = (e: MouseEvent) => {
+    const target = e.target as Element | null;
+    setShown(!!target?.closest?.(selector));
   };
 
-  const onLeave = () => {
-    active = Math.max(0, active - 1);
-    if (active === 0) {
-      gsap.to(cursor, { scale: 0.6, autoAlpha: 0, duration: 0.2, ease: 'power3.out' });
-    }
-  };
+  const onLeaveWindow = () => setShown(false);
 
   window.addEventListener('mousemove', onMove, { passive: true });
-  links.forEach((link) => {
-    link.addEventListener('mouseenter', onEnter);
-    link.addEventListener('mouseleave', onLeave);
-  });
+  document.addEventListener('mouseover', onOver);
+  document.addEventListener('mouseleave', onLeaveWindow);
 
   return () => {
     window.removeEventListener('mousemove', onMove);
-    links.forEach((link) => {
-      link.removeEventListener('mouseenter', onEnter);
-      link.removeEventListener('mouseleave', onLeave);
-    });
+    document.removeEventListener('mouseover', onOver);
+    document.removeEventListener('mouseleave', onLeaveWindow);
     gsap.set(cursor, { autoAlpha: 0 });
   };
 }
