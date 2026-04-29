@@ -1,0 +1,92 @@
+---
+import { t } from '@i18n/utils';
+
+interface Props {
+  locale: string;
+  class?: string;
+}
+
+const { locale, class: className } = Astro.props;
+const i18n = t(locale);
+
+const TICKER_REPEAT = 8;
+const tickerPhrase = `${i18n.footer.ticker}   `;
+
+const ribbons = [
+  { angle: -15, direction: 'normal',  speed: 28 },
+  { angle: 15,  direction: 'reverse', speed: 32 },
+];
+---
+
+<section class:list={['crossed-ticker', className]} aria-hidden="true">
+  {ribbons.map((ribbon) => (
+    <div
+      class="crossed-ticker__ribbon"
+      style={`--ribbon-angle: ${ribbon.angle}deg; --direction: ${ribbon.direction}; --speed: ${ribbon.speed}s;`}
+    >
+      <div class="crossed-ticker__track">
+        {Array.from({ length: TICKER_REPEAT * 2 }).map(() => (
+          <span class="crossed-ticker__phrase">{tickerPhrase}</span>
+        ))}
+      </div>
+    </div>
+  ))}
+</section>
+
+<style>
+  .crossed-ticker {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 60vh;
+    overflow: hidden;
+  }
+
+  .crossed-ticker__ribbon {
+    position: absolute;
+    left: -20%;
+    width: 140%;
+    top: 50%;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: var(--color-black);
+    border-top: 1px solid var(--color-offwhite);
+    border-bottom: 1px solid var(--color-offwhite);
+    transform: translateY(-50%) rotate(var(--ribbon-angle));
+    transform-origin: 50% 50%;
+  }
+
+  .crossed-ticker__track {
+    display: flex;
+    white-space: nowrap;
+    backface-visibility: hidden;
+    animation: crossed-ticker-scroll var(--speed) linear infinite;
+    animation-direction: var(--direction);
+  }
+
+  .crossed-ticker__phrase {
+    font-family: var(--font-body);
+    font-size: max(15px, calc(12px + 0.45vw));
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-offwhite);
+    letter-spacing: 0.05em;
+  }
+
+  @keyframes crossed-ticker-scroll {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .crossed-ticker__track {
+      animation: none;
+    }
+  }
+</style>

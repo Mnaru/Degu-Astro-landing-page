@@ -11,37 +11,29 @@ interface Props extends HTMLAttributes<'footer'> {
 
 const { locale, class: className, ...attrs } = Astro.props;
 const i18n = t(locale);
-
-const tickerPhrase = `${i18n.footer.ticker}\u00a0\u00a0\u00a0`;
-const tickerRepeat = 8;
 ---
 
 <footer class:list={['footer', className]} aria-label="Site footer" {...attrs}>
-  <div class="footer__cta-row" aria-hidden="true">
-    <div class="footer__ticker-track">
-      {Array.from({ length: tickerRepeat * 2 }).map(() => (
-        <span class="footer__ticker-phrase">{tickerPhrase}</span>
-      ))}
-    </div>
-  </div>
-
   <div class="footer__content-grid">
-    <div class="footer__col footer__col--tagline">
-      <p class="footer__tagline">{i18n.footer.tagline}</p>
-      <a href="#" class="footer__contact-link">
-        <span aria-hidden="true">&#x2197;</span>
-        {i18n.footer.contactLabel}
-      </a>
-      <a href={`mailto:${i18n.footer.email}`} class="footer__email-link">{i18n.footer.email}</a>
-    </div>
+    <h2 class="footer__heading">{i18n.footer.heading}</h2>
 
-    <nav class="footer__col footer__col--connect" aria-label={i18n.footer.connectLabel}>
-      <p class="footer__col-label">{i18n.footer.connectLabel}</p>
-      <ul class="footer__link-list">
-        <li><a href="https://www.instagram.com/degu_studio/" target="_blank" rel="noopener noreferrer">{i18n.footer.instagram}</a></li>
-        <li><a href="#" target="_blank" rel="noopener noreferrer">{i18n.footer.linkedin}</a></li>
-      </ul>
-    </nav>
+    <div class="footer__columns">
+      <div class="footer__col">
+        <p class="footer__col-label footer__col-label--with-arrow">
+          <span aria-hidden="true">&#x2197;</span>
+          {i18n.footer.contactLabel}
+        </p>
+        <a href={`mailto:${i18n.footer.email}`} class="footer__email-link">{i18n.footer.email}</a>
+      </div>
+
+      <nav class="footer__col" aria-label={i18n.footer.connectLabel}>
+        <p class="footer__col-label">{i18n.footer.connectLabel}</p>
+        <ul class="footer__link-list">
+          <li><a href="https://www.instagram.com/degu_studio/" target="_blank" rel="noopener noreferrer">{i18n.footer.instagram}</a></li>
+          <li><a href="#" target="_blank" rel="noopener noreferrer">{i18n.footer.linkedin}</a></li>
+        </ul>
+      </nav>
+    </div>
   </div>
 
   <div class="footer__legal-row">
@@ -66,76 +58,54 @@ const tickerRepeat = 8;
   .footer {
     position: relative;
     z-index: 2;
-    background: var(--color-black);
-  }
-
-  /* ── CTA Row / Ticker ── */
-
-  .footer__cta-row {
-    height: 60px;
-    border-top: 1px solid var(--color-offwhite);
-    border-bottom: 1px solid var(--color-offwhite);
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    margin: 0 max(15px, calc(10px + 1.389vw));
-  }
-
-  .footer__ticker-track {
-    display: flex;
-    white-space: nowrap;
-    backface-visibility: hidden;
-    animation: ticker 20s linear infinite;
-  }
-
-  .footer__ticker-phrase {
-    font-family: var(--font-body);
-    font-size: 15px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--color-offwhite);
-  }
-
-  @keyframes ticker {
-    from {
-      transform: translate3d(0, 0, 0);
-    }
-    to {
-      transform: translate3d(-50%, 0, 0);
-    }
   }
 
   /* ── Content Grid ── */
 
   .footer__content-grid {
-    display: grid;
-    grid-template-columns: auto auto 1fr;
-    column-gap: 120px;
-    row-gap: 40px;
-    padding: 66px max(15px, calc(10px + 1.389vw)) 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 60px max(15px, calc(10px + 1.389vw)) 120px;
   }
 
-  .footer__tagline {
+  .footer__heading {
     font-family: var(--font-serif);
-    font-size: 32px;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
     font-weight: 400;
     line-height: 1;
     color: var(--color-offwhite);
-    white-space: pre-line;
-    margin: 0;
+    margin: 0 0 40px;
   }
 
-  .footer__contact-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 42px;
+  .footer__columns {
+    display: flex;
+    gap: 80px;
+    justify-content: center;
+  }
+
+  .footer__col {
+    text-align: center;
+  }
+
+  nav.footer__col {
+    text-align: left;
+  }
+
+  .footer__col-label {
     font-family: var(--font-body);
     font-size: 18px;
     font-weight: 700;
     text-transform: uppercase;
     color: var(--color-offwhite);
-    text-decoration: none;
+    margin: 0;
+  }
+
+  .footer__col-label--with-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .footer__email-link {
@@ -150,21 +120,13 @@ const tickerRepeat = 8;
     text-decoration: none;
   }
 
-  .footer__col-label {
-    font-family: var(--font-body);
-    font-size: 18px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--color-offwhite);
-    margin: 0;
-  }
-
   .footer__link-list {
     list-style: none;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    margin-top: 18px;
+    margin: 18px 0 0;
+    padding: 0;
   }
 
   .footer__link-list a {
@@ -216,11 +178,15 @@ const tickerRepeat = 8;
 
   /* ── Mobile ── */
 
-  @media (max-width: 1024px) {
-    .footer__content-grid {
-      grid-template-columns: 1fr;
+  @media (max-width: 768px) {
+    .footer__columns {
+      flex-direction: column;
+      gap: 32px;
+      align-items: center;
     }
+  }
 
+  @media (max-width: 1024px) {
     .footer__legal-row {
       flex-direction: column;
       align-items: flex-start;
