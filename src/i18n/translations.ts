@@ -121,7 +121,7 @@ export const translations = {
     },
     footer: {
       ticker: 'DIRBKIM KARTU?',
-      heading: 'Parašk mums',
+      heading: 'Parašyk mums',
       tagline: 'Švieži vizualai jūsų\nsocialiniams tinklams.',
       contactLabel: 'KONTAKTAI',
       email: 'info@degu.lt',
