@@ -12,6 +12,8 @@ interface Props {
 const { locale } = Astro.props;
 const i18n = t(locale);
 const galleryName = i18n.galleries.open24.name;
+const jobDone = i18n.galleries.open24.jobDone;
+const altBase = `${galleryName} ${jobDone} — Degu Studio`;
 const images = [img01, img02];
 ---
 
@@ -20,7 +22,7 @@ const images = [img01, img02];
     <div class="gallery__image-wrapper">
       <Image
         src={images[0]}
-        alt={`${galleryName} 1`}
+        alt={`${altBase} (1)`}
         widths={[400, 800, 1200, 1600]}
         sizes="(max-width: 1200px) 95vw, 50vw"
         loading="lazy"
@@ -29,7 +31,7 @@ const images = [img01, img02];
     <div class="gallery__image-wrapper">
       <Image
         src={images[1]}
-        alt={`${galleryName} 2`}
+        alt={`${altBase} (2)`}
         widths={[400, 800, 1200, 1600]}
         sizes="(max-width: 1200px) 95vw, 50vw"
         loading="lazy"

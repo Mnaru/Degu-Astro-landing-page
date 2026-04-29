@@ -78,7 +78,7 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
         {item.kind === 'image' ? (
           <Image
             src={item.src}
-            alt={`${galleryName} ${index + 1}`}
+            alt={`${galleryName} social media content by Degu Studio (${index + 1})`}
             widths={[400, 800, 1200, 1600]}
             sizes="(max-width: 1200px) 90vw, 50vw"
             loading={index < 3 ? 'eager' : 'lazy'}
@@ -100,9 +100,10 @@ function getOffset(offsets: typeof desktopOffsets, index: number, axis: 'x' | 'y
               poster={`https://image.mux.com/${item.playbackId}/thumbnail.webp?time=0`}
               loop
               playsinline
-              preload="auto"
+              preload={index === 0 ? 'auto' : 'metadata'}
               muted
-              aria-label={`${galleryName} video ${index + 1}`}
+              {...(index === 0 ? { autoplay: true } : {})}
+              aria-label={`${galleryName} social media video by Degu Studio (${index + 1})`}
             ></mux-video>
           </>
         )}

@@ -15,6 +15,8 @@ interface Props {
 const { locale } = Astro.props;
 const i18n = t(locale);
 const galleryName = i18n.galleries.alita.name;
+const jobDone = i18n.galleries.alita.jobDone;
+const altBase = `${galleryName} ${jobDone} — Degu Studio`;
 const images = [img01, img02, img03, img04, img05];
 ---
 
@@ -24,7 +26,7 @@ const images = [img01, img02, img03, img04, img05];
       <div class="gallery__image-wrapper">
         <Image
           src={img}
-          alt={`${galleryName} ${index + 1}`}
+          alt={`${altBase} (${index + 1})`}
           widths={[400, 800, 1200, 1600]}
           sizes="(max-width: 1200px) 95vw, 50vw"
           loading="lazy"
@@ -35,7 +37,7 @@ const images = [img01, img02, img03, img04, img05];
       <div class="gallery__image-wrapper">
         <Image
           src={img}
-          alt={`${galleryName} ${index + 1}`}
+          alt={`${altBase} (${index + 1})`}
           widths={[400, 800, 1200, 1600]}
           sizes="(max-width: 1200px) 95vw, 50vw"
           loading="lazy"

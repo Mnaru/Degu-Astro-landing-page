@@ -1,8 +1,8 @@
 export const translations = {
   en: {
     meta: {
-      title: 'Degu Studio',
-      description: 'Fresh visuals to feed your socials',
+      title: 'Degu Studio — Social Media Content Production Studio in Vilnius, Lithuania',
+      description: 'Photo and video content production studio in Vilnius for beverage, beauty, and e-commerce brands. Clients include Eckes Granini, Alita, Manilla, Bottlery, and Open24.',
     },
     intro: {
       header1: 'DEGU',
@@ -69,8 +69,8 @@ export const translations = {
   lt: {
     // TODO: Replace with actual Lithuanian translations
     meta: {
-      title: 'Degu Studio',
-      description: 'Švieži vizualai jūsų socialiniams tinklams',
+      title: 'Degu Studio — Socialinių tinklų turinio gamybos studija Vilniuje',
+      description: 'Foto ir video turinio gamybos studija Vilniuje gėrimų, grožio ir e-komercijos prekių ženklams. Klientai: Eckes Granini, Alita, Manilla, Bottlery, Open24.',
     },
     intro: {
       header1: 'DEGU',

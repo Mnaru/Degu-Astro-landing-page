@@ -14,18 +14,20 @@ interface Props {
 const { locale } = Astro.props;
 const i18n = t(locale);
 const galleryName = i18n.galleries['eckes-granini'].name;
+const jobDone = i18n.galleries['eckes-granini'].jobDone;
+const altBase = `${galleryName} ${jobDone} — Degu Studio`;
 
 type HomeMedia =
   | { kind: 'image'; src: ImageMetadata; alt: string }
   | { kind: 'video'; playbackId: string; alt: string };
 
 const mediaItems: HomeMedia[] = [
-  { kind: 'video', playbackId: 'ZjZlATUFk01g9dX8ILrKQ00wZqUVQipg79MBG6VXFFCJg', alt: `${galleryName} video 1` },
-  { kind: 'image', src: eckes06, alt: `${galleryName} 1` },
-  { kind: 'video', playbackId: '14E5o7fTxLPNZLbgPSOHimIJ9o201y02HOR8X41gPV01H8', alt: `${galleryName} video 2` },
-  { kind: 'image', src: eckes04, alt: `${galleryName} 2` },
-  { kind: 'video', playbackId: 'Y5eDdnqx5oUx3aS3mGFw101xZXnHD01CmXPKzRvK3WSrc', alt: `${galleryName} video 3` },
-  { kind: 'image', src: eckes02, alt: `${galleryName} 3` },
+  { kind: 'video', playbackId: 'ZjZlATUFk01g9dX8ILrKQ00wZqUVQipg79MBG6VXFFCJg', alt: `${altBase} video (1)` },
+  { kind: 'image', src: eckes06, alt: `${altBase} (1)` },
+  { kind: 'video', playbackId: '14E5o7fTxLPNZLbgPSOHimIJ9o201y02HOR8X41gPV01H8', alt: `${altBase} video (2)` },
+  { kind: 'image', src: eckes04, alt: `${altBase} (2)` },
+  { kind: 'video', playbackId: 'Y5eDdnqx5oUx3aS3mGFw101xZXnHD01CmXPKzRvK3WSrc', alt: `${altBase} video (3)` },
+  { kind: 'image', src: eckes02, alt: `${altBase} (3)` },
 ];
 
 const loop = [...mediaItems, ...mediaItems];
@@ -60,7 +62,7 @@ const loop = [...mediaItems, ...mediaItems];
               autoplay
               loop
               playsinline
-              preload="auto"
+              preload="metadata"
               aria-label={item.alt}
             ></mux-video>
           </>

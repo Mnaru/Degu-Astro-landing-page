@@ -1,8 +1,10 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import { getImage } from 'astro:assets';
 
 import '../styles/global.css';
 import obviouslyFont from '../assets/fonts/Obviously-CondSupr.woff2?url';
+import ogImageSrc from '../assets/images/team/TeamPhoto.png';
 
 import FluidBackground from '@components/FluidBackground.astro';
 
@@ -15,6 +17,118 @@ interface Props {
 }
 
 const { title, description, locale, bodyClass, bodyStyle } = Astro.props;
+
+const siteOrigin = (Astro.site ?? new URL('https://degu.lt')).origin;
+const path = Astro.url.pathname;
+
+// Strip any leading locale segment so we can rebuild per-locale URLs.
+const localelessPath = path.replace(/^\/(en|lt)(?=\/|$)/, '') || '/';
+const isHome = localelessPath === '/';
+
+// Vercel only rewrites `/` → `/lt/` for the homepage, so the LT homepage lives
+// at `/` while all other LT pages keep the `/lt/` prefix in the URL.
+const ltUrl = isHome ? `${siteOrigin}/` : `${siteOrigin}/lt${localelessPath}`;
+const enUrl = `${siteOrigin}/en${isHome ? '/' : localelessPath}`;
+const canonicalUrl = locale === 'en' ? enUrl : ltUrl;
+
+const ogImage = await getImage({ src: ogImageSrc, width: 1200, height: 630, format: 'jpg' });
+const ogImageUrl = new URL(ogImage.src, siteOrigin).href;
+
+// JSON-LD: Organization / ProfessionalService describing Degu Studio.
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': ['Organization', 'ProfessionalService'],
+      '@id': `${siteOrigin}/#organization`,
+      name: 'Degu Studio',
+      alternateName: 'Degu',
+      url: siteOrigin,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteOrigin}/favicon.svg`,
+      },
+      image: ogImageUrl,
+      description:
+        'Social media content production studio in Vilnius, Lithuania. Photo and video for beverage, beauty, and e-commerce brands.',
+      email: 'info@degu.lt',
+      foundingLocation: {
+        '@type': 'Place',
+        name: 'Vilnius, Lithuania',
+      },
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Vilnius',
+        addressCountry: 'LT',
+      },
+      areaServed: [
+        { '@type': 'Country', name: 'Lithuania' },
+        { '@type': 'Place', name: 'Baltic States' },
+        { '@type': 'Place', name: 'Europe' },
+      ],
+      knowsAbout: [
+        'Social media content production',
+        'Product photography',
+        'Video production',
+        'Beverage photography',
+        'Beauty photography',
+        'E-commerce content',
+        'Short-form video',
+        'Art direction',
+      ],
+      makesOffer: [
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Social media content production',
+            description:
+              'Photo and video content packages produced and edited for Instagram, TikTok, and other social platforms.',
+          },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Product photography',
+            description: 'Studio and on-location product photography for beverages, beauty, and consumer goods.',
+          },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Video production',
+            description: 'Short-form video and product films for social media and e-commerce.',
+          },
+        },
+      ],
+      sameAs: [
+        'https://www.instagram.com/degu_studio/',
+      ],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${siteOrigin}/#website`,
+      url: siteOrigin,
+      name: 'Degu Studio',
+      description: title,
+      publisher: { '@id': `${siteOrigin}/#organization` },
+      inLanguage: ['lt', 'en'],
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${canonicalUrl}#webpage`,
+      url: canonicalUrl,
+      name: title,
+      description,
+      isPartOf: { '@id': `${siteOrigin}/#website` },
+      about: { '@id': `${siteOrigin}/#organization` },
+      inLanguage: locale,
+      ...(isHome ? { primaryImageOfPage: { '@type': 'ImageObject', url: ogImageUrl } } : {}),
+    },
+  ],
+};
 ---
 
 <html lang={locale}>
@@ -25,6 +139,36 @@ const { title, description, locale, bodyClass, bodyStyle } = Astro.props;
     <link rel="preload" href={obviouslyFont} as="font" type="font/woff2" crossorigin />
     <title>{title}</title>
     <meta name="description" content={description} />
+
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="lt" href={ltUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={ltUrl} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Degu Studio" />
+    <meta property="og:locale" content={locale === 'en' ? 'en_US' : 'lt_LT'} />
+    <meta property="og:locale:alternate" content={locale === 'en' ? 'lt_LT' : 'en_US'} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Degu Studio team in Vilnius, Lithuania" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="author" content="Degu Studio" />
+    <meta name="geo.region" content="LT-VL" />
+    <meta name="geo.placename" content="Vilnius" />
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
+
     <ClientRouter />
   </head>
   <body class={bodyClass} style={bodyStyle}>
