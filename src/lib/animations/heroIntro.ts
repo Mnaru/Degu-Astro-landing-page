@@ -108,14 +108,14 @@ export function heroIntro(heroEl: HTMLElement, options?: { skipIntro?: boolean }
       e.preventDefault();
       if (!wheelTriggered && tl.progress() < 1) {
         wheelTriggered = true;
-        tl.tweenTo(tl.duration(), { duration: 0.4, ease: 'power2.inOut' });
+        tl.progress(1);
       }
     };
     const onTouchMove = (e: TouchEvent) => {
       e.preventDefault();
       if (!wheelTriggered && tl.progress() < 1) {
         wheelTriggered = true;
-        tl.tweenTo(tl.duration(), { duration: 0.4, ease: 'power2.inOut' });
+        tl.progress(1);
       }
     };
     window.addEventListener('wheel', onWheel, { passive: false });
