@@ -28,6 +28,10 @@ const {
   VECTOR_SCALE_MOBILE,
   MARKER_COLOR,
   MARKER_COLOR_MOBILE,
+  MARKER_COLOR_HOVER,
+  HOVER_HALO_INNER_PX,
+  HOVER_HALO_OUTER_PX,
+  HOVER_TRAIL_DECAY,
 } = FLUID_CONFIG;
 
 const PRESSURE_CALC_ALPHA = -1;
@@ -38,12 +42,15 @@ export class FluidSimulation {
   private velocityState!: GPULayer;
   private divergenceState!: GPULayer;
   private pressureState!: GPULayer;
+  private trailState!: GPULayer;
 
   private advection!: GPUProgram;
   private divergence2D!: GPUProgram;
   private jacobi!: GPUProgram;
   private gradientSubtraction!: GPUProgram;
   private touchProgram!: GPUProgram;
+  private trailProgram!: GPUProgram;
+  private dashColorProgram!: GPUProgram;
 
   private canvas: HTMLCanvasElement;
   private isMobile: boolean;
@@ -52,6 +59,14 @@ export class FluidSimulation {
   private frameCount = 0;
 
   private activeTouches: Record<number, { current: [number, number]; last?: [number, number] }> = {};
+
+  // Hover-color state. Cursor in CSS pixels, halo intensity in [0, 1].
+  // Desktop: latches to 1 on first pointermove (fades back if pointer leaves
+  // the viewport). Mobile: lifts on pointerdown, fades on pointerup.
+  private cursorPx: [number, number] = [-9999, -9999];
+  private cursorActive = false;
+  private haloIntensity = 0;
+  private canvasSizePx: [number, number] = [1, 1];
 
   // Mobile scroll protection
   private isScrolling = false;
@@ -62,6 +77,8 @@ export class FluidSimulation {
   private boundPointerStop: (e: PointerEvent) => void;
   private boundContextLost: (e: Event) => void;
   private boundScroll: () => void;
+  private boundCursorEnter: () => void;
+  private boundCursorLeave: () => void;
 
   constructor(canvas: HTMLCanvasElement, isMobile: boolean) {
     this.canvas = canvas;
@@ -75,6 +92,8 @@ export class FluidSimulation {
       if (this.scrollTimeout) clearTimeout(this.scrollTimeout);
       this.scrollTimeout = window.setTimeout(() => { this.isScrolling = false; }, 150);
     };
+    this.boundCursorEnter = () => { this.cursorActive = true; };
+    this.boundCursorLeave = () => { this.cursorActive = false; };
 
     try {
       const glslVersion = isWebGL2Supported() ? GLSL3 : GLSL1;
@@ -122,6 +141,18 @@ export class FluidSimulation {
         numComponents: 1,
         wrapX: REPEAT,
         wrapY: REPEAT,
+        numBuffers: 2,
+      });
+
+      // Hover trail — single-channel scalar at velocity-layer resolution.
+      // LINEAR filter so the dash shader reads a smooth value across the
+      // (lower-res) layer.
+      this.trailState = new GPULayer(this.composer, {
+        name: 'trail',
+        dimensions: [velW, velH],
+        type: FLOAT,
+        filter: LINEAR,
+        numComponents: 1,
         numBuffers: 2,
       });
 
@@ -236,12 +267,79 @@ export class FluidSimulation {
         ],
       });
 
+      // Trail update — runs each frame, reading the previous trail value,
+      // applying decay, and OR-ing in the current cursor halo. The result is
+      // a soft scalar field that lights up where the cursor is and fades
+      // smoothly behind it.
+      this.trailProgram = new GPUProgram(this.composer, {
+        name: 'trailUpdate',
+        fragmentShader: `
+          in vec2 v_uv;
+          uniform sampler2D u_previousTrail;
+          uniform vec2 u_canvasSize;
+          uniform vec2 u_cursor;
+          uniform float u_haloIntensity;
+          uniform float u_haloInnerPx;
+          uniform float u_haloOuterPx;
+          uniform float u_decay;
+          out float out_trail;
+          void main() {
+            float previous = texture(u_previousTrail, v_uv).r * u_decay;
+            vec2 dPx = (v_uv - u_cursor) * u_canvasSize;
+            float distPx = length(dPx);
+            float currentHalo = (1.0 - smoothstep(u_haloInnerPx, u_haloOuterPx, distPx)) * u_haloIntensity;
+            out_trail = max(previous, currentHalo);
+          }`,
+        uniforms: [
+          { name: 'u_previousTrail', value: 0, type: INT },
+          { name: 'u_canvasSize', value: [width, height], type: FLOAT },
+          { name: 'u_cursor', value: [-1, -1], type: FLOAT },
+          { name: 'u_haloIntensity', value: 0, type: FLOAT },
+          { name: 'u_haloInnerPx', value: HOVER_HALO_INNER_PX, type: FLOAT },
+          { name: 'u_haloOuterPx', value: HOVER_HALO_OUTER_PX, type: FLOAT },
+          { name: 'u_decay', value: HOVER_TRAIL_DECAY, type: FLOAT },
+        ],
+      });
+
+      // Dash colour program — custom shader for drawLayerAsVectorField.
+      // Reads the trail layer (input 0) and lerps base→hover by its value.
+      // The vector-field velocity layer is appended at input index 1; we
+      // don't sample it here, but the gpu-io vertex shader uses it for line
+      // displacement.
+      const baseColor = isMobile ? MARKER_COLOR_MOBILE : MARKER_COLOR;
+      this.dashColorProgram = new GPUProgram(this.composer, {
+        name: 'dashColor',
+        fragmentShader: `
+          in vec2 v_uv;
+          uniform sampler2D u_trail;
+          uniform vec3 u_baseColor;
+          uniform vec3 u_hoverColor;
+          out vec4 out_color;
+          void main() {
+            float t = clamp(texture(u_trail, v_uv).r, 0.0, 1.0);
+            vec3 color = mix(u_baseColor, u_hoverColor, t);
+            out_color = vec4(color, 1.0);
+          }`,
+        uniforms: [
+          { name: 'u_trail', value: 0, type: INT },
+          { name: 'u_baseColor', value: baseColor, type: FLOAT },
+          { name: 'u_hoverColor', value: MARKER_COLOR_HOVER, type: FLOAT },
+        ],
+      });
+
+      this.canvasSizePx = [width, height];
+
       // --- Events ---
       window.addEventListener('pointermove', this.boundPointerMove);
       window.addEventListener('pointerup', this.boundPointerStop);
       canvas.addEventListener('webglcontextlost', this.boundContextLost);
       if (isMobile) {
         window.addEventListener('scroll', this.boundScroll, { passive: true });
+      } else {
+        // Desktop: track when the cursor leaves/re-enters the viewport so
+        // the halo doesn't stay frozen at the page edge.
+        document.documentElement.addEventListener('mouseenter', this.boundCursorEnter);
+        document.documentElement.addEventListener('mouseleave', this.boundCursorLeave);
       }
 
       // Initial resize to set canvas pixel dimensions
@@ -318,12 +416,16 @@ export class FluidSimulation {
     this.velocityState.resize(velDims);
     this.divergenceState.resize(velDims);
     this.pressureState.resize(velDims);
+    this.trailState.resize(velDims);
 
     this.advection.setUniform('u_dimensions', [width, height]);
     const pxSize: [number, number] = [1 / velDims[0], 1 / velDims[1]];
     this.divergence2D.setUniform('u_pxSize', pxSize);
     this.jacobi.setUniform('u_pxSize', pxSize);
     this.gradientSubtraction.setUniform('u_pxSize', pxSize);
+
+    this.canvasSizePx = [width, height];
+    this.trailProgram.setUniform('u_canvasSize', [width, height]);
   }
 
   dispose(): void {
@@ -332,6 +434,8 @@ export class FluidSimulation {
     window.removeEventListener('pointermove', this.boundPointerMove);
     window.removeEventListener('pointerup', this.boundPointerStop);
     window.removeEventListener('scroll', this.boundScroll);
+    document.documentElement.removeEventListener('mouseenter', this.boundCursorEnter);
+    document.documentElement.removeEventListener('mouseleave', this.boundCursorLeave);
     this.canvas.removeEventListener('webglcontextlost', this.boundContextLost);
     if (this.scrollTimeout) clearTimeout(this.scrollTimeout);
 
@@ -340,11 +444,14 @@ export class FluidSimulation {
     this.velocityState.dispose();
     this.divergenceState.dispose();
     this.pressureState.dispose();
+    this.trailState.dispose();
     this.advection.dispose();
     this.divergence2D.dispose();
     this.jacobi.dispose();
     this.gradientSubtraction.dispose();
     this.touchProgram.dispose();
+    this.trailProgram.dispose();
+    this.dashColorProgram.dispose();
     this.composer.dispose();
   }
 
@@ -411,13 +518,33 @@ export class FluidSimulation {
       output: velocityState,
     });
 
-    // 5. Clear canvas to black and draw velocity field
+    // 5. Update the hover trail (decay previous + stamp current halo).
+    // Smoothly approach the target halo intensity (1 when cursor active, 0
+    // otherwise). Same factor on desktop and mobile — mobile renders at half
+    // the rate so the perceived fade is ~2× longer, which feels right for
+    // touch release.
+    const target = this.cursorActive ? 1 : 0;
+    this.haloIntensity += (target - this.haloIntensity) * 0.18;
+    const [cw, ch] = this.canvasSizePx;
+    this.trailProgram.setUniform('u_cursor', [
+      this.cursorPx[0] / cw,
+      1 - this.cursorPx[1] / ch,
+    ]);
+    this.trailProgram.setUniform('u_haloIntensity', this.haloIntensity);
+    composer.step({
+      program: this.trailProgram,
+      input: this.trailState,
+      output: this.trailState,
+    });
+
+    // 6. Clear canvas to black and draw velocity field, coloured by trail.
     composer.clear();
     composer.drawLayerAsVectorField({
       layer: velocityState,
       vectorSpacing: this.isMobile ? VECTOR_SPACING_MOBILE : VECTOR_SPACING_DESKTOP,
       vectorScale: this.isMobile ? VECTOR_SCALE_MOBILE : VECTOR_SCALE,
-      color: this.isMobile ? MARKER_COLOR_MOBILE : MARKER_COLOR,
+      program: this.dashColorProgram,
+      input: this.trailState,
     });
   }
 
@@ -427,6 +554,15 @@ export class FluidSimulation {
 
     const x = e.clientX;
     const y = e.clientY;
+
+    // Hover-color tracking: always update cursor pos; on mobile the halo
+    // only lights while a touch is in progress (mouse pointers latch on).
+    this.cursorPx = [x, y];
+    if (this.isMobile) {
+      this.cursorActive = e.pointerType !== 'mouse' ? true : this.cursorActive;
+    } else {
+      this.cursorActive = true;
+    }
 
     if (this.activeTouches[e.pointerId] === undefined) {
       this.activeTouches[e.pointerId] = { current: [x, y] };
@@ -455,5 +591,8 @@ export class FluidSimulation {
 
   private onPointerStop = (e: PointerEvent): void => {
     delete this.activeTouches[e.pointerId];
+    if (this.isMobile && e.pointerType !== 'mouse') {
+      this.cursorActive = false;
+    }
   };
 }
