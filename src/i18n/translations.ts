@@ -53,7 +53,7 @@ export const translations = {
     },
     footer: {
       ticker: "LET'S WORK TOGETHER",
-      heading: 'Refresh your visuals',
+      heading: 'Drop us a message',
       tagline: 'Fresh visuals to feed\nyour socials.',
       contactLabel: 'CONTACT',
       email: 'info@degu.lt',
@@ -121,7 +121,7 @@ export const translations = {
     },
     footer: {
       ticker: 'DIRBKIM KARTU?',
-      heading: 'Atnaujink savo vizualus',
+      heading: 'Parašk mums',
       tagline: 'Švieži vizualai jūsų\nsocialiniams tinklams.',
       contactLabel: 'KONTAKTAI',
       email: 'info@degu.lt',

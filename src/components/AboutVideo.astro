@@ -99,7 +99,8 @@ const POSTER_URL = `https://image.mux.com/${PLAYBACK_ID}/thumbnail.webp?time=0`;
   .about-video__overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: #000;
+    opacity: 0.6;
     pointer-events: none;
     z-index: 2;
   }
@@ -130,7 +131,7 @@ const POSTER_URL = `https://image.mux.com/${PLAYBACK_ID}/thumbnail.webp?time=0`;
     text-transform: uppercase;
     color: var(--color-offwhite);
     text-align: center;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
     will-change: transform;
   }
 
@@ -148,7 +149,8 @@ const POSTER_URL = `https://image.mux.com/${PLAYBACK_ID}/thumbnail.webp?time=0`;
       height: 100vh;
     }
     .about-video__text-block {
-      max-width: 80%;
+      max-width: 88%;
+      font-size: clamp(60px, 16vw, 80px);
     }
   }
 

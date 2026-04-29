@@ -15,13 +15,18 @@ gsap.registerPlugin(ScrollTrigger);
 export function initAboutVideo(section: HTMLElement): () => void {
   const sticky = section.querySelector('.about-video__sticky') as HTMLElement | null;
   const videoWrap = section.querySelector('.about-video__video-wrap') as HTMLElement | null;
+  const overlay = section.querySelector('.about-video__overlay') as HTMLElement | null;
   const textTrack = section.querySelector('.about-video__text-track') as HTMLElement | null;
   const textBlock = section.querySelector('.about-video__text-block') as HTMLElement | null;
 
-  if (!sticky || !videoWrap || !textTrack || !textBlock) {
+  if (!sticky || !videoWrap || !overlay || !textTrack || !textBlock) {
     console.warn('aboutVideo: missing elements, skipping');
     return () => {};
   }
+
+  // Overlay opacity tracks scale: darker when small, lighter when scaled up.
+  const OVERLAY_OPACITY_DOWN = 0.6;
+  const OVERLAY_OPACITY_UP = 0.4;
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -33,9 +38,10 @@ export function initAboutVideo(section: HTMLElement): () => void {
     const isMobileRM = window.innerWidth <= ABOUT_VIDEO_MOBILE_BREAKPOINT;
     const peakRM = isMobileRM ? ABOUT_VIDEO_SCALE_END_MOBILE : ABOUT_VIDEO_SCALE_END_DESKTOP;
     gsap.set(videoWrap, { scale: peakRM });
+    gsap.set(overlay, { opacity: OVERLAY_OPACITY_UP });
     gsap.set(textBlock, { y: () => -((textTrack.offsetHeight - textBlock.offsetHeight) / 2 + textBlock.offsetHeight) });
     return () => {
-      gsap.set([section, videoWrap, textBlock], { clearProps: 'all' });
+      gsap.set([section, videoWrap, overlay, textBlock], { clearProps: 'all' });
     };
   }
 
@@ -45,12 +51,14 @@ export function initAboutVideo(section: HTMLElement): () => void {
 
   // Initial state: video at start scale, text below the visible track area.
   gsap.set(videoWrap, { scale: ABOUT_VIDEO_SCALE_START, willChange: 'transform' });
+  gsap.set(overlay, { opacity: OVERLAY_OPACITY_DOWN });
   gsap.set(textBlock, { y: 0, willChange: 'transform' });
 
   const tl = gsap.timeline({ paused: true });
 
-  // Phase 1: scale up (0 → 1, takes 25% of timeline).
+  // Phase 1: scale up (0 → 1, takes 25% of timeline). Overlay lightens in parallel.
   tl.to(videoWrap, { scale: scaleEnd, ease: 'none', duration: 1 }, 0);
+  tl.to(overlay, { opacity: OVERLAY_OPACITY_UP, ease: 'none', duration: 1 }, 0);
 
   // Phase 2: text traverses bottom → top through the video frame.
   // Longer duration than the scale phases so reading pace feels slower than scroll.
@@ -66,8 +74,9 @@ export function initAboutVideo(section: HTMLElement): () => void {
     1
   );
 
-  // Phase 3: scale down.
+  // Phase 3: scale down. Overlay darkens back in parallel.
   tl.to(videoWrap, { scale: ABOUT_VIDEO_SCALE_START, ease: 'none', duration: 1 }, 5.8);
+  tl.to(overlay, { opacity: OVERLAY_OPACITY_DOWN, ease: 'none', duration: 1 }, 5.8);
 
   const st = ScrollTrigger.create({
     trigger: section,
@@ -84,6 +93,26 @@ export function initAboutVideo(section: HTMLElement): () => void {
     // pinned video appears overlapping the previous gallery.
     refreshPriority: -1,
     animation: tl,
+    // Snap only within the scale phases (timeline 0→1 and 5.8→6.8 of 6.8 total),
+    // leaving the long text-reading phase in the middle free-scrolling so users
+    // can pause to read without being yanked.
+    snap: {
+      snapTo: (value) => {
+        const SCALE_UP_END = 1 / 6.8;
+        const SCALE_DOWN_START = 5.8 / 6.8;
+        if (value < SCALE_UP_END) {
+          return value < SCALE_UP_END / 2 ? 0 : SCALE_UP_END;
+        }
+        if (value > SCALE_DOWN_START) {
+          return value > (SCALE_DOWN_START + 1) / 2 ? 1 : SCALE_DOWN_START;
+        }
+        return value;
+      },
+      duration: { min: 0.15, max: 0.4 },
+      ease: 'power2.inOut',
+      delay: 0.1,
+      directional: true,
+    },
   });
 
   // Pause/resume the mux video when the section enters/leaves the viewport.
@@ -116,6 +145,6 @@ export function initAboutVideo(section: HTMLElement): () => void {
     st.kill();
     tl.kill();
     visObserver.disconnect();
-    gsap.set([section, videoWrap, textBlock], { clearProps: 'all' });
+    gsap.set([section, videoWrap, overlay, textBlock], { clearProps: 'all' });
   };
 }
