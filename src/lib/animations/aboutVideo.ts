@@ -56,7 +56,6 @@ export function initAboutVideo(section: HTMLElement): () => void {
   // more runway, ~40% slower per scroll-pixel.
   const textDuration = isMobile ? 8 : 4.8;
   const scaleDownStart = 1 + textDuration;
-  const timelineTotal = scaleDownStart + 1;
 
   // Initial state: video at start scale, text below the visible track area.
   gsap.set(videoWrap, { scale: ABOUT_VIDEO_SCALE_START, willChange: 'transform' });
@@ -94,11 +93,11 @@ export function initAboutVideo(section: HTMLElement): () => void {
     start: 'top top',
     end: `+=${runway}`,
     pin: sticky,
-    // Numeric scrub adds smoothing: animation eases toward the scroll position
-    // over N seconds instead of locking 1:1 with the scroll wheel. Higher = laggier.
-    // Desktop reads tighter so the text settles when the user stops to read; mobile
-    // keeps the heavier value to absorb fling overshoot.
-    scrub: isMobile ? 2.5 : 1,
+    // scrub: true locks the timeline 1:1 with scroll position. No catch-up
+    // smoothing — the moment the user stops scrolling, text stops moving.
+    // Reading speed is the user's scroll speed; flinging makes text rush, but
+    // a still finger keeps text still.
+    scrub: true,
     invalidateOnRefresh: true,
     // Refresh after default-priority pins (e.g. hero) so this trigger's start
     // is measured against the post-pinSpacing layout. Without this, on cold
@@ -109,26 +108,6 @@ export function initAboutVideo(section: HTMLElement): () => void {
     // the section doesn't appear to "jump" into the pinned position on flings.
     anticipatePin: 1,
     animation: tl,
-    // Snap only within the scale phases (timeline 0→1 and scaleDownStart→total),
-    // leaving the long text-reading phase in the middle free-scrolling so users
-    // can pause to read without being yanked.
-    snap: {
-      snapTo: (value) => {
-        const SCALE_UP_END = 1 / timelineTotal;
-        const SCALE_DOWN_START = scaleDownStart / timelineTotal;
-        if (value < SCALE_UP_END) {
-          return value < SCALE_UP_END / 2 ? 0 : SCALE_UP_END;
-        }
-        if (value > SCALE_DOWN_START) {
-          return value > (SCALE_DOWN_START + 1) / 2 ? 1 : SCALE_DOWN_START;
-        }
-        return value;
-      },
-      duration: { min: 0.15, max: 0.4 },
-      ease: 'power2.inOut',
-      delay: 0.1,
-      directional: true,
-    },
   });
 
   // Pause/resume the mux video when the section enters/leaves the viewport.
