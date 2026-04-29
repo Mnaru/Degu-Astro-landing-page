@@ -8,10 +8,10 @@ export const ABOUT_VIDEO_SCALE_END_DESKTOP = 100 / 60;
 export const ABOUT_VIDEO_SCALE_END_MOBILE = 100 / 75;
 // Total pinned scroll distance — divided proportionally across the 3 phases
 // per the timeline durations. Desktop uses 1:4.8:1; mobile uses 1:8:1 so touch
-// flings don't streak the text. Mobile runway is bumped proportionally so the
-// scale phases keep the same scroll-pixel length on both viewports.
+// flings don't streak the text. Mobile runway is roughly doubled vs desktop's
+// per-unit pace so a single fling absorbs less of the text phase.
 // Long runway = lots of scroll required to advance text = "heavy" reading pace.
-export const ABOUT_VIDEO_SCROLL_RUNWAY = '612vh';
-export const ABOUT_VIDEO_SCROLL_RUNWAY_MOBILE = '700vh';
+export const ABOUT_VIDEO_SCROLL_RUNWAY = '825vh';
+export const ABOUT_VIDEO_SCROLL_RUNWAY_MOBILE = '1400vh';
 // Single breakpoint per project spec.
 export const ABOUT_VIDEO_MOBILE_BREAKPOINT = 768;
