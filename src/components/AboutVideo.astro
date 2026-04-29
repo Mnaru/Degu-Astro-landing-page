@@ -92,6 +92,17 @@ const POSTER_URL = `https://image.mux.com/${PLAYBACK_ID}/thumbnail.webp?time=0`;
     --controls: none;
   }
 
+  /* Force the inner <video> element (inside mux-video's shadow DOM) to cover
+     the wrap. Belt-and-braces alongside --media-object-fit, since the variable
+     is sometimes ignored — without this the video letterboxes when its native
+     aspect ratio is wider than the wrap, leaving the overlay covering bars. */
+  .about-video__video-wrap mux-video::part(video) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
   .about-video__video-wrap mux-video.is-playing {
     opacity: 1;
   }

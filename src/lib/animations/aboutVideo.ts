@@ -66,8 +66,9 @@ export function initAboutVideo(section: HTMLElement): () => void {
   const tl = gsap.timeline({ paused: true });
 
   // Phase 1: scale up (0 → 1, takes 25% of timeline). Overlay lightens in parallel.
-  tl.to(videoWrap, { scale: scaleEnd, ease: 'none', duration: 1 }, 0);
-  tl.to(overlay, { opacity: OVERLAY_OPACITY_UP, ease: 'none', duration: 1 }, 0);
+  // Curve matches heroToGallery convention for scrubbed scale entries.
+  tl.to(videoWrap, { scale: scaleEnd, ease: 'power2.out', duration: 1 }, 0);
+  tl.to(overlay, { opacity: OVERLAY_OPACITY_UP, ease: 'power2.out', duration: 1 }, 0);
 
   // Phase 2: text traverses bottom → top through the video frame.
   // Longer duration than the scale phases so reading pace feels slower than scroll.
@@ -84,8 +85,9 @@ export function initAboutVideo(section: HTMLElement): () => void {
   );
 
   // Phase 3: scale down. Overlay darkens back in parallel.
-  tl.to(videoWrap, { scale: ABOUT_VIDEO_SCALE_START, ease: 'none', duration: 1 }, scaleDownStart);
-  tl.to(overlay, { opacity: OVERLAY_OPACITY_DOWN, ease: 'none', duration: 1 }, scaleDownStart);
+  // Curve matches heroToGallery convention for scrubbed exits (ease 'in' → accelerate away).
+  tl.to(videoWrap, { scale: ABOUT_VIDEO_SCALE_START, ease: 'power2.in', duration: 1 }, scaleDownStart);
+  tl.to(overlay, { opacity: OVERLAY_OPACITY_DOWN, ease: 'power2.in', duration: 1 }, scaleDownStart);
 
   const st = ScrollTrigger.create({
     trigger: section,
