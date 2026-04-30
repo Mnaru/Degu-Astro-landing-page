@@ -74,15 +74,18 @@ function buildDesktopTimeline(els: Elements) {
   tl.to(degu, { scale: deguScale, x: deguTargetX, y: deguTargetY, duration: 0.4, ease: 'power2.inOut', force3D: false }, 0);
   tl.to(studio, { scale: studioScale, x: studioTargetX, y: studioTargetY, duration: 0.4, ease: 'power2.inOut', force3D: false }, 0);
 
-  // Phase 3: Exit DEGU left, STUDIO right (40% → 90%)
-  tl.to(degu, { xPercent: -500, duration: 0.5, ease: 'power2.in' }, 0.4);
-  tl.to(studio, { xPercent: 500, duration: 0.5, ease: 'power2.in' }, 0.4);
+  // Phase 3: Exit DEGU left, STUDIO right (40% → 100%) — desktop only,
+  // 20% slower than the original 0.5 duration so the letters take longer to
+  // leave. The pointer-events flip and heroInner fade are shifted to match,
+  // preserving the original "letters out → fade → reveal" sequence.
+  tl.to(degu, { xPercent: -500, duration: 0.6, ease: 'power2.in' }, 0.4);
+  tl.to(studio, { xPercent: 500, duration: 0.6, ease: 'power2.in' }, 0.4);
 
   // Letters gone — let clicks pass through to the gallery beneath
-  tl.set(hero, { pointerEvents: 'none' }, 0.9);
+  tl.set(hero, { pointerEvents: 'none' }, 1.0);
 
-  // Phase 4: Hero fades out, revealing gallery (85% → 100%)
-  tl.to(heroInner, { opacity: 0, duration: 0.15, ease: 'none' }, 0.85);
+  // Phase 4: Hero fades out, revealing gallery (95% → 110%)
+  tl.to(heroInner, { opacity: 0, duration: 0.15, ease: 'none' }, 0.95);
 
   // Phase 5: Gallery fades in and scales up (65% → 125%)
   tl.to(galleriesWrapper, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'power2.out' }, 0.65);
