@@ -39,11 +39,18 @@ const { class: className, ...attrs } = Astro.props;
 
   document.addEventListener('astro:page-load', () => {
     document.querySelectorAll('.scroll-hint').forEach((hint) => {
+      // Idempotency: skip if the cylinder is already built on this hint.
+      // Guards against astro:page-load firing twice or HMR re-runs.
+      if ((hint as any).__cylinderBuilt) return;
+
       const textEl = hint.querySelector('.roll-text');
       if (!textEl) return;
 
       const content = textEl.textContent || '';
-      hint.removeChild(textEl);
+
+      // Wipe everything (including stray text nodes / wrappers) before building.
+      // More bulletproof than removeChild, which requires a direct-child relationship.
+      hint.innerHTML = '';
 
       // Tube container (holds 3 stacked lines)
       const tube = document.createElement('div');
@@ -87,6 +94,14 @@ const { class: className, ...attrs } = Astro.props;
 
       gsap.set(allLines, { perspective: 200, transformStyle: 'preserve-3d' });
 
+      // Pre-set chars to the timeline's from-state so the paused cylinder is
+      // invisible (chars rotated 90° out of view), not 4 stacked lines visible
+      // at rotationX: 0 — which would otherwise look like a static "Slinkite"
+      // sitting under the rotating cylinder until the timeline plays.
+      charSets.forEach((chars) => {
+        gsap.set(chars, { rotationX: 90, transformOrigin });
+      });
+
       // Cylinder rotation — starts paused, triggered by parent animation (e.g. heroIntro)
       // Top-to-bottom: each line rotates from top(90) through front(0) to bottom(-90)
       // Lines are staggered so one is always visible at the front
@@ -103,6 +118,7 @@ const { class: className, ...attrs } = Astro.props;
 
       // Expose timeline so parent animations can trigger it
       (hint as any)._scrollHintTl = tl;
+      (hint as any).__cylinderBuilt = true;
     });
   });
 </script>
