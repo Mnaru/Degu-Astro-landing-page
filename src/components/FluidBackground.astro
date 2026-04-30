@@ -7,10 +7,14 @@
 </div>
 
 <script>
-  import { FluidSimulation } from '@lib/fluid/fluidSim';
-  import { FLUID_CONFIG } from '@lib/fluid/config';
+  // The fluid simulation is dynamically imported so it can be code-split
+  // out of the critical-render-path bundle. On modern devices we still
+  // load+init immediately (no perceptible delay vs static imports thanks
+  // to Vite's automatic modulepreload). On low-end devices we wait for
+  // requestIdleCallback so the page becomes interactive sooner — the
+  // bg appears once the browser is otherwise idle.
 
-  function init() {
+  async function init() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
@@ -21,6 +25,15 @@
     if ((canvas as any).__fluidSim) return;
 
     try {
+      const [{ FluidSimulation }, { FLUID_CONFIG }] = await Promise.all([
+        import('@lib/fluid/fluidSim'),
+        import('@lib/fluid/config'),
+      ]);
+
+      // Re-check the persistence flag after async import — another page-load
+      // race could have already initialized while we were awaiting.
+      if ((canvas as any).__fluidSim) return;
+
       const isMobile = window.innerWidth < FLUID_CONFIG.MOBILE_BREAKPOINT;
       const sim = new FluidSimulation(canvas, isMobile);
       (canvas as any).__fluidSim = sim;
@@ -49,7 +62,31 @@
     }
   }
 
-  init();
+  // Heuristic: defer init on low-end devices. hardwareConcurrency is
+  // universal; deviceMemory and Network Information are Chromium-only and
+  // safely undefined elsewhere (Safari users classified by core count alone).
+  function shouldDefer(): boolean {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return true;
+    const cores = navigator.hardwareConcurrency ?? 8;
+    const mem = (navigator as unknown as { deviceMemory?: number }).deviceMemory;
+    const conn = (navigator as unknown as { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    return (
+      cores <= 4 ||
+      (mem !== undefined && mem <= 4) ||
+      conn?.saveData === true ||
+      (conn?.effectiveType !== undefined && ['slow-2g', '2g'].includes(conn.effectiveType))
+    );
+  }
+
+  if (shouldDefer()) {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => { void init(); }, { timeout: 2000 });
+    } else {
+      setTimeout(() => { void init(); }, 200);
+    }
+  } else {
+    void init();
+  }
 </script>
 
 <style>
