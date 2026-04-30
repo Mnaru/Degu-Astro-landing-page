@@ -12,6 +12,22 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Measure the stable (chrome-retracted) viewport height. Mobile browsers
+// (iOS Safari, Android Chrome, Firefox, Edge…) auto-hide their URL bar on
+// scroll, which changes window.innerHeight and shifts vh-based ScrollTrigger
+// ranges mid-scroll — visible as the timeline lurching forward when the bar
+// re-shows on touch. lvh (large viewport height) is stable across that show/
+// hide and probes give us its value in pixels at refresh time. Older browsers
+// without lvh fall back to innerHeight (the existing behaviour, no regression).
+function measureStableVh(): number {
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:absolute;top:0;left:0;width:0;height:100lvh;visibility:hidden;pointer-events:none';
+  document.body.appendChild(probe);
+  const value = probe.offsetHeight;
+  document.body.removeChild(probe);
+  return value || window.innerHeight;
+}
+
 export function initAboutVideo(section: HTMLElement): () => void {
   const sticky = section.querySelector('.about-video__sticky') as HTMLElement | null;
   const videoWrap = section.querySelector('.about-video__video-wrap') as HTMLElement | null;
@@ -47,7 +63,7 @@ export function initAboutVideo(section: HTMLElement): () => void {
 
   const isMobile = window.innerWidth <= ABOUT_VIDEO_MOBILE_BREAKPOINT;
   const scaleEnd = isMobile ? ABOUT_VIDEO_SCALE_END_MOBILE : ABOUT_VIDEO_SCALE_END_DESKTOP;
-  const runway = isMobile ? ABOUT_VIDEO_SCROLL_RUNWAY_MOBILE : ABOUT_VIDEO_SCROLL_RUNWAY;
+  const runwayVh = parseFloat(isMobile ? ABOUT_VIDEO_SCROLL_RUNWAY_MOBILE : ABOUT_VIDEO_SCROLL_RUNWAY);
 
   // Text-phase duration is longer on mobile so touch flings don't streak the
   // text across the screen. Scale phases stay duration:1 on both — together with
@@ -91,7 +107,10 @@ export function initAboutVideo(section: HTMLElement): () => void {
   const st = ScrollTrigger.create({
     trigger: section,
     start: 'top top',
-    end: `+=${runway}`,
+    // end is a function so it re-measures on ScrollTrigger.refresh() (orientation,
+    // resize). Locked to lvh-derived pixels so the URL-bar auto-hide on mobile
+    // browsers doesn't shift the runway and lurch the timeline mid-scroll.
+    end: () => `+=${Math.round(runwayVh * measureStableVh() / 100)}`,
     pin: sticky,
     // scrub: true locks the timeline 1:1 with scroll position. No catch-up
     // smoothing — the moment the user stops scrolling, text stops moving.
