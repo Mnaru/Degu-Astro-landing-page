@@ -87,6 +87,18 @@ const i18n = t(locale);
   }
 
   .footer__col {
+    /* Flex column with explicit gap so the label-to-content distance is
+       identical between the contact column (label is inline-flex with arrow)
+       and the connect column (label is plain block). Mixing block + inline-flex
+       previously caused subtle line-box differences that made the gaps look
+       unequal even at matching margins.
+       text-align: left explicitly overrides the inherited center from
+       .footer__content-grid — without it, link-list items get centered
+       within their <li> width and drift off the left edge. */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
     text-align: left;
   }
 
@@ -94,23 +106,24 @@ const i18n = t(locale);
     font-family: var(--font-body);
     font-size: 18px;
     font-weight: 700;
+    line-height: 1.2;
     text-transform: uppercase;
     color: var(--color-offwhite);
     margin: 0;
   }
 
   .footer__col-label--with-arrow {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 8px;
   }
 
   .footer__email-link {
     display: block;
-    margin-top: 16px;
     font-family: var(--font-body);
     font-size: 14px;
     font-weight: 300;
+    line-height: 1.2;
     letter-spacing: 1.32px;
     text-transform: uppercase;
     color: var(--color-offwhite);
@@ -121,15 +134,23 @@ const i18n = t(locale);
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin: 18px 0 0;
+    gap: 16px;
+    /* Negative margin-top nudges the list up to optically match the
+       label-to-email gap in the contact column. Pure spacing adjustment;
+       the value is empirical, not derived from font metrics. */
+    margin: -1px 0 0;
     padding: 0;
+    /* Match the email link's font metrics so the first link's line-box
+       (= font-size × line-height) is identical. */
+    font-size: 14px;
+    line-height: 1.2;
   }
 
   .footer__link-list a {
     font-family: var(--font-body);
     font-size: 14px;
     font-weight: 300;
+    line-height: 1.2;
     letter-spacing: 1.32px;
     text-transform: uppercase;
     color: var(--color-offwhite);
@@ -183,6 +204,7 @@ const i18n = t(locale);
     }
 
     .footer__col {
+      align-items: center;
       text-align: center;
     }
   }
