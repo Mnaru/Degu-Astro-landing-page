@@ -172,6 +172,29 @@ const orgJsonLd = {
     <ClientRouter />
   </head>
   <body class={bodyClass} style={bodyStyle}>
+    <noscript>
+      <div class="noscript-warning">
+        {locale === 'lt'
+          ? 'Šis puslapis naudoja JavaScript animacijoms ir interaktyviems elementams. Įjunkite JavaScript, kad matytumėte jį taip, kaip numatyta.'
+          : 'This site uses JavaScript for animations and interactive features. Please enable JavaScript to view it as intended.'}
+      </div>
+      <style>
+        .noscript-warning {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          padding: 12px 16px;
+          background: var(--color-orange);
+          color: var(--color-white);
+          font-family: var(--font-body);
+          font-size: 14px;
+          line-height: 1.4;
+          text-align: center;
+          z-index: 9999;
+        }
+      </style>
+    </noscript>
     <div transition:persist="fluid-bg">
       <FluidBackground />
     </div>
